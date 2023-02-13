@@ -9,10 +9,10 @@ import { useSignMessage } from 'wagmi'
 
 export default function Home() {
   return (
-    <div className={styles.container}>
+    <div className="container mx-auto">
       <Header />
       <Main />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   )
 }
@@ -20,35 +20,22 @@ export default function Home() {
 function Header() {
   return (
     <header className={styles.header}>
-      <div>
-        <ThemeToggleList />
-      </div>
-      <div className="flex items-center">
-        <ThemeToggleButton /> header <ThemeToggleList />
-      </div>
+      <div>SOUNDME</div>
+      <div className="flex items-center">{/* <ThemeToggleButton /> header <ThemeToggleList /> */}</div>
 
       <div className="flex items-center">
         <ThemeToggleButton />
-        <ThemeToggleList />
+        <ConnectWallet />
       </div>
     </header>
   )
 }
 
 function Main() {
-  const { address, isConnected, connector } = useAccount()
-  const { chain, chains } = useNetwork()
-  const { isLoading: isNetworkLoading, pendingChainId, switchNetwork } = useSwitchNetwork()
-  const { data: balance, isLoading: isBalanceLoading } = useBalance({
-    address: address,
-  })
-  const { openConnectModal } = useConnectModal()
-  const { openAccountModal } = useAccountModal()
-  const { openChainModal } = useChainModal()
   return (
     <main className={styles.main + ' space-y-6'}>
       <div className="text-center">
-        <p className="font-medium">Dapp Starter Boilerplate by arisac.eth</p>
+        {/* <p className="font-medium">Dapp Starter Boilerplate by arisac.eth</p>
         <p>
           <a
             href="https://github.com/arisac/dapp-starter"
@@ -58,97 +45,10 @@ function Main() {
           >
             https://github.com/arisac/dapp-starter
           </a>
-        </p>
+        </p> */}
       </div>
 
-      <div>
-        <h4 className="text-center text-sm font-medium">demo: ConnectWalletBtn Full</h4>
-        <div className="flex w-full flex-col items-center">
-          <ConnectWallet />
-        </div>
-      </div>
-
-      <div>
-        <h4 className="text-center text-sm font-medium">demo: useModal (rainbowkit ^0.4.3)</h4>
-        <div className="flex w-full flex-col items-center">
-          {openConnectModal && (
-            <button
-              onClick={openConnectModal}
-              type="button"
-              className="m-1 rounded-lg bg-orange-500 py-1 px-3 text-white transition-all duration-150 hover:scale-105"
-            >
-              useConnectModal
-            </button>
-          )}
-
-          {openAccountModal && (
-            <button
-              onClick={openAccountModal}
-              type="button"
-              className="m-1 rounded-lg bg-orange-500 py-1 px-3 text-white transition-all duration-150 hover:scale-105"
-            >
-              useAccountModal
-            </button>
-          )}
-
-          {openChainModal && (
-            <button
-              onClick={openChainModal}
-              type="button"
-              className="m-1 rounded-lg bg-orange-500 py-1 px-3 text-white transition-all duration-150 hover:scale-105"
-            >
-              useChainModal
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className="w-full max-w-xl rounded-xl bg-sky-500/10 p-6 text-center">
-        <dl className={styles.dl}>
-          <dt>Connector</dt>
-          <dd>
-            {connector?.name}
-            {!address && (
-              <ConnectButton.Custom>
-                {({ openConnectModal }) => (
-                  <span onClick={openConnectModal} className="cursor-pointer hover:underline">
-                    Not connected, connect wallet
-                  </span>
-                )}
-              </ConnectButton.Custom>
-            )}
-          </dd>
-          <dt>Connected Network</dt>
-          <dd>{chain ? `${chain?.id}: ${chain?.name}` : 'n/a'}</dd>
-          <dt>Switch Network</dt>
-          <dd className="flex flex-wrap justify-center">
-            {isConnected &&
-              chains.map(x => (
-                <button
-                  disabled={!switchNetwork || x.id === chain?.id}
-                  key={x.id}
-                  onClick={() => switchNetwork?.(x.id)}
-                  className={
-                    (x.id === chain?.id ? 'bg-green-500' : 'bg-blue-500 hover:scale-105') +
-                    ' m-1 rounded-lg py-1 px-3 text-white transition-all duration-150'
-                  }
-                >
-                  {x.name}
-                  {isNetworkLoading && pendingChainId === x.id && ' (switching)'}
-                </button>
-              ))}
-            <ConnectWallet show="disconnected" />
-          </dd>
-          <dt>Account</dt>
-          <dd className="break-all">{address ? `${address}` : 'n/a'}</dd>
-          <dt>Balance</dt>
-          <dd className="break-all">
-            {isBalanceLoading ? 'loading' : balance ? `${balance?.formatted} ${balance?.symbol}` : 'n/a'}
-          </dd>
-          <dt>Sign Message</dt>
-          <dd className="break-all">{address ? <SignMsg /> : 'n/a'} </dd>
-        </dl>
-      </div>
+      <div className="w-full max-w-xl rounded-xl p-6 text-center"></div>
     </main>
   )
 }
