@@ -2,7 +2,8 @@ import MusicCard from 'components/MusicCard'
 import NewSheetButton from 'components/NewSheetButton'
 import SignPopup, { TokenProp } from 'components/SignPopup'
 import { useFluence } from 'hooks/use-fluence'
-import { useState } from 'react'
+import { useIpfs } from 'hooks/use-ipfs'
+import { useEffect, useState } from 'react'
 import styles from 'styles/Home.module.scss'
 import { usePrepareContractWrite } from 'wagmi'
 
@@ -31,6 +32,7 @@ export default function MusicCollection() {
 
   return (
     <>
+      <NewSheetButton />
       <main className={styles.main + ' space-y-6'}>
         <div>
           {musics.map(music => (

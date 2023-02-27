@@ -24,6 +24,7 @@ import { infuraProvider } from 'wagmi/providers/infura'
 import { publicProvider } from 'wagmi/providers/public'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { FluenceProvider } from 'hooks/use-fluence'
+import { IpfsProvider } from 'hooks/use-ipfs'
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -94,7 +95,9 @@ export function Web3Wrapper({ children }) {
         showRecentTransactions={true}
         theme={resolvedTheme === 'dark' ? darkTheme() : lightTheme()}
       >
-        <FluenceProvider>{children}</FluenceProvider>
+        <IpfsProvider>
+          <FluenceProvider>{children}</FluenceProvider>
+        </IpfsProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   )

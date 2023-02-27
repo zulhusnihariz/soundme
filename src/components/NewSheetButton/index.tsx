@@ -2,6 +2,7 @@ import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from
 import music_abi from '../../abis/music_utility.json'
 import sha256 from 'crypto-js/sha256'
 import BN from 'bn.js'
+import { useIpfs } from 'hooks/use-ipfs'
 
 export default function NewSheetButton() {
   const generate_metadata_uri = tokenId => {
@@ -37,11 +38,19 @@ export default function NewSheetButton() {
     hash: data?.hash,
   })
 
+  // TODO - Upload file
+  // const ipfs = useIpfs()
+
+  // const handleButton = async (buffer) => {
+  //   console.log(await ipfs.add(buffer))
+  // }
+
   return (
     <button
       className="inline-block rounded bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 p-[2px] hover:text-white focus:outline-none focus:ring active:text-opacity-75"
       // disabled={!write || !isLoading}
       onClick={() => write?.()}
+      // onClick={handleButton}
     >
       <span className="block rounded-sm bg-transparent px-8 py-3 text-sm font-medium">
         {isLoading ? 'Creating sheet...' : 'New Sheet'}

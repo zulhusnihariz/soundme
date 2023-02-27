@@ -28,6 +28,8 @@
     "bn.js": "^5.2.1",
     "crypto-js": "^4.1.1",
     "ethers": "^5.7.2",
+    "ipfs-core-types": "^0.14.0",
+    "ipfs-http-client": "^60.0.0",
     "next": "^13.1.1",
     "next-themes": "^0.2.1",
     "postcss": "^8.4.20",
