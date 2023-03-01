@@ -160,7 +160,7 @@ export function add_beat(...args: any) {
                           )
                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("block_formatter" "serialize") [dht.$.alias! content dht.$.cid!] formatted)
                          )
-                         (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("ipfs_dag" "put") [formatted "/dns4/ipfs.xfero.io/tcp/5002" 0] result)
+                         (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("ipfs_dag" "put") [formatted "" 0] result)
                         )
                         (xor
                          (mismatch dht.$.cid! ""
