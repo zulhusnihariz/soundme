@@ -22,7 +22,7 @@ func add_beat(key: string, public_key: string, content: string, signature: strin
     formatted <- BlockFormatter.serialize(dht.alias, content, dht.cid)
 
     -- push Block to ipfs
-    result <- IpfsDag.put(formatted, "/dns4/ipfs.xfero.io/tcp/5002", 0)
+    result <- IpfsDag.put(formatted, "", 0)
     
     -- -- Add data to DHT table
     if dht.cid != "":
