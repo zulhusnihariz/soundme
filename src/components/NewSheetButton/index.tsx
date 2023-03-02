@@ -59,13 +59,6 @@ export default function NewSheetButton() {
     hash: data?.hash,
   })
 
-  // TODO - Upload file
-  // const ipfs = useIpfs()
-
-  // const handleButton = async (buffer) => {
-  //   console.log(await ipfs.add(buffer))
-  // }
-
   // Countdown circle
   const renderTime = ({ remainingTime }) => {
     const currentTime = useRef(remainingTime)
@@ -122,23 +115,6 @@ export default function NewSheetButton() {
   const [minute, setMinute] = useState('00')
   const [hour, setHour] = useState('00')
   const [timer, setTimer] = useState(0)
-  const [collaborations, setCollaborations] = useState([
-    // {
-    //   name: 'Collaboration_1',
-    //   beatAmount: 30,
-    //   url: '',
-    // },
-    // {
-    //   name: 'Collaboration_2',
-    //   beatAmount: 10,
-    //   url: '',
-    // },
-    // {
-    //   name: 'Collaboration_3',
-    //   beatAmount: 10,
-    //   url: '',
-    // },
-  ])
   const [intervalId, setIntervalId] = useState(null)
 
   const [title, setTitle] = useState('')
@@ -300,13 +276,6 @@ export default function NewSheetButton() {
     if (uploadProgress === 100 && intervalId) {
       clearInterval(intervalId)
       setTitle('Done! Collaboration has been updated.')
-      const newCollab = collaborations
-      newCollab.push({
-        name: 'Collaboration_1',
-        beatAmount: 1,
-        url: audioUrl,
-      })
-      setCollaborations(newCollab)
     }
   }, [uploadProgress, intervalId])
 
