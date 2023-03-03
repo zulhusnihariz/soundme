@@ -274,6 +274,8 @@ export default function MusicCollection() {
         '0xCe2F68C1CfEA8748F56032F7601eE04715e165C0': '',
         '0xD014B065247EC977A2E94F128e3B33d73dD3EA02':
           'https://seedweb3.infura-ipfs.io/ipfs/QmQ7JWesgkf49HBFgQwBXHRw8M3erPbVM7QWXAA76cq9A1',
+        '0xC8216a85b7Ac6F2279e11DAaE93FA3dAc9bd9b8A':
+          'https://seedweb3.infura-ipfs.io/ipfs/QmPoRTH55jRRU3kiFrKctimkrJNyAWiD1ec6YoQ5KENcMp',
       },
       {
         'tokenId': 2,

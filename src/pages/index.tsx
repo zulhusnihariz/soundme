@@ -86,23 +86,6 @@ export default function Home() {
   const [minute, setMinute] = useState('00')
   const [hour, setHour] = useState('00')
   const [timer, setTimer] = useState(0)
-  const [collaborations, setCollaborations] = useState([
-    // {
-    //   name: 'Collaboration_1',
-    //   beatAmount: 30,
-    //   url: '',
-    // },
-    // {
-    //   name: 'Collaboration_2',
-    //   beatAmount: 10,
-    //   url: '',
-    // },
-    // {
-    //   name: 'Collaboration_3',
-    //   beatAmount: 10,
-    //   url: '',
-    // },
-  ])
   const [intervalId, setIntervalId] = useState(null)
 
   const [title, setTitle] = useState('')
@@ -249,13 +232,6 @@ export default function Home() {
     if (uploadProgress === 100 && intervalId) {
       clearInterval(intervalId)
       setTitle('Done! Collaboration has been updated.')
-      const newCollab = collaborations
-      newCollab.push({
-        name: 'Collaboration_1',
-        beatAmount: 1,
-        url: audioUrl,
-      })
-      setCollaborations(newCollab)
     }
   }, [uploadProgress, intervalId])
 
@@ -317,67 +293,6 @@ export default function Home() {
           </div>
         </div>
         <h1 className="Inter my-8 text-left text-3xl font-medium text-white">Recent</h1>
-        <div className="w-full">
-          {collaborations.map(item => {
-            return (
-              <div>
-                <div className="flex w-full flex-row items-center justify-between">
-                  <div className="flex flex-row items-center">
-                    <div className="h-[50px] w-[50px] bg-[#EF326C]" />
-                    <div className="Inter ml-2 text-base font-semibold leading-5 text-[#F5517B]">{item.name}</div>
-                  </div>
-                  <div className="Inter text-base font-medium leading-5 text-white">{item.beatAmount} Beats</div>
-                  <div className="flex flex-row items-center">
-                    <div className="px-3" onClick={() => handleReplay(item.url)}>
-                      {/* <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="h-6 w-6 rounded-full bg-gradient-to-b from-[#F5517B] to-[#7423A7] p-1"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                          clipRule="evenodd"
-                        />
-                      </svg> */}
-                      <div className="h-6 w-6 rounded-full bg-gradient-to-b from-[#F5517B] to-[#7423A7] p-1">
-                        <PlayIcon />
-                      </div>
-                    </div>
-                    {/* <audio controls src="">
-                      <a href=">Download audio</a>
-                    </audio> */}
-                    <div className="flex flex-row gap-x-1">
-                      <img src={voice.src} alt="" />
-                      <img src={voice2.src} alt="" />
-                      <img src={voice2.src} alt="" />
-                      <img src={voice.src} alt="" />
-                      <img src={voice2.src} alt="" />
-                    </div>
-                    <div className="Inter px-3 text-sm font-normal text-white">3:00</div>
-                  </div>
-                  <div className="flex flex-row ">
-                    <button
-                      type="button"
-                      className="Inter mr-2 rounded-lg bg-[#D45BFF] px-4 py-2 text-base font-medium leading-5 text-white"
-                    >
-                      Mint
-                    </button>
-                    <button
-                      type="button"
-                      className="Inter rounded-lg border border-[#B1B1B1] bg-white px-4 py-2 text-base font-medium leading-5 text-[#303030] "
-                    >
-                      Collaborate
-                    </button>
-                  </div>
-                </div>
-
-                <hr className="my-6 border-b border-[#E9E9E9]" />
-              </div>
-            )
-          })}
-        </div>
         <MusicCollection />
       </div>
       {/* Record Modal  */}
