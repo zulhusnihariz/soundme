@@ -225,9 +225,12 @@ export default function NewSheetButton() {
 
     setUploading(true)
     setRecord(false)
+    setUpload(true)
+    setTitle('Saving your recording')
     try {
       const resp = await ipfs.add(audioBlob)
-      console.log(resp)
+      const url = `https://seedweb3.infura-ipfs.io/ipfs/${resp.path}`
+      write?.()
     } catch (err) {
       console.log(err)
     }
