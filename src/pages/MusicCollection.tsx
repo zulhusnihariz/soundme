@@ -270,9 +270,10 @@ export default function MusicCollection() {
         '0x16716B9a49B607CDA90cC0a2eB997c3B3CDAe49c': '',
         '0x244584678E6AE4363c8561e5f58Bd4938eD7c10D': 'banjir',
         '0x64dBb406074d09f5a480ABDD12b37d4BbD2a4076':
-          'https://seedweb3.infura-ipfs.io/ipfs/QmRe3HBw8auNR7wsCN2jZtWcbUzZ9Tway4fF6qFsL49UDb',
+          'https://seedweb3.infura-ipfs.io/ipfs/Qmdc4hhF8S55JB7GBezS6PXs7bRrMibJDYUEnTkZs2Yk7J',
         '0xCe2F68C1CfEA8748F56032F7601eE04715e165C0': '',
-        '0xD014B065247EC977A2E94F128e3B33d73dD3EA02': '',
+        '0xD014B065247EC977A2E94F128e3B33d73dD3EA02':
+          'https://seedweb3.infura-ipfs.io/ipfs/QmQ7JWesgkf49HBFgQwBXHRw8M3erPbVM7QWXAA76cq9A1',
       },
       {
         'tokenId': 2,
@@ -289,6 +290,7 @@ export default function MusicCollection() {
     for (var i in rawData) {
       const currData = rawData[i]
       const currMusic = {}
+      const audioUrls = []
       let beatAmount = 0
       for (var j of Object.keys(currData)) {
         switch (j) {
@@ -318,13 +320,14 @@ export default function MusicCollection() {
           }
           default: {
             if (isValidUrl(currData[j])) {
-              currMusic.audioUrl = currData[j]
+              audioUrls.push(currData[j])
+              beatAmount = beatAmount + 1
             }
-            beatAmount = beatAmount + 1
             break
           }
         }
       }
+      currMusic.audioUrls = audioUrls
       currMusic.beatAmount = beatAmount
       newMusics.push(currMusic)
     }
@@ -394,7 +397,7 @@ export default function MusicCollection() {
               name={music.name}
               description={music.description}
               beatAmount={music.beatAmount}
-              audioUrl={music.audioUrl}
+              audioUrls={music.audioUrls}
               handleClick={() => handleRecordButtonClick(music.tokenId, music.token_key)}
             />
           ))}

@@ -1,4 +1,5 @@
-import { PlayIcon } from '@heroicons/react/24/solid'
+import React, { useState, useRef, useEffect } from 'react'
+import { PlayIcon, PauseIcon } from '@heroicons/react/24/solid'
 
 import voice from '../../assets/img/voice.png'
 import voice2 from '../../assets/img/voice2.png'
@@ -10,14 +11,100 @@ interface Music {
   name: String
   description: String
   beatAmount: String
-  audioUrl: String
+  audioUrls: Array<string>
   handleClick: () => void
 }
 
-const MusicCard = ({ name, description, beatAmount, audioUrl, handleClick }: Music) => {
-  const handleReplay = currUrl => {
-    const audio = new Audio(currUrl)
-    audio.play()
+const MusicCard = ({ name, description, beatAmount, audioUrls, handleClick }: Music) => {
+  const [playing2, setPlaying2] = useState(false)
+  const [globalSources, setGlobalSources] = useState([])
+  // let playing = false
+
+  const handleReplay = async () => {
+    // const audios = []
+    // const audioJSON = []
+    // for (var item of audioUrls) {
+    //   const audio = new Audio(item)
+    //   audios.push(audio)
+    //   console.log(audio)
+    //   audioJSON.push({
+    //     duration: audio.duration,
+    //   })
+    // }
+    // for (var item2 of audios) {
+    //   item2.play()
+    // }
+    // console.log(audioJSON)
+
+    // console.log(playing)
+    // setPlaying(true)
+
+    if (playing2) {
+      // playing = false
+      setPlaying2(false)
+      stopAudios()
+    } else {
+      // playing = true
+      setPlaying2(true)
+      const context = new AudioContext()
+
+      const buffers: AudioBuffer[] = []
+
+      Promise.all(audioUrls.map(url => fetch(url)))
+        .then(responses => Promise.all(responses.map(response => response.arrayBuffer())))
+        .then(arrayBuffers => Promise.all(arrayBuffers.map(buffer => context.decodeAudioData(buffer))))
+        .then(decodedBuffers => {
+          playAudios(buffers, context, decodedBuffers)
+        })
+        .catch(error => console.error(error))
+    }
+  }
+
+  const stopAudios = () => {
+    globalSources.forEach(source => source.stop())
+    setGlobalSources([])
+  }
+
+  const playAudios = (buffers, context, decodedBuffers) => {
+    buffers.push(...decodedBuffers)
+
+    // Create an array of audio sources and connect them to the destination
+    const sources = buffers.map(buffer => {
+      const source = context.createBufferSource()
+      source.buffer = buffer
+      source.connect(context.destination)
+      return source
+    })
+
+    // Start playing all sources at the same time
+    sources.forEach(source => source.start(0))
+    setGlobalSources(sources)
+
+    // // Create two audio sources and connect them to the destination
+    // const source1 = context.createBufferSource()
+    // const source2 = context.createBufferSource()
+
+    // source1.buffer = buffers[0]
+    // source2.buffer = buffers[1]
+
+    // source1.connect(context.destination)
+    // source2.connect(context.destination)
+
+    // // Start playing the sources at the same time
+    // source1.start(0)
+    // source2.start(0)
+
+    // // Find the length of the longest audio file
+    const longestDuration = Math.max(...buffers.map(buffer => buffer.duration))
+
+    // Wait for the longest audio file to finish playing before restarting
+    setTimeout(() => {
+      buffers = []
+      // if (playing2) {
+      //   playAudios(buffers, context, decodedBuffers)
+      // }
+      setPlaying2(false)
+    }, longestDuration * 1000)
   }
 
   return (
@@ -56,7 +143,7 @@ const MusicCard = ({ name, description, beatAmount, audioUrl, handleClick }: Mus
         </div>
         <div className="Inter text-base font-medium leading-5 text-white">{beatAmount} Beats</div>
         <div className="flex flex-row items-center">
-          <div className="px-3" onClick={() => handleReplay(audioUrl)}>
+          <div className="px-3" onClick={() => handleReplay()}>
             {/* <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
@@ -70,7 +157,7 @@ const MusicCard = ({ name, description, beatAmount, audioUrl, handleClick }: Mus
                         />
                       </svg> */}
             <div className="h-6 w-6 rounded-full bg-gradient-to-b from-[#F5517B] to-[#7423A7] p-1">
-              <PlayIcon />
+              {playing2 ? <PauseIcon /> : <PlayIcon />}
             </div>
           </div>
           {/* <audio controls src="">
