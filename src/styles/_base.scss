@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+#root {
+  --primary: #0abab5;
+  --secondary: #0ce6df;
+  --accent: #718096;
+  --background: #fff;
+  --main: #0d0106;
+  --header: #2d3748;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+@font-face {
+  font-family: 'Satoshi'; /* choose a name for your font family */
+  src: url('../../src/assets/font/Satoshi-Variable.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.Satoshi {
+  font-family: 'Satoshi', sans-serif;
+}
+
+.Inter {
+  font-family: 'Inter', sans-serif;
+}
+
+.Roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+.timer-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.time-wrapper {
+  position: relative;
+  width: 80px;
+  height: 60px;
+  font-size: 48px;
+  color: white;
+  font-family: 'Satoshi';
+}
+
+.time-wrapper .time {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 0.2s;
+}
+
+.time-wrapper .time.up {
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+.time-wrapper .time.down {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.box-shadow {
+  box-shadow: 0px 0px 20px #ffc8c8;
+}
+
+.bg-pink {
+  background: linear-gradient(180deg, rgba(247, 80, 123, 0.8) 0%, rgba(117, 35, 167, 0.8) 100%);
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+  /* Note: backdrop-filter has minimal browser support */
+  border-radius: 5px;
+}
+
+.module-border-wrap {
+  position: relative;
+  background: linear-gradient(to bottom, #d45bff 0%, #de296a 50%, #fedc00 100%);
+  padding: 1px;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+}
+
+.module-border-wrap2 {
+  position: relative;
+  background: linear-gradient(to bottom, #fedc00 50%, #de296a 100%);
+  padding: 1px;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+}
+
+.module {
+  background: #1f1424;
+  color: white;
+  border-radius: 10px;
+}
+
+.background {
+  background-image: url('../../src/assets/img/bg.png');
+  background-size: cover; /* set the size of the background image */
+  background-position: center; /* center the background image */
+}
+
+/* .container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  width: 694px;
+  height: 666px;
+  left: 489px;
+  top: 469px;
+  background: #7423A7;
+  filter: blur(595.5px);
+}
+
+.container::after {
+  content: "";
+  position: absolute;
+  width: 836.2px;
+  height: 93.5px;
+  left: 640px;
+  top: 329.47px;
+  background: #F5517B;
+  filter: blur(231.5px);
+  transform: rotate(-40.54deg);
+}
+
+.container::before,
+.container::after {
+  z-index: -1;
+}
+
+.container::before::after {
+  content: "";
+  position: absolute;
+  width: 257px;
+  height: 221px;
+  left: 971px;
+  top: 483px;
+  background: #FEDC00;
+  filter: blur(510px);
+} */
+
+.MuiLinearProgress-root {
+  height: 10px;
+  position: absolute;
+}
