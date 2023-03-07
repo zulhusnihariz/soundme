@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useState } from 'react'
 
 interface IpfsContextInterface {
   ipfs: any
-  upload: (buffer) => void
 }
 
 export const IpfsContext = createContext<IpfsContextInterface | undefined>(undefined)
@@ -28,8 +27,6 @@ export const IpfsProvider: React.FC<IpfsProviderProps> = ({ children }) => {
     async function startIpfs() {
       if (!isIPFSConnected) {
         try {
-          console.log('IPFS Starting')
-
           const projectId = '2HDrQBzBA6e4Elmdwhpa6Mjg1Qs'
           const projectSecret = 'a8a2d7f469b2e8dbfc4dece05bdde035'
 
@@ -58,14 +55,8 @@ export const IpfsProvider: React.FC<IpfsProviderProps> = ({ children }) => {
     return <div>Connecting to Ipfs...</div>
   }
 
-  console.log(ipfs)
-
-  const upload = buffer => {
-    console.log(buffer)
-  }
-
   return (
-    <IpfsContext.Provider value={{ ipfs, upload }}>
+    <IpfsContext.Provider value={{ ipfs }}>
       <div>{children}</div>
     </IpfsContext.Provider>
   )

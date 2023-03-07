@@ -7,6 +7,7 @@ import { useState } from 'react'
 import styles from 'styles/Home.module.scss'
 import { usePrepareContractWrite } from 'wagmi'
 import RecordingDialog from 'components/RecordingDialog'
+import ShareDialog from 'components/ShareDialog'
 
 const musics = [
   {
@@ -32,6 +33,10 @@ export default function MusicCollection() {
   })
 
   const [isDialogRecordingOpened, setIsDialogRecordingOpened] = useState(false)
+  const [shareDialogState, setShareDialogState] = useState({
+    tokenId: '',
+    opened: false,
+  })
 
   const onHandleRecordClicked = tokenId => {
     setSelectedToken({
@@ -44,70 +49,43 @@ export default function MusicCollection() {
 
   return (
     <>
-      <main className={styles.main + ' space-y-6'}>
-        <div>
-          {/* <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Musics</h1> */}
-          {musics.map(music => (
-            <MusicCard
-              key={music.tokenId}
-              tokenId={music.tokenId.toString()}
-              name={music.name}
-              description={music.description}
-              audioUrls={[]}
-              onHandleRecordClicked={onHandleRecordClicked}
-            />
-          ))}
-          {isDialogRecordingOpened && (
-            <RecordingDialog
-              dataKey={selectedToken.dataKey}
-              isOpened={isDialogRecordingOpened}
-              setIsOpened={setIsDialogRecordingOpened}
-            />
-          )}
-        </div>
-        {/* {selectedToken.tokenId && (
-          <SignPopup
-            token={selectedToken as any}
-            handleCancel={() =>
-              setSelectedToken({
-                tokenId: -1,
-                dataKey: '',
+      <main className="grid grid-cols-4 gap-4">
+        {/* <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Musics</h1> */}
+        {musics.map(music => (
+          <MusicCard
+            key={music.tokenId}
+            tokenId={music.tokenId.toString()}
+            name={music.name}
+            description={music.description}
+            audioUrls={[]}
+            onHandleRecordClicked={onHandleRecordClicked}
+            onHandleShareClicked={tokenId =>
+              setShareDialogState({
+                tokenId,
+                opened: true,
               })
             }
           />
-        )} */}
+        ))}
+        {isDialogRecordingOpened && (
+          <RecordingDialog
+            dataKey={selectedToken.dataKey}
+            isOpened={isDialogRecordingOpened}
+            setIsOpened={setIsDialogRecordingOpened}
+          />
+        )}
+        {shareDialogState.opened && (
+          <ShareDialog
+            tokenId={shareDialogState.tokenId}
+            onHandleCloseClicked={() =>
+              setShareDialogState({
+                tokenId: '',
+                opened: false,
+              })
+            }
+          />
+        )}
       </main>
     </>
   )
 }
-
-// function SignMsg() {
-//   const [msg, setMsg] = useState('Dapp Starter')
-//   const { data, isError, isLoading, isSuccess, signMessage } = useSignMessage({
-//     message: msg,
-//   })
-//   const signMsg = () => {
-//     if (msg) {
-//       signMessage()
-//     }
-//   }
-
-//   return (
-//     <>
-//       <p>
-//         <input value={msg} onChange={e => setMsg(e.target.value)} className="rounded-lg p-1" />
-//         <button
-//           disabled={isLoading}
-//           onClick={() => signMsg()}
-//           className="ml-1 rounded-lg bg-blue-500 py-1 px-2 text-white transition-all duration-150 hover:scale-105"
-//         >
-//           Sign
-//         </button>
-//       </p>
-//       <p>
-//         {isSuccess && <span>Signature: {data}</span>}
-//         {isError && <span>Error signing message</span>}
-//       </p>
-//     </>
-//   )
-// }

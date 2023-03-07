@@ -26,7 +26,7 @@ import mute from '../assets/icon/mute.png'
 import { useAccount, useSignMessage } from 'wagmi'
 import { add_beat } from '_aqua/music'
 import MintDialog from 'components/MintButtonDialog'
-import ShareButtonDialog from 'components/ShareButtonDialog'
+import ShareButtonDialog from 'components/ShareDialog'
 
 export default function MusicCollection() {
   const [selectedToken, setSelectedToken] = useState({

@@ -18,6 +18,13 @@ interface RecordingDialogProp {
   setIsOpened: (flag: boolean) => void
 }
 
+interface AudioState {
+  key: String
+  data: any
+  isMuted: boolean
+  playerState: PlayerState
+}
+
 export enum RecordingDialogState {
   START,
   COUNTDOWN,
@@ -26,7 +33,7 @@ export enum RecordingDialogState {
   FINISH,
 }
 
-export enum BeatState {
+export enum PlayerState {
   STOP,
   PLAY,
   PAUSED,
@@ -53,12 +60,11 @@ const rawData = {
 
 const RecordingDialog = (prop: RecordingDialogProp) => {
   const [state, setState] = useState<RecordingDialogState>(RecordingDialogState.START)
-  const [playerState, setPlayerState] = useState(BeatState.STOP)
   const [audioData, setAudioData] = useState({
     blob: null,
     url: '',
   })
-  const [filteredData, setFilteredData] = useState({})
+  const [filteredData, setFilteredData] = useState<Array<AudioState>>([])
   const { address } = useAccount()
 
   const onHandleRecordClicked = () => {
@@ -78,16 +84,60 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   }
 
   useEffect(() => {
-    const filtered = {}
+    const filtered = []
     for (const key in rawData) {
       if (key.toLowerCase().startsWith('0x')) {
-        filtered[key] = rawData[key]
+        filtered.push({
+          key,
+          data: rawData[key],
+          isMuted: false,
+          playerState: PlayerState.STOP,
+        } as AudioState)
       }
     }
-    setFilteredData(filtered)
-  }, [])
 
-  const mediaRecorder = useRef(null)
+    // the last items, is an empty state
+    filtered.push({
+      key: address,
+      data: '',
+      isMuted: false,
+      playerState: PlayerState.STOP,
+    })
+
+    setFilteredData(filtered)
+  }, [address])
+
+  const changeAllState = (state: PlayerState) => {
+    const data = filteredData.map(audio => {
+      return { ...audio, playerState: state }
+    })
+
+    setFilteredData(data)
+  }
+
+  const changeState = (state: AudioState, player: PlayerState) => {
+    const index = filteredData.findIndex(item => item.key === state.key)
+    const updatedData = [...filteredData]
+
+    updatedData[index] = {
+      ...updatedData[index],
+      playerState: player,
+    }
+
+    setFilteredData(updatedData)
+  }
+
+  const onToggleSound = (state: AudioState) => {
+    const index = filteredData.findIndex(item => item.key === state.key)
+    const updatedData = [...filteredData]
+
+    updatedData[index] = {
+      ...updatedData[index],
+      isMuted: !state.isMuted,
+    }
+
+    setFilteredData(updatedData)
+  }
 
   return (
     <>
@@ -97,9 +147,9 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
         })}
       >
         <div className="flex min-h-screen items-center justify-center px-4 py-4 pb-20 text-center sm:block sm:p-0">
-          <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+          {/* <div className="fixed inset-0 transition-opacity" aria-hidden="true">
             <div className="absolute inset-0 bg-[#202020] bg-opacity-80" />
-          </div>
+          </div> */}
 
           {/* <span className="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true" /> */}
 
@@ -116,15 +166,20 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                   </div>
                 </div>
                 <div className="">
-                  {Object.entries(filteredData).map(([key, value]) => {
-                    if (value) {
+                  {filteredData.map((audioState, key) => {
+                    if (audioState.data) {
                       return (
                         <div key={key} className="border-1 m-1 h-[80px] rounded bg-white p-2 text-left opacity-50">
                           <div className="font-sm inline-block whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-sm text-black">
-                            {key}
+                            {audioState.key}
                           </div>
                           <div className="h-1/2 w-full">
-                            <Waveform url={value as string} state={playerState} />
+                            <Waveform
+                              url={audioState.data as string}
+                              playerState={audioState.playerState}
+                              isMuted={audioState.isMuted}
+                              onToggleSound={() => onToggleSound(audioState)}
+                            />
                           </div>
                         </div>
                       )
@@ -152,7 +207,14 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                       )}
                       {state === RecordingDialogState.UPLOAD && (
                         <div className="w-full items-center justify-center">
-                          {audioData.url && <Waveform url={audioData.url as string} state={playerState} />}
+                          {audioData.url && (
+                            <Waveform
+                              url={audioData.url as string}
+                              playerState={filteredData[filteredData.length - 1].playerState}
+                              isMuted={filteredData[filteredData.length - 1].isMuted}
+                              onToggleSound={() => onToggleSound(filteredData[filteredData.length - 1])}
+                            />
+                          )}
                           <Upload
                             audioData={audioData}
                             dataKey={rawData.token_key}
@@ -165,9 +227,9 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                   </div>
                 </div>
                 <div className="flex  grid grid-cols-4 items-center gap-4 bg-black p-4">
-                  <button onClick={() => setPlayerState(BeatState.STOP)}>Stop</button>
-                  <button onClick={() => setPlayerState(BeatState.PLAY)}>Play</button>
-                  <button onClick={() => setPlayerState(BeatState.PAUSED)}>Pause</button>
+                  <button onClick={() => changeAllState(PlayerState.STOP)}>Stop</button>
+                  <button onClick={() => changeAllState(PlayerState.PLAY)}>Play</button>
+                  <button onClick={() => changeAllState(PlayerState.PAUSED)}>Pause</button>
                 </div>
               </div>
             </div>

@@ -27,7 +27,6 @@ const Upload = (prop: UploadProp) => {
       const resp = await ipfs.add(prop.audioData.blob)
       const url = `${process.env.NEXT_PUBLIC_IPFS_BEAT_STORAGE_URL}/${resp.path}`
       setAudioUrl(url)
-      prop.onHandleConfirmClicked()
     } catch (err) {
       console.log(err)
     }
@@ -41,6 +40,7 @@ const Upload = (prop: UploadProp) => {
 
   const add_new_beat = async signature => {
     add_beat(prop.dataKey.toString(), address, audioUrl, signature)
+    prop.onHandleConfirmClicked()
   }
 
   return (
