@@ -25,6 +25,7 @@ import { publicProvider } from 'wagmi/providers/public'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { FluenceProvider } from 'hooks/use-fluence'
 import { IpfsProvider } from 'hooks/use-ipfs'
+import MainLayout from 'layout/MainLayout'
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -32,7 +33,9 @@ function App({ Component, pageProps }: AppProps) {
     <ThemeProvider defaultTheme="system" attribute="class">
       <HeadGlobal />
       <Web3Wrapper>
-        <Component key={router.asPath} {...pageProps} />
+        <MainLayout>
+          <Component key={router.asPath} {...pageProps} />
+        </MainLayout>
       </Web3Wrapper>
     </ThemeProvider>
   )
