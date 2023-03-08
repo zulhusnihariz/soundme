@@ -3,7 +3,7 @@ import "@0x3zero/aqua-lib/builtin.aqua"
 import "./dht.aqua"
 
 const PEER_ID ?= "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK"
-const DHT_SERVICE_ID ?= "bc818a2d-deee-4e0a-b3d7-2aa5f0bc6ef3"
+const DHT_SERVICE_ID ?= "9a38b271-d738-44a5-a68e-fbf79f553040"
 
 func generate_block(key: string, public_key: string, dt: string) -> string:
   on HOST_PEER_ID:

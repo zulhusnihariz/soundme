@@ -155,7 +155,7 @@ export function add_beat(...args: any) {
                         (seq
                          (seq
                           (seq
-                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("bc818a2d-deee-4e0a-b3d7-2aa5f0bc6ef3" "get_latest_record_by_pk_and_key") [key public_key] dht)
+                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("9a38b271-d738-44a5-a68e-fbf79f553040" "get_latest_record_by_pk_and_key") [key public_key] dht)
                            (null)
                           )
                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("block_formatter" "serialize") [dht.$.alias! content dht.$.cid!] formatted)
@@ -168,7 +168,7 @@ export function add_beat(...args: any) {
                            (seq
                             (seq
                              (null)
-                             (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("bc818a2d-deee-4e0a-b3d7-2aa5f0bc6ef3" "insert") [key dht.$.alias! result.$.cid! public_key signature content "secp256k1"])
+                             (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("9a38b271-d738-44a5-a68e-fbf79f553040" "insert") [key dht.$.alias! result.$.cid! public_key signature content "secp256k1"])
                             )
                             (call -relay- ("op" "noop") [])
                            )
@@ -181,7 +181,7 @@ export function add_beat(...args: any) {
                          (seq
                           (seq
                            (call -relay- ("op" "noop") [])
-                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("bc818a2d-deee-4e0a-b3d7-2aa5f0bc6ef3" "insert") [key "" result.$.cid! public_key signature content "secp256k1"])
+                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("9a38b271-d738-44a5-a68e-fbf79f553040" "insert") [key "" result.$.cid! public_key signature content "secp256k1"])
                           )
                           (call -relay- ("op" "noop") [])
                          )
