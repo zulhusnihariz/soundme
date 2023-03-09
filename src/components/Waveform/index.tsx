@@ -48,7 +48,8 @@ const Waveform: React.FC<WaveformProps> = ({
           barHeight: 10,
           barWidth: 2,
           fillParent: false,
-          minPxPerSec: 100,
+          minPxPerSec: window.innerWidth < 720 ? 1 : 5,
+          scrollParent: false,
         })
         wavesurferRef.current.load(url)
 

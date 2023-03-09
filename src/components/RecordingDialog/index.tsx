@@ -83,20 +83,17 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
           hidden: !prop.isOpened,
         })}
       >
-        <div className="flex min-h-screen items-center justify-center px-4 py-4 text-center">
-          <div className="border-gradient sm: inline-block w-full transform overflow-hidden rounded-md bg-[#DE296A] text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:align-middle md:max-w-7xl">
-            <div className="justify-between">
+        <div className="mx-10 flex min-h-screen items-end justify-center px-4 py-4 pb-28 text-center">
+          <div className="border-gradient transform overflow-hidden rounded-md bg-transparent text-left align-bottom shadow-xl transition-all sm:my-8 sm:inline-block sm:w-full sm:align-middle md:max-w-5xl">
+            <div className="bg-gray-900 px-8 pt-4 pb-8">
               <div className="">
                 <div className="flex justify-end">
-                  <div className="p-3 text-white">
+                  <div className="text-white">
                     <XMarkIcon className="h-6 w-6 cursor-pointer" onClick={() => prop.onDialogClosed()} />
                   </div>
                 </div>
                 <div className="">
-                  <div className="border-1 m-1 h-[180px] rounded bg-black p-2 text-left">
-                    <div className="font-sm absolute inline-block whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-sm text-black">
-                      {address}
-                    </div>
+                  <div className="border-1 m-1 h-[180px] rounded p-2 text-left">
                     <div className="flex h-full w-full items-center justify-center">
                       {state == RecordingDialogState.START && (
                         <StartRecording

@@ -1,10 +1,11 @@
 import Waveform from 'components/Waveform'
 import { AudioState, PlayerState, SelectedAudio } from 'lib'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import RecordingDialog from 'components/RecordingDialog'
 import MintButton from 'components/MintButton'
 import ForkDialog from 'components/ForkDialog'
+import ShareDialog from 'components/ShareDialog'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -21,6 +22,8 @@ const SingleMusic = () => {
 
   const [isDialogRecordingOpened, setIsDialogRecordingOpened] = useState(false)
   const [isDialogForkOpened, setIsDialogForkOpened] = useState(false)
+  const [isWebRTCAllowed, setIsWebRTCAllowed] = useState(false)
+  const [isShareDialogShow, setIsShareDialogShow] = useState(false)
 
   useEffect(() => {
     if (data && !isLoad) {
@@ -144,8 +147,24 @@ const SingleMusic = () => {
     setForkData(selections)
   }
 
+  const mediaRecorder = useRef(null)
+
+  useEffect(() => {
+    const testMic = async () => {
+      try {
+        const constraints = { audio: true, video: false }
+        await navigator.mediaDevices.getUserMedia(constraints)
+        setIsWebRTCAllowed(true)
+      } catch (ex) {
+        setIsWebRTCAllowed(false)
+      }
+    }
+
+    testMic()
+  }, [])
+
   return (
-    <div className="">
+    <>
       <div className="">
         <div className="fixed bottom-0 left-0 mb-5 flex w-full items-center justify-center">
           <div className="flex items-center justify-between rounded-xl bg-gray-700 p-2">
@@ -161,7 +180,7 @@ const SingleMusic = () => {
                 </g>
               </svg>
             </button>
-            {!isForking && (
+            {!isForking && isWebRTCAllowed && (
               <button
                 className="mr-2 inline-block rounded-xl bg-red-500 px-8 py-3 text-white"
                 onClick={() => setIsDialogRecordingOpened(!isDialogRecordingOpened)}
@@ -209,14 +228,14 @@ const SingleMusic = () => {
               </button>
             )}
           </div>
-          <button className="rounded-md p-3 hover:rounded-full">
-            <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" stroke="#fff">
+          <button className="bg-yellow-500 p-3 text-black" onClick={() => setIsShareDialogShow(true)}>
+            <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" stroke="#000">
               <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
               <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
               <g id="SVGRepo_iconCarrier">
                 <path
                   d="M9.42857 12.875L14.5714 16.8125M14.5714 7.625L9.42857 11.125M6 12.0357V11.9643C6 11.0175 6.76751 10.25 7.71429 10.25C8.66106 10.25 9.42857 11.0175 9.42857 11.9643V12.0357C9.42857 12.9825 8.66106 13.75 7.71429 13.75C6.76751 13.75 6 12.9825 6 12.0357ZM14.5714 6.78571V6.71429C14.5714 5.76751 15.3389 5 16.2857 5C17.2325 5 18 5.76751 18 6.71429V6.78571C18 7.73249 17.2325 8.5 16.2857 8.5C15.3389 8.5 14.5714 7.73249 14.5714 6.78571ZM14.5714 17.2857V17.2143C14.5714 16.2675 15.3389 15.5 16.2857 15.5C17.2325 15.5 18 16.2675 18 17.2143V17.2857C18 18.2325 17.2325 19 16.2857 19C15.3389 19 14.5714 18.2325 14.5714 17.2857Z"
-                  stroke="#fff"
+                  stroke="#000"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 ></path>
@@ -269,7 +288,10 @@ const SingleMusic = () => {
           onDialogClosed={() => setIsDialogForkOpened(false)}
         />
       )}
-    </div>
+      {isShareDialogShow && (
+        <ShareDialog dataKey={router.query.key.toString()} onHandleCloseClicked={() => setIsShareDialogShow(false)} />
+      )}
+    </>
   )
 }
 

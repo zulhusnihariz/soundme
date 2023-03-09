@@ -27,17 +27,8 @@ export const IpfsProvider: React.FC<IpfsProviderProps> = ({ children }) => {
     async function startIpfs() {
       if (!isIPFSConnected) {
         try {
-          const projectId = '2HDrQBzBA6e4Elmdwhpa6Mjg1Qs'
-          const projectSecret = 'a8a2d7f469b2e8dbfc4dece05bdde035'
-
-          const auth = 'Basic ' + Buffer.from(projectId + ':' + projectSecret).toString('base64')
           const client = await create({
-            host: 'ipfs.infura.io',
-            port: 5001,
-            protocol: 'https',
-            headers: {
-              authorization: auth,
-            },
+            url: process.env.NEXT_PUBLIC_IPFS_MULTIADDRESS,
           })
 
           setIpfs(client)

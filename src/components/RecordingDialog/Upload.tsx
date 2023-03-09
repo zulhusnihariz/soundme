@@ -45,10 +45,13 @@ const Upload = (prop: UploadProp) => {
 
   return (
     <div className="mt-4 text-center">
-      <button className="mx-3 rounded-full bg-indigo-600 px-5 py-3" onClick={prop.onHandleRecordClicked}>
+      <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandleRecordClicked}>
+        Play
+      </button>
+      <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandleRecordClicked}>
         Recording again
       </button>
-      <button className="rounded-full bg-red-600 px-5 py-3" onClick={() => add_to_nft()}>
+      <button className="bg-red-600 px-5 py-3" onClick={() => add_to_nft()}>
         Add to NFT
       </button>
     </div>

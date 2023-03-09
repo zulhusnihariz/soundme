@@ -11,7 +11,7 @@ const MintButtonDialog = (prop: MintDialogProp) => {
     <>
       <button
         type="button"
-        className="Inter mr-2 rounded-lg bg-[#D45BFF] px-4 py-2 text-base font-medium leading-5 text-white"
+        className="Inter mr-2 bg-[#D45BFF] px-4 py-2 text-base font-medium leading-5 text-white"
         onClick={() => setIsDialogOpened(true)}
       >
         Mint

@@ -1,27 +1,8 @@
-import MusicRow from 'components/MusicRow'
 import MusicCard from 'components/MusicCard'
-import NewSheetButton from 'components/MintButton/_index'
-import SignPopup, { TokenProp } from 'components/SignPopup'
-import { useFluence } from 'hooks/use-fluence'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ShareDialog from 'components/ShareDialog'
-
-const musics = [
-  {
-    tokenId: 1,
-    token_key: '1',
-    name: 'music #1',
-    owner: '0x244584678E6AE4363c8561e5f58Bd4938eD7c10D',
-    description: '',
-  },
-  {
-    tokenId: 2,
-    token_key: '2',
-    name: 'music #2',
-    owner: '0x244584678E6AE4363c8561e5f58Bd4938eD7c10D',
-    description: '',
-  },
-]
+import { get_sheets } from '_aqua/music'
+import { Sheet } from 'lib'
 
 export default function MusicCollection() {
   const [selectedToken, setSelectedToken] = useState({
@@ -30,9 +11,11 @@ export default function MusicCollection() {
   })
 
   const [shareDialogState, setShareDialogState] = useState({
-    tokenId: '',
+    dataKey: '',
     opened: false,
   })
+
+  const [sheets, setSheets] = useState<Sheet[]>([])
 
   const onHandleRecordClicked = tokenId => {
     setSelectedToken({
@@ -41,21 +24,34 @@ export default function MusicCollection() {
     })
   }
 
+  useEffect(() => {
+    const get = async () => {
+      let sheets = await get_sheets()
+      console.log(sheets)
+      setSheets(sheets)
+    }
+
+    if (sheets.length <= 0) {
+      get()
+    }
+  }, [sheets])
+
   return (
-    <>
-      <main className="grid grid-cols-4 gap-4">
+    <div className="m-5">
+      <main className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
         {/* <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Musics</h1> */}
-        {musics.map(music => (
+        {sheets.map(sheet => (
           <MusicCard
-            key={music.tokenId}
-            tokenId={music.tokenId.toString()}
-            name={music.name}
-            description={music.description}
+            sheet={sheet}
+            key={sheet.data_key.toString()}
+            tokenId={sheet.data_key.toString()}
+            name={sheet.data_key.toString()}
+            description={''}
             audioUrls={[]}
             onHandleRecordClicked={onHandleRecordClicked}
-            onHandleShareClicked={tokenId =>
+            onHandleShareClicked={dataKey =>
               setShareDialogState({
-                tokenId,
+                dataKey,
                 opened: true,
               })
             }
@@ -63,16 +59,16 @@ export default function MusicCollection() {
         ))}
         {shareDialogState.opened && (
           <ShareDialog
-            tokenId={shareDialogState.tokenId}
+            dataKey={shareDialogState.dataKey}
             onHandleCloseClicked={() =>
               setShareDialogState({
-                tokenId: '',
+                dataKey: '',
                 opened: false,
               })
             }
           />
         )}
       </main>
-    </>
+    </div>
   )
 }

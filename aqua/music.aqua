@@ -1,9 +1,17 @@
 import "@fluencelabs/aqua-lib/builtin.aqua"
 import "@0x3zero/aqua-lib/builtin.aqua" 
 import "./dht.aqua"
+import "./collabeat.aqua"
 
+-- 
 const PEER_ID ?= "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK"
 const DHT_SERVICE_ID ?= "9a38b271-d738-44a5-a68e-fbf79f553040"
+-- COLLABEAT
+const COLLABEAT_NODE_URL = "https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74"
+const COLLABEAT_SERVICE_ID ?= "d62285ba-4e92-4d45-8367-fbe3f45cbf03"
+const COLLABEAT_ABI_URL = "https://ipfs.xfero.io/ipfs/QmRwqq9MfPdBsMeTJcQDXSp5EYVYvheQMXu5tpBiJqaECW?filename=CollaBeatUtility-abi.json"
+const COLLABEAT_ADDRESS = "0xb38d31ea6a07f7bbab4f2934a8cde1664007a48a"
+const COLLABEAT_IPFS_ADDRESS = "/dns4/ipfs.xfero.io/tcp/5002"
 
 func generate_block(key: string, public_key: string, dt: string) -> string:
   on HOST_PEER_ID:
@@ -29,3 +37,10 @@ func add_beat(key: string, public_key: string, content: string, signature: strin
       Dht.insert(key, dht.alias, result.cid, public_key, signature, content, "secp256k1")
     else:
       Dht.insert(key, "", result.cid, public_key, signature, content, "secp256k1")
+
+func get_sheets() -> []Sheet:
+  on HOST_PEER_ID:
+    Collabeat COLLABEAT_SERVICE_ID
+    sheets <- Collabeat.get_sheets(COLLABEAT_NODE_URL, COLLABEAT_ABI_URL, "0x0", "latest", COLLABEAT_ADDRESS, ["0xd31cec58938275800d2f103b2ae24dfd32064eb9d23903438c16fa409956242c"], COLLABEAT_IPFS_ADDRESS)
+
+  <- sheets

@@ -1,86 +1,70 @@
 import { useState } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import email from '../../assets/icon/email.png'
 import copy from '../../assets/icon/copy.png'
-import twitter from '../../assets/icon/twitter.png'
+import {
+  EmailShareButton,
+  FacebookShareButton,
+  LinkedinShareButton,
+  RedditShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+} from 'react-share'
+
+import { EmailIcon, FacebookIcon, LinkedinIcon, RedditIcon, TwitterIcon, WhatsappIcon } from 'react-share'
 
 interface ShareDialogProp {
-  tokenId: String
+  dataKey: String
   onHandleCloseClicked: () => void
 }
 
 const ShareDialog = (prop: ShareDialogProp) => {
+  const [shareUrl] = useState(`${window.location.origin}/${prop.dataKey}`)
+  const [title] = useState('Collabeat')
+
   return (
     <div className="fixed inset-0 z-10 overflow-y-auto">
-      <div className="flex min-h-screen items-center justify-center px-4 py-4 text-center sm:block sm:p-0">
-        <div
-          className="border-gradient my-20 inline-block transform overflow-hidden rounded-xl bg-transparent text-left align-bottom shadow-xl transition-all sm:w-full sm:max-w-lg sm:align-middle"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-headline"
-        >
-          <div className="bg-black px-2 pt-4 pb-8 ">
-            <div className="flex justify-end text-white">
-              <XMarkIcon
-                className="h-6 w-6 cursor-pointer"
-                aria-hidden="true"
-                onClick={() => prop.onHandleCloseClicked()}
-              />
+      <div className="flex min-h-screen items-center justify-center text-center">
+        <div className="border-gradient transform overflow-hidden bg-transparent text-left align-bottom shadow-xl transition-all sm:my-8 sm:inline-block sm:w-full sm:align-middle md:max-w-xl">
+          <div className="bg-gray-900 px-8 pt-4 pb-8">
+            <div className="flex justify-between text-white">
+              <h3 className="Roboto mb-4 text-xl font-bold leading-6 text-[#DCDCDC]">Share</h3>
+              <XMarkIcon className="h-6 w-6 cursor-pointer" onClick={() => prop.onHandleCloseClicked()} />
             </div>
-            <div className="px-4 py-1 sm:flex sm:items-center">
+            <div className="">
               <div className="mt-3 text-left">
-                <div className="px-2 text-left">
-                  <h3 className="Roboto mb-4 text-xl font-bold leading-6 text-[#DCDCDC]">Invite a friend</h3>
-                  <label htmlFor="email" className="Roboto block text-sm font-medium text-[#DCDCDC]">
-                    Enter email
-                  </label>
-                  <div className="flex w-full flex-row justify-between">
-                    <div>
-                      <input
-                        type="text"
-                        className="block w-full rounded-md border  border-white bg-black px-4 py-2 text-gray-700 "
-                      />
-                      <span className="Roboto text-sm text-[#DCDCDC]">
-                        Your friend can join and collaborate on the same project
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      className="Inter flex h-11 flex-row items-center justify-center gap-x-4 rounded-md bg-[#F5517B] px-4 py-2 text-base font-medium text-white hover:bg-opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
-                    >
-                      <img src={email.src} alt="Email" />
-                      Invite
-                    </button>
-                  </div>
+                <div className="mt-4 flex justify-between">
+                  <WhatsappShareButton url={shareUrl} title={title} separator=":: ">
+                    <WhatsappIcon size={48} round />
+                  </WhatsappShareButton>
+                  <FacebookShareButton url={shareUrl} quote={title}>
+                    <FacebookIcon size={48} round />
+                  </FacebookShareButton>
+                  <TwitterShareButton url={shareUrl} title={title}>
+                    <TwitterIcon size={48} round />
+                  </TwitterShareButton>
+                  <EmailShareButton url={shareUrl} subject={title} body="body">
+                    <EmailIcon size={48} round />
+                  </EmailShareButton>
+                  <LinkedinShareButton url={shareUrl}>
+                    <LinkedinIcon size={48} round />
+                  </LinkedinShareButton>
+                  <RedditShareButton url={shareUrl} title={title} windowWidth={660} windowHeight={460}>
+                    <RedditIcon size={48} round />
+                  </RedditShareButton>
                 </div>
-                <hr className="my-6 border-b border-[#525252]" />
-                <div className="px-2 text-left">
-                  <h3 className="Roboto mb-4 text-xl font-bold leading-6 text-[#DCDCDC]">Share link</h3>
-                  <div className="flex w-full flex-row justify-between">
+                <div className="mt-6">
+                  <div className="flex w-full items-center justify-between">
                     <input
                       type="text"
-                      placeholder="https://www.testing.com/collaboration_1"
-                      className="block w-full rounded-md border  border-white bg-black px-4 py-2 text-[#DCDCDC] "
+                      value={shareUrl}
+                      className="mr-2 block w-full border border-white bg-black p-3 text-sm text-white"
                     />
                     <button
                       type="button"
-                      className="Inter flex h-11 flex-row items-center justify-center gap-x-4 rounded-md bg-[#F5517B] px-6 py-2 text-base font-medium text-white hover:bg-opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
+                      className="Inter flex h-11 flex-row items-center justify-center gap-x-4 bg-[#F5517B] px-6 py-2 text-base font-medium text-white hover:bg-opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
                     >
                       <img src={copy.src} alt="Email" />
                       Copy
-                    </button>
-                  </div>
-                </div>
-                <hr className="my-6 border-b border-[#525252]" />
-                <div className="px-2">
-                  <h3 className="Roboto mb-4 text-xl font-bold leading-6 text-[#DCDCDC]">Social media</h3>
-                  <div>
-                    <button
-                      type="button"
-                      className="Inter flex flex-row items-center gap-x-2 rounded-md bg-[#1A8CD8] px-4 py-2 text-sm text-white hover:bg-opacity-70"
-                    >
-                      <img src={twitter.src} alt="Email" />
-                      Tweet
                     </button>
                   </div>
                 </div>

@@ -112,6 +112,119 @@ export function generate_block(...args: any) {
 
  
 
+export function get_sheets(
+    config?: {ttl?: number}
+): Promise<{ beats: { cid: string; data_key: string; owner: string; }[]; cid: string; data_key: string; owner: string; }[]>;
+
+export function get_sheets(
+    peer: FluencePeer,
+    config?: {ttl?: number}
+): Promise<{ beats: { cid: string; data_key: string; owner: string; }[]; cid: string; data_key: string; owner: string; }[]>;
+
+export function get_sheets(...args: any) {
+
+    let script = `
+                    (xor
+                     (seq
+                      (seq
+                       (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                       (xor
+                        (seq
+                         (new $array-inline
+                          (seq
+                           (ap "0xd31cec58938275800d2f103b2ae24dfd32064eb9d23903438c16fa409956242c" $array-inline)
+                           (canon -relay- $array-inline  #array-inline-0)
+                          )
+                         )
+                         (call -relay- ("d62285ba-4e92-4d45-8367-fbe3f45cbf03" "get_sheets") ["https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74" "https://ipfs.xfero.io/ipfs/QmRwqq9MfPdBsMeTJcQDXSp5EYVYvheQMXu5tpBiJqaECW?filename=CollaBeatUtility-abi.json" "0x0" "latest" "0xb38d31ea6a07f7bbab4f2934a8cde1664007a48a" #array-inline-0 "/dns4/ipfs.xfero.io/tcp/5002"] sheets)
+                        )
+                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                       )
+                      )
+                      (xor
+                       (call %init_peer_id% ("callbackSrv" "response") [sheets])
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                      )
+                     )
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
+                    )
+    `
+    return callFunction$$(
+        args,
+        {
+    "functionName" : "get_sheets",
+    "arrow" : {
+        "tag" : "arrow",
+        "domain" : {
+            "tag" : "labeledProduct",
+            "fields" : {
+                
+            }
+        },
+        "codomain" : {
+            "tag" : "unlabeledProduct",
+            "items" : [
+                {
+                    "tag" : "array",
+                    "type" : {
+                        "tag" : "struct",
+                        "name" : "Sheet",
+                        "fields" : {
+                            "beats" : {
+                                "tag" : "array",
+                                "type" : {
+                                    "tag" : "struct",
+                                    "name" : "Beat",
+                                    "fields" : {
+                                        "cid" : {
+                                            "tag" : "scalar",
+                                            "name" : "string"
+                                        },
+                                        "data_key" : {
+                                            "tag" : "scalar",
+                                            "name" : "string"
+                                        },
+                                        "owner" : {
+                                            "tag" : "scalar",
+                                            "name" : "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "cid" : {
+                                "tag" : "scalar",
+                                "name" : "string"
+                            },
+                            "data_key" : {
+                                "tag" : "scalar",
+                                "name" : "string"
+                            },
+                            "owner" : {
+                                "tag" : "scalar",
+                                "name" : "string"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "names" : {
+        "relay" : "-relay-",
+        "getDataSrv" : "getDataSrv",
+        "callbackSrv" : "callbackSrv",
+        "responseSrv" : "callbackSrv",
+        "responseFnName" : "response",
+        "errorHandlingSrv" : "errorHandlingSrv",
+        "errorFnName" : "error"
+    }
+},
+        script
+    )
+}
+
+ 
+
 export function add_beat(
     key: string,
     public_key: string,
