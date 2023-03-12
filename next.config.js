@@ -1,6 +1,6 @@
 module.exports = {
-  reactStrictMode: true
-
+  reactStrictMode: true,
+  output: 'export',
   /*  AssetPrefix
     --------------------------------------------------------------------------------
     AssetPrefix is used to determine where the "app" folder is located.
