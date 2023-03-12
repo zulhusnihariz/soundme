@@ -25,7 +25,7 @@ const ForkDialog = (prop: ForkDialogProp) => {
   useEffect(() => {
     const uploadToIpfs = async () => {
       try {
-        const cid = await ipfs.dag.put(JSON.stringify(prop.selectedAudios))
+        const cid = await ipfs.dag.put(prop.selectedAudios)
         setUplodedCid(cid.toString())
       } catch (e) {
         console.log(e)

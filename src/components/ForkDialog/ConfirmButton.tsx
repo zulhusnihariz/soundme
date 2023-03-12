@@ -17,7 +17,7 @@ const ConfirmButton = ({ cid, onForkSuccess }) => {
     functionName: 'fork',
     args: [cid],
     overrides: {
-      value: ethers.utils.parseUnits('0.05', 'ether'),
+      value: ethers.utils.parseUnits('0.015', 'ether'),
     },
     onError(error) {
       console.log('Error', error)

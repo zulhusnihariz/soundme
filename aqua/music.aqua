@@ -3,6 +3,7 @@ import "@0x3zero/aqua-lib/builtin.aqua"
 import "./dht.aqua"
 import "./collabeat.aqua"
 import "./evmrpc.aqua"
+import "@fluencelabs/aqua-lib/math.aqua"
 
 -- 
 const PEER_ID ?= "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK"
@@ -10,8 +11,8 @@ const DHT_SERVICE_ID ?= "ffe14ff1-1be1-4fee-8f8f-b37da725976d"
 -- COLLABEAT
 const NODE_URL = "https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74"
 const COLLABEAT_SERVICE_ID ?= "e91cfe47-e87d-4fab-855d-e1e76a521fc9"
-const COLLABEAT_ABI_URL = "https://ipfs.xfero.io/ipfs/QmRwqq9MfPdBsMeTJcQDXSp5EYVYvheQMXu5tpBiJqaECW?filename=CollaBeatUtility-abi.json"
-const COLLABEAT_ADDRESS = "0xb38d31ea6a07f7bbab4f2934a8cde1664007a48a"
+const COLLABEAT_ABI_URL = "https://ipfs.xfero.io/ipfs/QmW4ZnFYDsp3CWezBu3s7arhJmEhukrvF8J9X61VBHz7ez?filename=CollaBeatUtility2-abi.json"
+const COLLABEAT_ADDRESS = "0xef7e2f7d3dedac01367652f661b468d3438c139b"
 const COLLABEAT_IPFS_ADDRESS = "/dns4/ipfs.xfero.io/tcp/5002"
 
 -- EVM JSON-RPC
@@ -41,11 +42,17 @@ func generate_block(key: string, public_key: string, dt: string) -> string:
     serialize_dt <- BlockFormatter.serialize(public_key, dt, "")
     <- serialize_dt
 
-func beat_max_up(url: string) -> bool:
+func beat_max_up(key: string) -> []FdbDht:
   on HOST_PEER_ID:
-    Collabeat COLLABEAT_SERVICE_ID
-    nos <- Collabeat.nos_of_beat(url)
-  <- nos > 10
+    Dht DHT_SERVICE_ID
+
+    count = 0
+    dhts <- Dht.get_records_by_key(key)
+  <- dhts
+  --   for dht <- dhts:
+  --     if dht.alias == "":
+  --       count = Math.add(count, 1)
+  -- <- count > 10
 
 -- Add beat to the sheet
 func add_beat(key: string, public_key: string, content: string, signature: string):
@@ -79,7 +86,7 @@ func get_sheets() -> []Sheet:
   on HOST_PEER_ID:
     Collabeat COLLABEAT_SERVICE_ID
     EvmRpc FEVM_JSON_RPC_SERVICE_ID
-    results <- EvmRpc.eth_get_logs(NODE_URL, COLLABEAT_ABI_URL, "0x0", "latest", COLLABEAT_ADDRESS, ["0xd31cec58938275800d2f103b2ae24dfd32064eb9d23903438c16fa409956242c"])
+    results <- EvmRpc.eth_get_logs(NODE_URL, COLLABEAT_ABI_URL, "0x0", "latest", COLLABEAT_ADDRESS, ["0xb6cf139cef7fa80097868d15e25a7cba51ec1c85e25f0aa709e5950f33321a2b"])
     n <- EventLogParamsMyOp.array_length(results)
 
     datas: *EventLogParamResult

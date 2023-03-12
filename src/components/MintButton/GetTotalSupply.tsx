@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useContractRead } from 'wagmi'
-import BN from 'bn.js'
+import { BigNumber } from 'ethers'
 
 const GetTotalSupply = ({ tokenId }) => {
   const [supplyLeft, setSupplyLeft] = useState(0)
@@ -31,7 +31,7 @@ const GetTotalSupply = ({ tokenId }) => {
       },
     ],
     functionName: 'totalSupply',
-    args: [new BN(`${tokenId}`)],
+    args: [BigNumber.from(tokenId)],
   })
 
   useEffect(() => {

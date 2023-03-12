@@ -122,7 +122,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                           )}
                           <Upload
                             audioData={audioData}
-                            dataKey={`1`}
+                            dataKey={prop.dataKey}
                             onHandleConfirmClicked={() => onHandleConfirmClicked()}
                             onHandleRecordClicked={() => onHandleRecordClicked()}
                           />

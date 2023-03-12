@@ -268,11 +268,11 @@ export function get_sheets(...args: any) {
                                  (seq
                                   (new $array-inline
                                    (seq
-                                    (ap "0xd31cec58938275800d2f103b2ae24dfd32064eb9d23903438c16fa409956242c" $array-inline)
+                                    (ap "0xb6cf139cef7fa80097868d15e25a7cba51ec1c85e25f0aa709e5950f33321a2b" $array-inline)
                                     (canon -relay- $array-inline  #array-inline-0)
                                    )
                                   )
-                                  (call -relay- ("676a3462-d46d-4ef6-8b9a-66873325ef1c" "eth_get_logs") ["https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74" "https://ipfs.xfero.io/ipfs/QmRwqq9MfPdBsMeTJcQDXSp5EYVYvheQMXu5tpBiJqaECW?filename=CollaBeatUtility-abi.json" "0x0" "latest" "0xb38d31ea6a07f7bbab4f2934a8cde1664007a48a" #array-inline-0] results)
+                                  (call -relay- ("676a3462-d46d-4ef6-8b9a-66873325ef1c" "eth_get_logs") ["https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74" "https://ipfs.xfero.io/ipfs/QmW4ZnFYDsp3CWezBu3s7arhJmEhukrvF8J9X61VBHz7ez?filename=CollaBeatUtility2-abi.json" "0x0" "latest" "0xef7e2f7d3dedac01367652f661b468d3438c139b" #array-inline-0] results)
                                  )
                                  (call -relay- ("op" "array_length") [results] n)
                                 )
@@ -584,15 +584,15 @@ export function generate_block(...args: any) {
  
 
 export function beat_max_up(
-    url: string,
+    key: string,
     config?: {ttl?: number}
-): Promise<boolean>;
+): Promise<{ alias: string; cid: string; data_key: string; public_key: string; }[]>;
 
 export function beat_max_up(
     peer: FluencePeer,
-    url: string,
+    key: string,
     config?: {ttl?: number}
-): Promise<boolean>;
+): Promise<{ alias: string; cid: string; data_key: string; public_key: string; }[]>;
 
 export function beat_max_up(...args: any) {
 
@@ -601,19 +601,16 @@ export function beat_max_up(...args: any) {
                      (seq
                       (seq
                        (seq
-                        (seq
-                         (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
-                         (call %init_peer_id% ("getDataSrv" "url") [] url)
-                        )
-                        (xor
-                         (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "nos_of_beat") [url] nos)
-                         (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
-                        )
+                        (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                        (call %init_peer_id% ("getDataSrv" "key") [] key)
                        )
-                       (call %init_peer_id% ("cmp" "gt") [nos 10] gt)
+                       (xor
+                        (call -relay- ("ffe14ff1-1be1-4fee-8f8f-b37da725976d" "get_records_by_key") [key] dhts)
+                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                       )
                       )
                       (xor
-                       (call %init_peer_id% ("callbackSrv" "response") [gt])
+                       (call %init_peer_id% ("callbackSrv" "response") [dhts])
                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
                       )
                      )
@@ -629,7 +626,7 @@ export function beat_max_up(...args: any) {
         "domain" : {
             "tag" : "labeledProduct",
             "fields" : {
-                "url" : {
+                "key" : {
                     "tag" : "scalar",
                     "name" : "string"
                 }
@@ -639,8 +636,29 @@ export function beat_max_up(...args: any) {
             "tag" : "unlabeledProduct",
             "items" : [
                 {
-                    "tag" : "scalar",
-                    "name" : "bool"
+                    "tag" : "array",
+                    "type" : {
+                        "tag" : "struct",
+                        "name" : "FdbDht",
+                        "fields" : {
+                            "alias" : {
+                                "tag" : "scalar",
+                                "name" : "string"
+                            },
+                            "cid" : {
+                                "tag" : "scalar",
+                                "name" : "string"
+                            },
+                            "data_key" : {
+                                "tag" : "scalar",
+                                "name" : "string"
+                            },
+                            "public_key" : {
+                                "tag" : "scalar",
+                                "name" : "string"
+                            }
+                        }
+                    }
                 }
             ]
         }

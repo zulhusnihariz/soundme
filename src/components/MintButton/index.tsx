@@ -2,7 +2,7 @@ import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, useCo
 import BN from 'bn.js'
 import { useEffect, useState } from 'react'
 import GetTotalSupply from './GetTotalSupply'
-import { ethers } from 'ethers'
+import { ethers, BigNumber } from 'ethers'
 interface MintProp {
   tokenId: String
 }
@@ -23,9 +23,9 @@ const MintButton = (prop: MintProp) => {
       },
     ],
     functionName: 'mint',
-    args: [new BN(1), 1],
+    args: [BigNumber.from(prop.tokenId), 1],
     overrides: {
-      value: ethers.utils.parseUnits('0.05', 'ether'),
+      value: ethers.utils.parseUnits('0.015', 'ether'),
     },
     onError(error) {
       console.log('Error', error)
@@ -35,8 +35,8 @@ const MintButton = (prop: MintProp) => {
   const { data, write } = useContractWrite(config)
 
   return (
-    <button className="mr-2 bg-red-300 px-5 py-3 text-black" onClick={() => write?.()}>
-      Mint (<GetTotalSupply tokenId={1} />)
+    <button className="mr-2 bg-blue-500 px-5 py-3 text-black" onClick={() => write?.()}>
+      Mint (<GetTotalSupply tokenId={prop.tokenId} />)
     </button>
   )
 }

@@ -26,7 +26,7 @@ export default function MusicCollection() {
 
   useEffect(() => {
     const get = async () => {
-      let sheets = await get_sheets()
+      let sheets = await get_sheets({ ttl: 10000 })
       setSheets(sheets)
     }
 

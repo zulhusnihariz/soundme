@@ -42,21 +42,25 @@ function App({ Component, pageProps }: AppProps) {
 }
 export default App
 
+const currentChain = []
+switch (process.env.NEXT_PUBLIC_CHAIN_ID) {
+  case 'goerli':
+  default:
+    currentChain.push(goerli)
+}
+
 // Web3 Configs
-const { chains, provider } = configureChains(
-  [mainnet, goerli],
-  [
-    infuraProvider({ apiKey: process.env.NEXT_PUBLIC_INFURA_ID !== '' && process.env.NEXT_PUBLIC_INFURA_ID }),
-    jsonRpcProvider({
-      rpc: chain => {
-        return {
-          http: `${chain.rpcUrls.default}`,
-        }
-      },
-    }),
-    publicProvider(),
-  ]
-)
+const { chains, provider } = configureChains(currentChain, [
+  infuraProvider({ apiKey: process.env.NEXT_PUBLIC_INFURA_ID !== '' && process.env.NEXT_PUBLIC_INFURA_ID }),
+  jsonRpcProvider({
+    rpc: chain => {
+      return {
+        http: `${chain.rpcUrls.default}`,
+      }
+    },
+  }),
+  publicProvider(),
+])
 
 const otherWallets = [
   braveWallet({ chains }),
