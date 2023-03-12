@@ -2,21 +2,50 @@ import "@fluencelabs/aqua-lib/builtin.aqua"
 import "@0x3zero/aqua-lib/builtin.aqua" 
 import "./dht.aqua"
 import "./collabeat.aqua"
+import "./evmrpc.aqua"
 
 -- 
 const PEER_ID ?= "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK"
-const DHT_SERVICE_ID ?= "9a38b271-d738-44a5-a68e-fbf79f553040"
+const DHT_SERVICE_ID ?= "ffe14ff1-1be1-4fee-8f8f-b37da725976d"
 -- COLLABEAT
-const COLLABEAT_NODE_URL = "https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74"
-const COLLABEAT_SERVICE_ID ?= "d62285ba-4e92-4d45-8367-fbe3f45cbf03"
+const NODE_URL = "https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74"
+const COLLABEAT_SERVICE_ID ?= "e91cfe47-e87d-4fab-855d-e1e76a521fc9"
 const COLLABEAT_ABI_URL = "https://ipfs.xfero.io/ipfs/QmRwqq9MfPdBsMeTJcQDXSp5EYVYvheQMXu5tpBiJqaECW?filename=CollaBeatUtility-abi.json"
 const COLLABEAT_ADDRESS = "0xb38d31ea6a07f7bbab4f2934a8cde1664007a48a"
 const COLLABEAT_IPFS_ADDRESS = "/dns4/ipfs.xfero.io/tcp/5002"
+
+-- EVM JSON-RPC
+const FEVM_JSON_RPC_SERVICE_ID = "676a3462-d46d-4ef6-8b9a-66873325ef1c"
+
+-- Data
+data Sheet:
+  owner: string
+  data_key: string
+  cid: string
+  token_id: u64
+  forked_beats: []Beat
+
+-- 
+service EventLogParamsMyOp("op"):
+  array_length(results: []EventLogParamResult) -> u32
+
+service BeatsMyOp("op"):
+  array_length(results: []Beat) -> u32
+
+service NumberOfBeat("op"):
+  array_length(results: []FdbDht) -> u32
+-- 
 
 func generate_block(key: string, public_key: string, dt: string) -> string:
   on HOST_PEER_ID:
     serialize_dt <- BlockFormatter.serialize(public_key, dt, "")
     <- serialize_dt
+
+func beat_max_up(url: string) -> bool:
+  on HOST_PEER_ID:
+    Collabeat COLLABEAT_SERVICE_ID
+    nos <- Collabeat.nos_of_beat(url)
+  <- nos > 10
 
 -- Add beat to the sheet
 func add_beat(key: string, public_key: string, content: string, signature: string):
@@ -25,7 +54,6 @@ func add_beat(key: string, public_key: string, content: string, signature: strin
 
     -- Check if there is record of dht
     dht <- Dht.get_latest_record_by_pk_and_key(key, public_key)
-
     -- format content to Block
     formatted <- BlockFormatter.serialize(dht.alias, content, dht.cid)
 
@@ -38,9 +66,48 @@ func add_beat(key: string, public_key: string, content: string, signature: strin
     else:
       Dht.insert(key, "", result.cid, public_key, signature, content, "secp256k1")
 
+-- Fork sheet
+func dht_fork(old_data_key: string, new_data_key: string, alias: string, public_key: string) -> FdbResult:
+  on HOST_PEER_ID:
+    Dht DHT_SERVICE_ID
+    result <- Dht.fork(old_data_key, new_data_key, alias, public_key)
+  <- result
+
+-- Get all sheets
+-- Retrieve the number of NFTs generated in ERC1155 address.
 func get_sheets() -> []Sheet:
   on HOST_PEER_ID:
     Collabeat COLLABEAT_SERVICE_ID
-    sheets <- Collabeat.get_sheets(COLLABEAT_NODE_URL, COLLABEAT_ABI_URL, "0x0", "latest", COLLABEAT_ADDRESS, ["0xd31cec58938275800d2f103b2ae24dfd32064eb9d23903438c16fa409956242c"], COLLABEAT_IPFS_ADDRESS)
+    EvmRpc FEVM_JSON_RPC_SERVICE_ID
+    results <- EvmRpc.eth_get_logs(NODE_URL, COLLABEAT_ABI_URL, "0x0", "latest", COLLABEAT_ADDRESS, ["0xd31cec58938275800d2f103b2ae24dfd32064eb9d23903438c16fa409956242c"])
+    n <- EventLogParamsMyOp.array_length(results)
+
+    datas: *EventLogParamResult
+    sheets: *Sheet
+
+    for result <- results par:
+      if result.data != "":
+        fork_data <- Collabeat.deserialize(result.data)
+        if fork_data.cid != "":
+          content <- IpfsDag.get(fork_data.cid, COLLABEAT_IPFS_ADDRESS, 0)
+          if content.success == true:
+            if content.content != "":
+              beats <- Collabeat.get_forked_beats(content.content)
+              o <- BeatsMyOp.array_length(beats)
+
+              for beat <- beats par:
+                rst <- dht_fork(beat.data_key, fork_data.data_key, "", beat.owner)
+              join beats[o-1]
+              
+              sheets <<- Sheet (
+                owner = fork_data.owner,
+                data_key = fork_data.data_key,
+                cid = fork_data.cid,
+                token_id = fork_data.token_id,
+                forked_beats = beats
+              )
+      datas <<- result
+
+    join datas[n-1]
 
   <- sheets

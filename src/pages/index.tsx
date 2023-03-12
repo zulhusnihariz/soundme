@@ -27,7 +27,6 @@ export default function MusicCollection() {
   useEffect(() => {
     const get = async () => {
       let sheets = await get_sheets()
-      console.log(sheets)
       setSheets(sheets)
     }
 
@@ -44,7 +43,7 @@ export default function MusicCollection() {
           <MusicCard
             sheet={sheet}
             key={sheet.data_key.toString()}
-            tokenId={sheet.data_key.toString()}
+            tokenId={sheet.token_id.toString()}
             name={sheet.data_key.toString()}
             description={''}
             audioUrls={[]}

@@ -1,15 +1,21 @@
+
+
 module Collabeat declares *
 
 data Beat:
   owner: string
   data_key: string
   cid: string
+  token_id: u64
 
-data Sheet:
+data ForkData:
   owner: string
   data_key: string
+  token_id: u64
   cid: string
-  beats: []Beat
 
 service Collabeat:
-  get_sheets(url: string, abi_url: string, start_block_in_hex: string, end_block_in_hex: string, address: string, topics: []string, ipfs_addr: string) -> []Sheet
+  deserialize(sheet: string) -> ForkData
+  get_forked_beats(content: string) -> []Beat
+  is_beat_maxed(url: string) -> bool
+  nos_of_beat(url: string) -> i32

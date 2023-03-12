@@ -6,6 +6,7 @@ import RecordingDialog from 'components/RecordingDialog'
 import MintButton from 'components/MintButton'
 import ForkDialog from 'components/ForkDialog'
 import ShareDialog from 'components/ShareDialog'
+import { beat_max_up } from '_aqua/music'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -24,6 +25,7 @@ const SingleMusic = () => {
   const [isDialogForkOpened, setIsDialogForkOpened] = useState(false)
   const [isWebRTCAllowed, setIsWebRTCAllowed] = useState(false)
   const [isShareDialogShow, setIsShareDialogShow] = useState(false)
+  const [canRecord, setCanRecord] = useState(false)
 
   useEffect(() => {
     if (data && !isLoad) {
@@ -54,7 +56,7 @@ const SingleMusic = () => {
       }
     }
 
-    if (!data) {
+    if (data == null) {
       load()
     }
   }, [data, router])
@@ -160,8 +162,20 @@ const SingleMusic = () => {
       }
     }
 
+    const canRecord = async () => {
+      try {
+        const d = await beat_max_up(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}/metadata/${router.query.key}`, {
+          ttl: 100000,
+        })
+        setCanRecord(!d)
+      } catch (ex) {
+        setCanRecord(false)
+      }
+    }
+
     testMic()
-  }, [])
+    canRecord()
+  }, [router])
 
   return (
     <>
@@ -180,7 +194,7 @@ const SingleMusic = () => {
                 </g>
               </svg>
             </button>
-            {!isForking && isWebRTCAllowed && (
+            {!isForking && isWebRTCAllowed && canRecord && (
               <button
                 className="mr-2 inline-block rounded-xl bg-red-500 px-8 py-3 text-white"
                 onClick={() => setIsDialogRecordingOpened(!isDialogRecordingOpened)}

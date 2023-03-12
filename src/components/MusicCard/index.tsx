@@ -25,7 +25,7 @@ const MusicCard = (prop: MusicCardProp) => {
     <>
       <div className="bg-pink px-4 py-2 text-white sm:w-1/2 md:w-full">
         <div className="my-4">
-          <p className="mb-1 text-left text-base font-semibold text-[#F6F8FF]">{`Collabeat #${prop.tokenId[0]}`}</p>
+          <p className="mb-1 text-left text-base font-semibold text-[#F6F8FF]">{`Collabeat #${prop.tokenId}`}</p>
           <p className="text-left text-xs text-[#F6F8FF]">
             <span className="text-[#FFE331]">{prop.sheet.owner}</span>
           </p>
