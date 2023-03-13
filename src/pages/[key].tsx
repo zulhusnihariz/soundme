@@ -53,7 +53,7 @@ const SingleMusic = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const d = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}/metadata/${dataKey}`)
+        const d = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
         const j = await d.json()
         setData(j)
       } catch (e) {
@@ -126,7 +126,7 @@ const SingleMusic = () => {
   }
 
   const onHandleCheckMetadata = () => {
-    window.open(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}/metadata/${dataKey}`, '_blank')
+    window.open(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`, '_blank')
   }
   const onHandleDialogClosed = () => {
     setData(null)
