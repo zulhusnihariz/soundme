@@ -28,7 +28,8 @@ export const FluenceProvider: React.FC<FluenceProviderProps> = ({ children }) =>
         try {
           await Fluence.start({
             connectTo: {
-              multiaddr: '/dns4/fluence.xfero.io/tcp/9990/ws/p2p/12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK',
+              multiaddr:
+                '/dns4/fluence.xfero.io/tcp/19990/wss/p2p/12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK',
               peerId: '12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK',
             },
           })
