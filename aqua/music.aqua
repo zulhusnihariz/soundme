@@ -7,7 +7,7 @@ import "@fluencelabs/aqua-lib/math.aqua"
 
 -- 
 const PEER_ID ?= "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK"
-const DHT_SERVICE_ID ?= "ffe14ff1-1be1-4fee-8f8f-b37da725976d"
+const DHT_SERVICE_ID ?= "f73671ed-e333-42d1-bd00-0da11bb89c30"
 -- COLLABEAT
 const NODE_URL = "https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74"
 const COLLABEAT_SERVICE_ID ?= "e91cfe47-e87d-4fab-855d-e1e76a521fc9"

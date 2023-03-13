@@ -39,10 +39,10 @@ export default function MusicCollection() {
     <div className="m-5">
       <main className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
         {/* <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Musics</h1> */}
-        {sheets.map(sheet => (
+        {sheets.map((sheet, index) => (
           <MusicCard
             sheet={sheet}
-            key={sheet.data_key.toString()}
+            key={index}
             tokenId={sheet.token_id.toString()}
             name={sheet.data_key.toString()}
             description={''}

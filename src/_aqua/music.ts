@@ -310,7 +310,7 @@ export function get_sheets(...args: any) {
                                                          (seq
                                                           (null)
                                                           (xor
-                                                           (call -relay- ("ffe14ff1-1be1-4fee-8f8f-b37da725976d" "fork") [beat-0.$.data_key! fork_data.$.data_key! "" beat-0.$.owner!] result-1)
+                                                           (call -relay- ("f73671ed-e333-42d1-bd00-0da11bb89c30" "fork") [beat-0.$.data_key! fork_data.$.data_key! "" beat-0.$.owner!] result-1)
                                                            (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
                                                           )
                                                          )
@@ -605,7 +605,7 @@ export function beat_max_up(...args: any) {
                         (call %init_peer_id% ("getDataSrv" "key") [] key)
                        )
                        (xor
-                        (call -relay- ("ffe14ff1-1be1-4fee-8f8f-b37da725976d" "get_records_by_key") [key] dhts)
+                        (call -relay- ("f73671ed-e333-42d1-bd00-0da11bb89c30" "get_records_by_key") [key] dhts)
                         (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
                        )
                       )
@@ -722,7 +722,7 @@ export function add_beat(...args: any) {
                         (seq
                          (seq
                           (seq
-                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("ffe14ff1-1be1-4fee-8f8f-b37da725976d" "get_latest_record_by_pk_and_key") [key public_key] dht)
+                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("f73671ed-e333-42d1-bd00-0da11bb89c30" "get_latest_record_by_pk_and_key") [key public_key] dht)
                            (null)
                           )
                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("block_formatter" "serialize") [dht.$.alias! content dht.$.cid!] formatted)
@@ -735,7 +735,7 @@ export function add_beat(...args: any) {
                            (seq
                             (seq
                              (null)
-                             (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("ffe14ff1-1be1-4fee-8f8f-b37da725976d" "insert") [key dht.$.alias! result.$.cid! public_key signature content "secp256k1"])
+                             (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("f73671ed-e333-42d1-bd00-0da11bb89c30" "insert") [key dht.$.alias! result.$.cid! public_key signature content "secp256k1"])
                             )
                             (call -relay- ("op" "noop") [])
                            )
@@ -748,7 +748,7 @@ export function add_beat(...args: any) {
                          (seq
                           (seq
                            (call -relay- ("op" "noop") [])
-                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("ffe14ff1-1be1-4fee-8f8f-b37da725976d" "insert") [key "" result.$.cid! public_key signature content "secp256k1"])
+                           (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("f73671ed-e333-42d1-bd00-0da11bb89c30" "insert") [key "" result.$.cid! public_key signature content "secp256k1"])
                           )
                           (call -relay- ("op" "noop") [])
                          )
@@ -844,7 +844,7 @@ export function dht_fork(...args: any) {
                         (call %init_peer_id% ("getDataSrv" "public_key") [] public_key)
                        )
                        (xor
-                        (call -relay- ("ffe14ff1-1be1-4fee-8f8f-b37da725976d" "fork") [old_data_key new_data_key alias public_key] result)
+                        (call -relay- ("f73671ed-e333-42d1-bd00-0da11bb89c30" "fork") [old_data_key new_data_key alias public_key] result)
                         (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
                        )
                       )
