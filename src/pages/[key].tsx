@@ -129,10 +129,12 @@ const SingleMusic = () => {
     window.open(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`, '_blank')
   }
   const onHandleDialogClosed = () => {
-    setData(null)
-    setFilteredData([])
-    setIsLoad(false)
-    setIsDialogRecordingOpened(!isDialogRecordingOpened)
+    setTimeout(() => {
+      setData(null)
+      setFilteredData([])
+      setIsLoad(false)
+      setIsDialogRecordingOpened(!isDialogRecordingOpened)
+    }, 3000)
   }
 
   const toggleForkingMode = () => {

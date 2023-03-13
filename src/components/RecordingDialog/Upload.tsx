@@ -6,6 +6,8 @@ import { add_beat } from '_aqua/music'
 interface UploadProp {
   audioData: any
   dataKey: String
+  onHandlePlayClicked: () => void
+  onHandleStopClicked: () => void
   onHandleRecordClicked: () => any
   onHandleConfirmClicked: () => void
 }
@@ -46,9 +48,14 @@ const Upload = (prop: UploadProp) => {
 
   return (
     <div className="mt-4 text-center">
-      <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandleRecordClicked}>
-        Play
-      </button>
+      <div>
+        <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandlePlayClicked}>
+          Play
+        </button>
+        <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandleStopClicked}>
+          Stop
+        </button>
+      </div>
       <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandleRecordClicked}>
         Recording again
       </button>

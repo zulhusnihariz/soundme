@@ -76,6 +76,30 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
     setFilteredData(updatedData)
   }
 
+  const onPlayOneAudio = (state: AudioState) => {
+    const index = filteredData.findIndex(item => item.key === state.key)
+    const updatedData = [...filteredData]
+
+    updatedData[index] = {
+      ...updatedData[index],
+      playerState: PlayerState.PLAY,
+    }
+
+    setFilteredData(updatedData)
+  }
+
+  const onStopOneAudio = (state: AudioState) => {
+    const index = filteredData.findIndex(item => item.key === state.key)
+    const updatedData = [...filteredData]
+
+    updatedData[index] = {
+      ...updatedData[index],
+      playerState: PlayerState.STOP,
+    }
+
+    setFilteredData(updatedData)
+  }
+
   return (
     <>
       <div
@@ -125,6 +149,8 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                             dataKey={prop.dataKey}
                             onHandleConfirmClicked={() => onHandleConfirmClicked()}
                             onHandleRecordClicked={() => onHandleRecordClicked()}
+                            onHandlePlayClicked={() => onPlayOneAudio(filteredData[filteredData.length - 1])}
+                            onHandleStopClicked={() => onStopOneAudio(filteredData[filteredData.length - 1])}
                           />
                         </div>
                       )}
