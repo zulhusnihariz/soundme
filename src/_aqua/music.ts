@@ -16,6 +16,73 @@ import {
 
 // Services
 
+export interface MyOpDef {
+    array_length: (fdb: { alias: string; cid: string; data_key: string; public_key: string; }[], callParams: CallParams$$<'fdb'>) => number | Promise<number>;
+}
+export function registerMyOp(service: MyOpDef): void;
+export function registerMyOp(serviceId: string, service: MyOpDef): void;
+export function registerMyOp(peer: FluencePeer, service: MyOpDef): void;
+export function registerMyOp(peer: FluencePeer, serviceId: string, service: MyOpDef): void;
+       
+
+export function registerMyOp(...args: any) {
+    registerService$$(
+        args,
+        {
+    "defaultServiceId" : "op",
+    "functions" : {
+        "tag" : "labeledProduct",
+        "fields" : {
+            "array_length" : {
+                "tag" : "arrow",
+                "domain" : {
+                    "tag" : "labeledProduct",
+                    "fields" : {
+                        "fdb" : {
+                            "tag" : "array",
+                            "type" : {
+                                "tag" : "struct",
+                                "name" : "FdbDht",
+                                "fields" : {
+                                    "alias" : {
+                                        "tag" : "scalar",
+                                        "name" : "string"
+                                    },
+                                    "cid" : {
+                                        "tag" : "scalar",
+                                        "name" : "string"
+                                    },
+                                    "data_key" : {
+                                        "tag" : "scalar",
+                                        "name" : "string"
+                                    },
+                                    "public_key" : {
+                                        "tag" : "scalar",
+                                        "name" : "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "codomain" : {
+                    "tag" : "unlabeledProduct",
+                    "items" : [
+                        {
+                            "tag" : "scalar",
+                            "name" : "i64"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
+    );
+}
+      
+
+
 export interface EventLogParamsMyOpDef {
     array_length: (results: { data: string; error_msg: string; event_name: string; params: { kind: string; name: string; value: string; }[]; success: boolean; }[], callParams: CallParams$$<'results'>) => number | Promise<number>;
 }
@@ -264,130 +331,121 @@ export function get_sheets(...args: any) {
                              (seq
                               (seq
                                (seq
-                                (seq
+                                (new $array-inline
                                  (seq
-                                  (new $array-inline
-                                   (seq
-                                    (ap "0xb6cf139cef7fa80097868d15e25a7cba51ec1c85e25f0aa709e5950f33321a2b" $array-inline)
-                                    (canon -relay- $array-inline  #array-inline-0)
-                                   )
-                                  )
-                                  (call -relay- ("676a3462-d46d-4ef6-8b9a-66873325ef1c" "eth_get_logs") ["https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74" "https://ipfs.xfero.io/ipfs/QmW4ZnFYDsp3CWezBu3s7arhJmEhukrvF8J9X61VBHz7ez?filename=CollaBeatUtility2-abi.json" "0x0" "latest" "0xef7e2f7d3dedac01367652f661b468d3438c139b" #array-inline-0] results)
+                                  (ap "0xb6cf139cef7fa80097868d15e25a7cba51ec1c85e25f0aa709e5950f33321a2b" $array-inline)
+                                  (canon -relay- $array-inline  #array-inline-0)
                                  )
-                                 (call -relay- ("op" "array_length") [results] n)
                                 )
+                                (call -relay- ("676a3462-d46d-4ef6-8b9a-66873325ef1c" "eth_get_logs") ["https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74" "https://ipfs.xfero.io/ipfs/QmW4ZnFYDsp3CWezBu3s7arhJmEhukrvF8J9X61VBHz7ez?filename=CollaBeatUtility2-abi.json" "0x0" "latest" "0xef7e2f7d3dedac01367652f661b468d3438c139b" #array-inline-0] results)
+                               )
+                               (call -relay- ("op" "array_length") [results] n)
+                              )
+                              (par
+                               (fold results result-0
                                 (par
-                                 (fold results result-0
-                                  (par
-                                   (seq
+                                 (seq
+                                  (xor
+                                   (mismatch result-0.$.data! ""
                                     (xor
-                                     (mismatch result-0.$.data! ""
+                                     (seq
+                                      (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "deserialize") [result-0.$.data!] fork_data)
                                       (xor
-                                       (seq
-                                        (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "deserialize") [result-0.$.data!] fork_data)
+                                       (mismatch fork_data.$.cid! ""
                                         (xor
-                                         (mismatch fork_data.$.cid! ""
+                                         (seq
+                                          (call -relay- ("ipfs_dag" "get") [fork_data.$.cid! "/dns4/ipfs.xfero.io/tcp/5002" 0] content)
                                           (xor
-                                           (seq
-                                            (call -relay- ("ipfs_dag" "get") [fork_data.$.cid! "/dns4/ipfs.xfero.io/tcp/5002" 0] content)
+                                           (match content.$.success! true
                                             (xor
-                                             (match content.$.success! true
-                                              (xor
+                                             (xor
+                                              (mismatch content.$.content! ""
                                                (xor
-                                                (mismatch content.$.content! ""
-                                                 (xor
+                                                (seq
+                                                 (seq
                                                   (seq
                                                    (seq
-                                                    (seq
-                                                     (seq
-                                                      (seq
-                                                       (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "get_forked_beats") [content.$.content!] beats)
-                                                       (call -relay- ("op" "array_length") [beats] o)
-                                                      )
-                                                      (par
-                                                       (fold beats beat-0
-                                                        (par
-                                                         (seq
-                                                          (null)
-                                                          (xor
-                                                           (call -relay- ("f73671ed-e333-42d1-bd00-0da11bb89c30" "fork") [beat-0.$.data_key! fork_data.$.data_key! "" beat-0.$.owner!] result-1)
-                                                           (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
-                                                          )
-                                                         )
-                                                         (next beat-0)
-                                                        )
-                                                        (never)
-                                                       )
-                                                       (null)
-                                                      )
-                                                     )
-                                                     (call -relay- ("math" "sub") [o 1] sub)
-                                                    )
-                                                    (call -relay- ("json" "obj") ["cid" fork_data.$.cid! "data_key" fork_data.$.data_key! "forked_beats" beats "owner" fork_data.$.owner! "token_id" fork_data.$.token_id!] Sheet_obj)
+                                                    (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "get_forked_beats") [content.$.content!] beats)
+                                                    (call -relay- ("op" "array_length") [beats] o)
                                                    )
-                                                   (ap Sheet_obj $sheets)
+                                                   (par
+                                                    (fold beats beat-0
+                                                     (par
+                                                      (seq
+                                                       (null)
+                                                       (xor
+                                                        (call -relay- ("f73671ed-e333-42d1-bd00-0da11bb89c30" "fork") [beat-0.$.data_key! fork_data.$.data_key! "" beat-0.$.owner!] result-1)
+                                                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                                                       )
+                                                      )
+                                                      (next beat-0)
+                                                     )
+                                                     (never)
+                                                    )
+                                                    (null)
+                                                   )
                                                   )
-                                                  (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                                                  (call -relay- ("json" "obj") ["cid" fork_data.$.cid! "data_key" fork_data.$.data_key! "forked_beats" beats "owner" fork_data.$.owner! "token_id" fork_data.$.token_id!] Sheet_obj)
                                                  )
+                                                 (ap Sheet_obj $sheets)
                                                 )
-                                                (call -relay- ("op" "noop") [])
+                                                (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
                                                )
-                                               (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
                                               )
+                                              (call -relay- ("op" "noop") [])
                                              )
-                                             (call -relay- ("op" "noop") [])
+                                             (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
                                             )
                                            )
-                                           (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 4])
+                                           (call -relay- ("op" "noop") [])
                                           )
                                          )
-                                         (call -relay- ("op" "noop") [])
+                                         (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 4])
                                         )
                                        )
-                                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 5])
+                                       (call -relay- ("op" "noop") [])
                                       )
                                      )
-                                     (call -relay- ("op" "noop") [])
+                                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 5])
                                     )
-                                    (ap result-0 $datas)
                                    )
-                                   (next result-0)
+                                   (call -relay- ("op" "noop") [])
+                                  )
+                                  (ap result-0 $datas)
+                                 )
+                                 (next result-0)
+                                )
+                                (never)
+                               )
+                               (null)
+                              )
+                             )
+                             (new $datas_test
+                              (seq
+                               (seq
+                                (seq
+                                 (call -relay- ("math" "add") [20 1] datas_incr)
+                                 (fold $datas s
+                                  (seq
+                                   (seq
+                                    (ap s $datas_test)
+                                    (canon -relay- $datas_test  #datas_iter_canon)
+                                   )
+                                   (xor
+                                    (match #datas_iter_canon.length datas_incr
+                                     (null)
+                                    )
+                                    (next s)
+                                   )
                                   )
                                   (never)
                                  )
-                                 (null)
                                 )
+                                (canon -relay- $datas_test  #datas_result_canon)
                                )
-                               (call -relay- ("math" "sub") [n 1] sub-0)
-                              )
-                              (new $datas_test
-                               (seq
-                                (seq
-                                 (seq
-                                  (call -relay- ("math" "add") [sub-0 1] datas_incr)
-                                  (fold $datas s
-                                   (seq
-                                    (seq
-                                     (ap s $datas_test)
-                                     (canon -relay- $datas_test  #datas_iter_canon)
-                                    )
-                                    (xor
-                                     (match #datas_iter_canon.length datas_incr
-                                      (null)
-                                     )
-                                     (next s)
-                                    )
-                                   )
-                                   (never)
-                                  )
-                                 )
-                                 (canon -relay- $datas_test  #datas_result_canon)
-                                )
-                                (ap #datas_result_canon datas_gate)
-                               )
+                               (ap #datas_result_canon datas_gate)
                               )
                              )
-                             (call -relay- ("math" "sub") [n 1] sub-1)
                             )
                             (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 6])
                            )
@@ -470,99 +528,6 @@ export function get_sheets(...args: any) {
                             }
                         }
                     }
-                }
-            ]
-        }
-    },
-    "names" : {
-        "relay" : "-relay-",
-        "getDataSrv" : "getDataSrv",
-        "callbackSrv" : "callbackSrv",
-        "responseSrv" : "callbackSrv",
-        "responseFnName" : "response",
-        "errorHandlingSrv" : "errorHandlingSrv",
-        "errorFnName" : "error"
-    }
-},
-        script
-    )
-}
-
- 
-
-export function generate_block(
-    key: string,
-    public_key: string,
-    dt: string,
-    config?: {ttl?: number}
-): Promise<string>;
-
-export function generate_block(
-    peer: FluencePeer,
-    key: string,
-    public_key: string,
-    dt: string,
-    config?: {ttl?: number}
-): Promise<string>;
-
-export function generate_block(...args: any) {
-
-    let script = `
-                    (xor
-                     (seq
-                      (seq
-                       (seq
-                        (seq
-                         (seq
-                          (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
-                          (call %init_peer_id% ("getDataSrv" "key") [] key)
-                         )
-                         (call %init_peer_id% ("getDataSrv" "public_key") [] public_key)
-                        )
-                        (call %init_peer_id% ("getDataSrv" "dt") [] dt)
-                       )
-                       (xor
-                        (call -relay- ("block_formatter" "serialize") [public_key dt ""] serialize_dt)
-                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
-                       )
-                      )
-                      (xor
-                       (call %init_peer_id% ("callbackSrv" "response") [serialize_dt])
-                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
-                      )
-                     )
-                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
-                    )
-    `
-    return callFunction$$(
-        args,
-        {
-    "functionName" : "generate_block",
-    "arrow" : {
-        "tag" : "arrow",
-        "domain" : {
-            "tag" : "labeledProduct",
-            "fields" : {
-                "key" : {
-                    "tag" : "scalar",
-                    "name" : "string"
-                },
-                "public_key" : {
-                    "tag" : "scalar",
-                    "name" : "string"
-                },
-                "dt" : {
-                    "tag" : "scalar",
-                    "name" : "string"
-                }
-            }
-        },
-        "codomain" : {
-            "tag" : "unlabeledProduct",
-            "items" : [
-                {
-                    "tag" : "scalar",
-                    "name" : "string"
                 }
             ]
         }
@@ -899,6 +864,284 @@ export function dht_fork(...args: any) {
                             "name" : "bool"
                         }
                     }
+                }
+            ]
+        }
+    },
+    "names" : {
+        "relay" : "-relay-",
+        "getDataSrv" : "getDataSrv",
+        "callbackSrv" : "callbackSrv",
+        "responseSrv" : "callbackSrv",
+        "responseFnName" : "response",
+        "errorHandlingSrv" : "errorHandlingSrv",
+        "errorFnName" : "error"
+    }
+},
+        script
+    )
+}
+
+ 
+
+export function generate_block(
+    key: string,
+    public_key: string,
+    dt: string,
+    config?: {ttl?: number}
+): Promise<string>;
+
+export function generate_block(
+    peer: FluencePeer,
+    key: string,
+    public_key: string,
+    dt: string,
+    config?: {ttl?: number}
+): Promise<string>;
+
+export function generate_block(...args: any) {
+
+    let script = `
+                    (xor
+                     (seq
+                      (seq
+                       (seq
+                        (seq
+                         (seq
+                          (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                          (call %init_peer_id% ("getDataSrv" "key") [] key)
+                         )
+                         (call %init_peer_id% ("getDataSrv" "public_key") [] public_key)
+                        )
+                        (call %init_peer_id% ("getDataSrv" "dt") [] dt)
+                       )
+                       (xor
+                        (call -relay- ("block_formatter" "serialize") [public_key dt ""] serialize_dt)
+                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                       )
+                      )
+                      (xor
+                       (call %init_peer_id% ("callbackSrv" "response") [serialize_dt])
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                      )
+                     )
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
+                    )
+    `
+    return callFunction$$(
+        args,
+        {
+    "functionName" : "generate_block",
+    "arrow" : {
+        "tag" : "arrow",
+        "domain" : {
+            "tag" : "labeledProduct",
+            "fields" : {
+                "key" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                },
+                "public_key" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                },
+                "dt" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            }
+        },
+        "codomain" : {
+            "tag" : "unlabeledProduct",
+            "items" : [
+                {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            ]
+        }
+    },
+    "names" : {
+        "relay" : "-relay-",
+        "getDataSrv" : "getDataSrv",
+        "callbackSrv" : "callbackSrv",
+        "responseSrv" : "callbackSrv",
+        "responseFnName" : "response",
+        "errorHandlingSrv" : "errorHandlingSrv",
+        "errorFnName" : "error"
+    }
+},
+        script
+    )
+}
+
+ 
+
+export function get_metadata_uri(
+    key: string,
+    config?: {ttl?: number}
+): Promise<string>;
+
+export function get_metadata_uri(
+    peer: FluencePeer,
+    key: string,
+    config?: {ttl?: number}
+): Promise<string>;
+
+export function get_metadata_uri(...args: any) {
+
+    let script = `
+                    (xor
+                     (seq
+                      (seq
+                       (seq
+                        (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                        (call %init_peer_id% ("getDataSrv" "key") [] key)
+                       )
+                       (new $rss
+                        (xor
+                         (seq
+                          (seq
+                           (seq
+                            (seq
+                             (seq
+                              (call -relay- ("f73671ed-e333-42d1-bd00-0da11bb89c30" "get_records_by_key") [key] get_records_by_key)
+                              (call -relay- ("op" "array_length") [get_records_by_key] n)
+                             )
+                             (par
+                              (fold get_records_by_key rst-0
+                               (par
+                                (new $sb
+                                 (seq
+                                  (seq
+                                   (seq
+                                    (call -relay- ("ipfs_dag" "get") [rst-0.$.cid! "" 0] get)
+                                    (xor
+                                     (mismatch rst-0.$.alias! ""
+                                      (xor
+                                       (seq
+                                        (null)
+                                        (call -relay- ("block_formatter" "serialize") [rst-0.$.alias! get.$.content! rst-0.$.cid!] $sb)
+                                       )
+                                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                                      )
+                                     )
+                                     (seq
+                                      (null)
+                                      (call -relay- ("block_formatter" "serialize") [rst-0.$.public_key! get.$.content! rst-0.$.cid!] $sb)
+                                     )
+                                    )
+                                   )
+                                   (new $sb_test
+                                    (seq
+                                     (seq
+                                      (seq
+                                       (call -relay- ("math" "add") [0 1] sb_incr)
+                                       (fold $sb s
+                                        (seq
+                                         (seq
+                                          (ap s $sb_test)
+                                          (canon -relay- $sb_test  #sb_iter_canon)
+                                         )
+                                         (xor
+                                          (match #sb_iter_canon.length sb_incr
+                                           (null)
+                                          )
+                                          (next s)
+                                         )
+                                        )
+                                        (never)
+                                       )
+                                      )
+                                      (canon -relay- $sb_test  #sb_result_canon)
+                                     )
+                                     (ap #sb_result_canon sb_gate)
+                                    )
+                                   )
+                                  )
+                                  (call -relay- ("block_formatter" "deserialize") [sb_gate.$.[0]!] $rss)
+                                 )
+                                )
+                                (next rst-0)
+                               )
+                               (never)
+                              )
+                              (null)
+                             )
+                            )
+                            (par
+                             (seq
+                              (seq
+                               (call -relay- ("math" "sub") [n 1] sub)
+                               (new $rss_test
+                                (seq
+                                 (seq
+                                  (seq
+                                   (call -relay- ("math" "add") [sub 1] rss_incr)
+                                   (fold $rss s
+                                    (seq
+                                     (seq
+                                      (ap s $rss_test)
+                                      (canon -relay- $rss_test  #rss_iter_canon)
+                                     )
+                                     (xor
+                                      (match #rss_iter_canon.length rss_incr
+                                       (null)
+                                      )
+                                      (next s)
+                                     )
+                                    )
+                                    (never)
+                                   )
+                                  )
+                                  (canon -relay- $rss_test  #rss_result_canon)
+                                 )
+                                 (ap #rss_result_canon rss_gate)
+                                )
+                               )
+                              )
+                              (call -relay- ("math" "sub") [n 1] sub-0)
+                             )
+                             (call -relay- ("peer" "timeout") [9000 "timeout"])
+                            )
+                           )
+                           (canon -relay- $rss  #rss_canon)
+                          )
+                          (call -relay- ("block_formatter" "format") ["" #rss_canon] format)
+                         )
+                         (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                        )
+                       )
+                      )
+                      (xor
+                       (call %init_peer_id% ("callbackSrv" "response") [format])
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
+                      )
+                     )
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 4])
+                    )
+    `
+    return callFunction$$(
+        args,
+        {
+    "functionName" : "get_metadata_uri",
+    "arrow" : {
+        "tag" : "arrow",
+        "domain" : {
+            "tag" : "labeledProduct",
+            "fields" : {
+                "key" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            }
+        },
+        "codomain" : {
+            "tag" : "unlabeledProduct",
+            "items" : [
+                {
+                    "tag" : "scalar",
+                    "name" : "string"
                 }
             ]
         }

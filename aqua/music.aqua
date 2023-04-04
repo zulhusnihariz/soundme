@@ -35,6 +35,9 @@ service BeatsMyOp("op"):
 
 service NumberOfBeat("op"):
   array_length(results: []FdbDht) -> u32
+
+service MyOp("op"):
+  array_length(fdb: []FdbDht) -> i64
 -- 
 
 func generate_block(key: string, public_key: string, dt: string) -> string:
@@ -104,7 +107,7 @@ func get_sheets() -> []Sheet:
 
               for beat <- beats par:
                 rst <- dht_fork(beat.data_key, fork_data.data_key, "", beat.owner)
-              join beats[o-1]
+              join beats[5]
               
               sheets <<- Sheet (
                 owner = fork_data.owner,
@@ -115,6 +118,31 @@ func get_sheets() -> []Sheet:
               )
       datas <<- result
 
-    join datas[n-1]
+    join datas[5]
 
   <- sheets
+
+func get_metadata_uri(key: string) -> string:
+  Dht DHT_SERVICE_ID
+
+  rss: *Block
+
+  on HOST_PEER_ID:
+    results = Dht.get_records_by_key(key)
+    n <- MyOp.array_length(results)
+
+    for rst <- results par:
+      rs = IpfsDag.get(rst.cid, "", 0)
+      sb: *string
+      if rst.alias != "":
+        sb <- BlockFormatter.serialize(rst.alias, rs.content, rst.cid)
+      else:
+        sb <- BlockFormatter.serialize(rst.public_key, rs.content, rst.cid)
+      sbt = sb!
+      rss <- BlockFormatter.deserialize(sbt)
+    join rss[n-1]
+
+    par Peer.timeout(9000, "timeout")
+
+    metadata = BlockFormatter.format("", rss)
+  <- metadata
