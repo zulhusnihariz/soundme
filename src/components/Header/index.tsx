@@ -12,13 +12,13 @@ import Link from 'next/link'
 export default function Header() {
   return (
     <Disclosure as="nav" className="bg-transparent">
-      <div className="mx-auto max-w-[3840px] px-2 sm:px-6 lg:px-8">
+      <div className="mx-auto mt-6 max-w-[3840px] px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="flex flex-1 items-center sm:items-stretch sm:justify-start">
             <div className="flex flex-shrink-0 items-center">
               <Link href="/">
-                <img className="block h-8 w-auto lg:hidden" src={logo.src} alt="Collabeat" />
-                <img className="hidden h-8 w-auto lg:block" src={logo.src} alt="Collabeat" />
+                <img className="block h-10 w-auto lg:hidden" src={logo.src} alt="Collabeat" />
+                <img className="hidden h-10 w-auto lg:block" src={logo.src} alt="Collabeat" />
               </Link>
             </div>
           </div>
