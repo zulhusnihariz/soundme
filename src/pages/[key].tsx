@@ -6,7 +6,6 @@ import RecordingDialog from 'components/RecordingDialog'
 import MintButton from 'components/MintButton'
 import ForkDialog from 'components/ForkDialog'
 import ShareDialog from 'components/ShareDialog'
-import { beat_max_up } from '_aqua/music'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -22,7 +21,6 @@ const SingleMusic = () => {
 
   const [isDialogRecordingOpened, setIsDialogRecordingOpened] = useState(false)
   const [isDialogForkOpened, setIsDialogForkOpened] = useState(false)
-  const [isWebRTCAllowed, setIsWebRTCAllowed] = useState(false)
   const [isShareDialogShow, setIsShareDialogShow] = useState(false)
   const [canRecord, setCanRecord] = useState(false)
 
@@ -163,20 +161,6 @@ const SingleMusic = () => {
     setForkData(selections)
   }
 
-  useEffect(() => {
-    const testMic = async () => {
-      try {
-        const constraints = { audio: true, video: false }
-        await navigator.mediaDevices.getUserMedia(constraints)
-        setIsWebRTCAllowed(true)
-      } catch (ex) {
-        setIsWebRTCAllowed(false)
-      }
-    }
-
-    testMic()
-  }, [router])
-
   return (
     <>
       <div className="pb-5">
@@ -194,7 +178,7 @@ const SingleMusic = () => {
                 </g>
               </svg>
             </button>
-            {!isForking && canRecord && isWebRTCAllowed && (
+            {!isForking && canRecord && (
               <button
                 className="mr-2 inline-block rounded-xl bg-red-500 px-8 py-3 text-white"
                 onClick={() => setIsDialogRecordingOpened(!isDialogRecordingOpened)}
