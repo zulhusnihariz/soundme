@@ -5,14 +5,6 @@ interface CountdownProp {
   onCountdownFinish: () => void
 }
 
-const renderTime = ({ remainingTime }) => {
-  return (
-    <div className="time-wrapper">
-      <div>{remainingTime}</div>
-    </div>
-  )
-}
-
 const CountdownTimer = (prop: CountdownProp) => {
   return (
     <CountdownCircleTimer
@@ -22,7 +14,7 @@ const CountdownTimer = (prop: CountdownProp) => {
       colorsTime={[3, 2, 1]}
       onComplete={prop.onCountdownFinish}
     >
-      {renderTime}
+      {({ remainingTime }) => <div className="time-wrapper">{remainingTime}</div>}
     </CountdownCircleTimer>
   )
 }
