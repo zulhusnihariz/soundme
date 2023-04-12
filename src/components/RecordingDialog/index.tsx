@@ -119,11 +119,9 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   }
 
   const removeMicrophoneAccess = async () => {
-    console.log('before', mediaStream)
     if (mediaStream) {
       mediaStream.getTracks().forEach(track => track.stop())
       setMediaStream(null)
-      console.log('after', mediaStream)
     }
   }
 
