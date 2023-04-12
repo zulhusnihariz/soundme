@@ -30,7 +30,7 @@ import MainLayout from 'layout/MainLayout'
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   return (
-    <ThemeProvider defaultTheme="system" attribute="class">
+    <ThemeProvider defaultTheme="system" attribute="class" forcedTheme="dark">
       <HeadGlobal />
       <Web3Wrapper>
         <MainLayout>

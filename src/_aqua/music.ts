@@ -308,12 +308,12 @@ export function registerBeatsMyOp(...args: any) {
 
 export function get_sheets(
     config?: {ttl?: number}
-): Promise<{ cid: string; data_key: string; forked_beats: { cid: string; data_key: string; owner: string; token_id: number; }[]; owner: string; token_id: number; }[]>;
+): Promise<{ cid: string; data_key: string; owner: string; token_id: number; }[]>;
 
 export function get_sheets(
     peer: FluencePeer,
     config?: {ttl?: number}
-): Promise<{ cid: string; data_key: string; forked_beats: { cid: string; data_key: string; owner: string; token_id: number; }[]; owner: string; token_id: number; }[]>;
+): Promise<{ cid: string; data_key: string; owner: string; token_id: number; }[]>;
 
 export function get_sheets(...args: any) {
 
@@ -331,123 +331,86 @@ export function get_sheets(...args: any) {
                              (seq
                               (seq
                                (seq
-                                (new $array-inline
+                                (seq
                                  (seq
-                                  (ap "0xb6cf139cef7fa80097868d15e25a7cba51ec1c85e25f0aa709e5950f33321a2b" $array-inline)
-                                  (canon -relay- $array-inline  #array-inline-0)
+                                  (new $array-inline
+                                   (seq
+                                    (ap "0xb6cf139cef7fa80097868d15e25a7cba51ec1c85e25f0aa709e5950f33321a2b" $array-inline)
+                                    (canon -relay- $array-inline  #array-inline-0)
+                                   )
+                                  )
+                                  (call -relay- ("676a3462-d46d-4ef6-8b9a-66873325ef1c" "eth_get_logs") ["https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74" "https://ipfs.xfero.io/ipfs/QmW4ZnFYDsp3CWezBu3s7arhJmEhukrvF8J9X61VBHz7ez?filename=CollaBeatUtility2-abi.json" "0x0" "latest" "0xef7e2f7d3dedac01367652f661b468d3438c139b" #array-inline-0] results)
                                  )
+                                 (call -relay- ("op" "array_length") [results] n)
                                 )
-                                (call -relay- ("676a3462-d46d-4ef6-8b9a-66873325ef1c" "eth_get_logs") ["https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74" "https://ipfs.xfero.io/ipfs/QmW4ZnFYDsp3CWezBu3s7arhJmEhukrvF8J9X61VBHz7ez?filename=CollaBeatUtility2-abi.json" "0x0" "latest" "0xef7e2f7d3dedac01367652f661b468d3438c139b" #array-inline-0] results)
-                               )
-                               (call -relay- ("op" "array_length") [results] n)
-                              )
-                              (par
-                               (fold results result-0
                                 (par
-                                 (seq
-                                  (xor
-                                   (mismatch result-0.$.data! ""
+                                 (fold results result-0
+                                  (par
+                                   (seq
                                     (xor
-                                     (seq
-                                      (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "deserialize") [result-0.$.data!] fork_data)
+                                     (mismatch result-0.$.data! ""
                                       (xor
-                                       (mismatch fork_data.$.cid! ""
+                                       (seq
+                                        (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "deserialize") [result-0.$.data!] fork_data)
                                         (xor
-                                         (seq
-                                          (call -relay- ("ipfs_dag" "get") [fork_data.$.cid! "/dns4/ipfs.xfero.io/tcp/5002" 0] content)
+                                         (mismatch fork_data.$.cid! ""
                                           (xor
-                                           (match content.$.success! true
-                                            (xor
-                                             (xor
-                                              (mismatch content.$.content! ""
-                                               (xor
-                                                (seq
-                                                 (seq
-                                                  (seq
-                                                   (seq
-                                                    (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "get_forked_beats") [content.$.content!] beats)
-                                                    (call -relay- ("op" "array_length") [beats] o)
-                                                   )
-                                                   (par
-                                                    (fold beats beat-0
-                                                     (par
-                                                      (seq
-                                                       (null)
-                                                       (xor
-                                                        (call -relay- ("f73671ed-e333-42d1-bd00-0da11bb89c30" "fork") [beat-0.$.data_key! fork_data.$.data_key! "" beat-0.$.owner!] result-1)
-                                                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
-                                                       )
-                                                      )
-                                                      (next beat-0)
-                                                     )
-                                                     (never)
-                                                    )
-                                                    (null)
-                                                   )
-                                                  )
-                                                  (call -relay- ("json" "obj") ["cid" fork_data.$.cid! "data_key" fork_data.$.data_key! "forked_beats" beats "owner" fork_data.$.owner! "token_id" fork_data.$.token_id!] Sheet_obj)
-                                                 )
-                                                 (ap Sheet_obj $sheets)
-                                                )
-                                                (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
-                                               )
-                                              )
-                                              (call -relay- ("op" "noop") [])
-                                             )
-                                             (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
-                                            )
+                                           (seq
+                                            (call -relay- ("json" "obj") ["cid" fork_data.$.cid! "data_key" fork_data.$.data_key! "owner" fork_data.$.owner! "token_id" fork_data.$.token_id!] Sheet_obj)
+                                            (ap Sheet_obj $sheets)
                                            )
-                                           (call -relay- ("op" "noop") [])
+                                           (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
                                           )
                                          )
-                                         (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 4])
+                                         (call -relay- ("op" "noop") [])
                                         )
                                        )
-                                       (call -relay- ("op" "noop") [])
+                                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
                                       )
                                      )
-                                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 5])
+                                     (call -relay- ("op" "noop") [])
                                     )
+                                    (ap result-0 $datas)
                                    )
-                                   (call -relay- ("op" "noop") [])
-                                  )
-                                  (ap result-0 $datas)
-                                 )
-                                 (next result-0)
-                                )
-                                (never)
-                               )
-                               (null)
-                              )
-                             )
-                             (new $datas_test
-                              (seq
-                               (seq
-                                (seq
-                                 (call -relay- ("math" "add") [20 1] datas_incr)
-                                 (fold $datas s
-                                  (seq
-                                   (seq
-                                    (ap s $datas_test)
-                                    (canon -relay- $datas_test  #datas_iter_canon)
-                                   )
-                                   (xor
-                                    (match #datas_iter_canon.length datas_incr
-                                     (null)
-                                    )
-                                    (next s)
-                                   )
+                                   (next result-0)
                                   )
                                   (never)
                                  )
+                                 (null)
                                 )
-                                (canon -relay- $datas_test  #datas_result_canon)
                                )
-                               (ap #datas_result_canon datas_gate)
+                               (call -relay- ("math" "sub") [n 1] sub)
+                              )
+                              (new $datas_test
+                               (seq
+                                (seq
+                                 (seq
+                                  (call -relay- ("math" "add") [sub 1] datas_incr)
+                                  (fold $datas s
+                                   (seq
+                                    (seq
+                                     (ap s $datas_test)
+                                     (canon -relay- $datas_test  #datas_iter_canon)
+                                    )
+                                    (xor
+                                     (match #datas_iter_canon.length datas_incr
+                                      (null)
+                                     )
+                                     (next s)
+                                    )
+                                   )
+                                   (never)
+                                  )
+                                 )
+                                 (canon -relay- $datas_test  #datas_result_canon)
+                                )
+                                (ap #datas_result_canon datas_gate)
+                               )
                               )
                              )
+                             (call -relay- ("math" "sub") [n 1] sub-0)
                             )
-                            (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 6])
+                            (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
                            )
                            (canon %init_peer_id% $sheets  #-sheets-fix-0)
                           )
@@ -458,10 +421,10 @@ export function get_sheets(...args: any) {
                       )
                       (xor
                        (call %init_peer_id% ("callbackSrv" "response") [-sheets-flat-0])
-                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 7])
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 4])
                       )
                      )
-                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 8])
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 5])
                     )
     `
     return callFunction$$(
@@ -489,42 +452,17 @@ export function get_sheets(...args: any) {
                                 "tag" : "scalar",
                                 "name" : "string"
                             },
-                            "token_id" : {
+                            "data_key" : {
                                 "tag" : "scalar",
-                                "name" : "u64"
+                                "name" : "string"
                             },
                             "owner" : {
                                 "tag" : "scalar",
                                 "name" : "string"
                             },
-                            "forked_beats" : {
-                                "tag" : "array",
-                                "type" : {
-                                    "tag" : "struct",
-                                    "name" : "Beat",
-                                    "fields" : {
-                                        "cid" : {
-                                            "tag" : "scalar",
-                                            "name" : "string"
-                                        },
-                                        "data_key" : {
-                                            "tag" : "scalar",
-                                            "name" : "string"
-                                        },
-                                        "owner" : {
-                                            "tag" : "scalar",
-                                            "name" : "string"
-                                        },
-                                        "token_id" : {
-                                            "tag" : "scalar",
-                                            "name" : "u64"
-                                        }
-                                    }
-                                }
-                            },
-                            "data_key" : {
+                            "token_id" : {
                                 "tag" : "scalar",
-                                "name" : "string"
+                                "name" : "u64"
                             }
                         }
                     }
@@ -862,6 +800,180 @@ export function dht_fork(...args: any) {
                         "success" : {
                             "tag" : "scalar",
                             "name" : "bool"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "names" : {
+        "relay" : "-relay-",
+        "getDataSrv" : "getDataSrv",
+        "callbackSrv" : "callbackSrv",
+        "responseSrv" : "callbackSrv",
+        "responseFnName" : "response",
+        "errorHandlingSrv" : "errorHandlingSrv",
+        "errorFnName" : "error"
+    }
+},
+        script
+    )
+}
+
+ 
+
+export function get_forked_beats(
+    cid: string,
+    data_key: string,
+    config?: {ttl?: number}
+): Promise<{ forked_beats: { cid: string; data_key: string; owner: string; token_id: number; }[]; }[]>;
+
+export function get_forked_beats(
+    peer: FluencePeer,
+    cid: string,
+    data_key: string,
+    config?: {ttl?: number}
+): Promise<{ forked_beats: { cid: string; data_key: string; owner: string; token_id: number; }[]; }[]>;
+
+export function get_forked_beats(...args: any) {
+
+    let script = `
+                    (xor
+                     (seq
+                      (seq
+                       (seq
+                        (seq
+                         (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                         (call %init_peer_id% ("getDataSrv" "cid") [] cid)
+                        )
+                        (call %init_peer_id% ("getDataSrv" "data_key") [] data_key)
+                       )
+                       (xor
+                        (xor
+                         (mismatch cid ""
+                          (xor
+                           (seq
+                            (call -relay- ("ipfs_dag" "get") [cid "/dns4/ipfs.xfero.io/tcp/5002" 0] content)
+                            (xor
+                             (match content.$.success! true
+                              (xor
+                               (xor
+                                (mismatch content.$.content! ""
+                                 (xor
+                                  (seq
+                                   (seq
+                                    (seq
+                                     (seq
+                                      (seq
+                                       (call -relay- ("e91cfe47-e87d-4fab-855d-e1e76a521fc9" "get_forked_beats") [content.$.content!] beats)
+                                       (call -relay- ("op" "array_length") [beats] o)
+                                      )
+                                      (par
+                                       (fold beats beat-0
+                                        (par
+                                         (seq
+                                          (null)
+                                          (xor
+                                           (call -relay- ("f73671ed-e333-42d1-bd00-0da11bb89c30" "fork") [beat-0.$.data_key! data_key "" beat-0.$.owner!] result)
+                                           (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                                          )
+                                         )
+                                         (next beat-0)
+                                        )
+                                        (never)
+                                       )
+                                       (null)
+                                      )
+                                     )
+                                     (call -relay- ("math" "sub") [o 1] sub)
+                                    )
+                                    (call -relay- ("json" "obj") ["forked_beats" beats] ForkedBeats_obj)
+                                   )
+                                   (ap ForkedBeats_obj $forked_beats)
+                                  )
+                                  (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                                 )
+                                )
+                                (call -relay- ("op" "noop") [])
+                               )
+                               (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
+                              )
+                             )
+                             (call -relay- ("op" "noop") [])
+                            )
+                           )
+                           (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 4])
+                          )
+                         )
+                         (call -relay- ("op" "noop") [])
+                        )
+                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 5])
+                       )
+                      )
+                      (xor
+                       (seq
+                        (canon %init_peer_id% $forked_beats  #forked_beats_canon)
+                        (call %init_peer_id% ("callbackSrv" "response") [#forked_beats_canon])
+                       )
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 6])
+                      )
+                     )
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 7])
+                    )
+    `
+    return callFunction$$(
+        args,
+        {
+    "functionName" : "get_forked_beats",
+    "arrow" : {
+        "tag" : "arrow",
+        "domain" : {
+            "tag" : "labeledProduct",
+            "fields" : {
+                "cid" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                },
+                "data_key" : {
+                    "tag" : "scalar",
+                    "name" : "string"
+                }
+            }
+        },
+        "codomain" : {
+            "tag" : "unlabeledProduct",
+            "items" : [
+                {
+                    "tag" : "array",
+                    "type" : {
+                        "tag" : "struct",
+                        "name" : "ForkedBeats",
+                        "fields" : {
+                            "forked_beats" : {
+                                "tag" : "array",
+                                "type" : {
+                                    "tag" : "struct",
+                                    "name" : "Beat",
+                                    "fields" : {
+                                        "cid" : {
+                                            "tag" : "scalar",
+                                            "name" : "string"
+                                        },
+                                        "data_key" : {
+                                            "tag" : "scalar",
+                                            "name" : "string"
+                                        },
+                                        "owner" : {
+                                            "tag" : "scalar",
+                                            "name" : "string"
+                                        },
+                                        "token_id" : {
+                                            "tag" : "scalar",
+                                            "name" : "u64"
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

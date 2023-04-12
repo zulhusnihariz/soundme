@@ -5,6 +5,7 @@ interface RecordingProp {
   state: RecordingDialogState
   onHandleStopRecordingClicked: () => any
   setAudioData: (obj: any) => void
+  mediaStream: MediaStream
 }
 
 const Recording = (prop: RecordingProp) => {
@@ -51,27 +52,22 @@ const Recording = (prop: RecordingProp) => {
     const startRecord = () => {
       if (prop.state !== RecordingDialogState.RECORD) return
 
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then(stream => {
-          mediaRecorder.current = new MediaRecorder(stream)
-          mediaRecorder.current.start()
+      mediaRecorder.current = new MediaRecorder(prop.mediaStream)
+      mediaRecorder.current.start()
 
-          const chunks = []
-          mediaRecorder.current.addEventListener('dataavailable', event => {
-            chunks.push(event.data)
-          })
+      const chunks = []
+      mediaRecorder.current.addEventListener('dataavailable', event => {
+        chunks.push(event.data)
+      })
 
-          mediaRecorder.current.addEventListener('stop', () => {
-            const blob = new Blob(chunks, { type: 'audio/mpeg' })
-            const url = URL.createObjectURL(blob)
-            prop.setAudioData({
-              blob,
-              url,
-            })
-          })
+      mediaRecorder.current.addEventListener('stop', () => {
+        const blob = new Blob(chunks, { type: 'audio/mpeg' })
+        const url = URL.createObjectURL(blob)
+        prop.setAudioData({
+          blob,
+          url,
         })
-        .catch(err => console.log(err))
+      })
     }
 
     startRecord()

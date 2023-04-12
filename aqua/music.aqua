@@ -24,7 +24,9 @@ data Sheet:
   data_key: string
   cid: string
   token_id: u64
-  forked_beats: []Beat
+
+data ForkedBeats:
+ forked_beats: []Beat
 
 -- 
 service EventLogParamsMyOp("op"):
@@ -99,26 +101,16 @@ func get_sheets() -> []Sheet:
       if result.data != "":
         fork_data <- Collabeat.deserialize(result.data)
         if fork_data.cid != "":
-          content <- IpfsDag.get(fork_data.cid, COLLABEAT_IPFS_ADDRESS, 0)
-          if content.success == true:
-            if content.content != "":
-              beats <- Collabeat.get_forked_beats(content.content)
-              o <- BeatsMyOp.array_length(beats)
-
-              for beat <- beats par:
-                rst <- dht_fork(beat.data_key, fork_data.data_key, "", beat.owner)
-              join beats[5]
-              
+       
               sheets <<- Sheet (
                 owner = fork_data.owner,
                 data_key = fork_data.data_key,
                 cid = fork_data.cid,
-                token_id = fork_data.token_id,
-                forked_beats = beats
+                token_id = fork_data.token_id
               )
       datas <<- result
 
-    join datas[5]
+    join datas[n-1]
 
   <- sheets
 
@@ -146,3 +138,25 @@ func get_metadata_uri(key: string) -> string:
 
     metadata = BlockFormatter.format("", rss)
   <- metadata
+
+func get_forked_beats(cid:string, data_key:string) -> *ForkedBeats:
+    on HOST_PEER_ID:
+      Collabeat COLLABEAT_SERVICE_ID
+
+      forked_beats: *ForkedBeats
+      
+      if cid != "":
+        content <- IpfsDag.get(cid, COLLABEAT_IPFS_ADDRESS, 0)
+        if content.success == true:
+          if content.content != "":
+            beats <- Collabeat.get_forked_beats(content.content)
+            o <- BeatsMyOp.array_length(beats)
+
+            for beat <- beats par:
+              rst <- dht_fork(beat.data_key, data_key, "", beat.owner)
+            join beats[o-1]
+            
+           forked_beats <<- ForkedBeats (
+              forked_beats = beats
+            ) 
+    <- forked_beats

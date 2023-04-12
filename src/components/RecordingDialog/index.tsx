@@ -35,12 +35,17 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   const [filteredData, setFilteredData] = useState<Array<AudioState>>([])
   const { address } = useAccount()
 
-  const onHandleRecordClicked = () => {
-    setState(RecordingDialogState.COUNTDOWN)
-  }
-
   const onHandleConfirmClicked = () => {
     prop.onDialogClosed()
+  }
+
+  async function onRecordingStart() {
+    try {
+      await getMicrophoneAccess()
+      setState(RecordingDialogState.COUNTDOWN)
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   const onRecordingFinished = () => {
@@ -49,6 +54,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
     } else {
       setState(RecordingDialogState.START)
     }
+    removeMicrophoneAccess()
   }
 
   useEffect(() => {
@@ -100,6 +106,27 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
     setFilteredData(updatedData)
   }
 
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null)
+
+  const getMicrophoneAccess = async () => {
+    try {
+      const constraints = { audio: true, video: false }
+      let stream = await navigator.mediaDevices.getUserMedia(constraints)
+      setMediaStream(stream)
+    } catch (ex) {
+      console.log(ex)
+    }
+  }
+
+  const removeMicrophoneAccess = async () => {
+    console.log('before', mediaStream)
+    if (mediaStream) {
+      mediaStream.getTracks().forEach(track => track.stop())
+      setMediaStream(null)
+      console.log('after', mediaStream)
+    }
+  }
+
   return (
     <>
       <div
@@ -120,9 +147,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                   <div className="border-1 m-1 h-[180px] rounded p-2 text-left">
                     <div className="flex h-full w-full items-center justify-center">
                       {state == RecordingDialogState.START && (
-                        <StartRecording
-                          onHandleStartRecordingClicked={() => setState(RecordingDialogState.COUNTDOWN)}
-                        />
+                        <StartRecording onHandleStartRecordingClicked={onRecordingStart} />
                       )}
                       {state === RecordingDialogState.COUNTDOWN && (
                         <CountdownTimer onCountdownFinish={() => setState(RecordingDialogState.RECORD)} />
@@ -132,6 +157,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                           state={state}
                           onHandleStopRecordingClicked={() => onRecordingFinished()}
                           setAudioData={setAudioData}
+                          mediaStream={mediaStream}
                         />
                       )}
                       {state === RecordingDialogState.UPLOAD && (
@@ -148,7 +174,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                             audioData={audioData}
                             dataKey={prop.dataKey}
                             onHandleConfirmClicked={() => onHandleConfirmClicked()}
-                            onHandleRecordClicked={() => onHandleRecordClicked()}
+                            onHandleRecordClicked={() => onRecordingStart()}
                             onHandlePlayClicked={() => onPlayOneAudio(filteredData[filteredData.length - 1])}
                             onHandleStopClicked={() => onStopOneAudio(filteredData[filteredData.length - 1])}
                           />
