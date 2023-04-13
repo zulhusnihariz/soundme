@@ -1,5 +1,5 @@
-import { create, IPFSHTTPClient } from 'ipfs-http-client'
 import { createContext, useContext, useEffect, useState } from 'react'
+import { NFTStorage } from 'nft.storage'
 
 interface IpfsContextInterface {
   ipfs: any
@@ -27,9 +27,8 @@ export const IpfsProvider: React.FC<IpfsProviderProps> = ({ children }) => {
     async function startIpfs() {
       if (!isIPFSConnected) {
         try {
-          const client = await create({
-            url: process.env.NEXT_PUBLIC_IPFS_MULTIADDRESS,
-          })
+          const NFT_STORAGE_TOKEN = process.env.NEXT_PUBLIC_NFTSTORAGE_TOKEN
+          const client = new NFTStorage({ token: NFT_STORAGE_TOKEN })
 
           setIpfs(client)
           setIsIPFSConnected(Boolean(client))
