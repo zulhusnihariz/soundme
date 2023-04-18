@@ -4,8 +4,12 @@ import ShareDialog from 'components/ShareDialog'
 import { get_sheets } from '_aqua/music'
 import { Sheet } from 'lib'
 import LoadingIndicator from 'components/LoadingIndicator'
+import { useRouter } from 'next/router'
+import { RefreshIcon } from 'components/Icons/icons'
 
 export default function MusicCollection() {
+  const router = useRouter()
+
   const [selectedToken, setSelectedToken] = useState({
     tokenId: '',
     dataKey: '',
@@ -20,6 +24,7 @@ export default function MusicCollection() {
 
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [paginatedSheets, setPaginatedSheets] = useState<Sheet[]>([])
+  const [refresh, setRefresh] = useState(false)
 
   const onHandleRecordClicked = tokenId => {
     setSelectedToken({
@@ -34,11 +39,12 @@ export default function MusicCollection() {
   }
 
   function handleMoreSheets() {
-    const page_size = 9
+    setCurrentPage(prev => prev + 1)
+    setRefresh(true)
+  }
 
-    setCurrentPage(p => p + 1)
-    let moreSheets = paginate(sheets, page_size, currentPage)
-    setPaginatedSheets(paginatedSheets.concat(moreSheets))
+  function handleRefreshSheets() {
+    router.reload()
   }
 
   useEffect(() => {
@@ -46,12 +52,18 @@ export default function MusicCollection() {
       let sheets = await get_sheets({ ttl: 60000 })
 
       setSheets(sheets)
-      setCurrentPage(1)
       setPaginatedSheets(paginate(sheets, 9, currentPage))
     }
 
     if (sheets.length <= 0) get()
-  }, [sheets])
+  }, [])
+
+  useEffect(() => {
+    const page_size = 9
+
+    let moreSheets = paginate(sheets, page_size, currentPage)
+    setPaginatedSheets(paginatedSheets.concat(moreSheets))
+  }, [currentPage])
 
   return (
     <div className="m-5">
@@ -89,10 +101,10 @@ export default function MusicCollection() {
 
         {paginatedSheets.length > 0 ? (
           <button
-            onClick={handleMoreSheets}
+            onClick={refresh ? handleRefreshSheets : handleMoreSheets}
             className="fixed inset-x-0 bottom-[15px] mx-auto flex w-28 cursor-pointer flex-row items-center justify-center rounded-3xl border border-[#232323] bg-black py-2 px-4"
           >
-            <span>More</span>
+            {refresh ? <RefreshIcon /> : <span>More</span>}
           </button>
         ) : (
           <LoadingIndicator text={'Fetching data...'} />
