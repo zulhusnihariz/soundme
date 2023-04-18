@@ -6,9 +6,11 @@ import { Sheet } from 'lib'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useRouter } from 'next/router'
 import { RefreshIcon } from 'components/Icons/icons'
+import { isMobile } from 'react-device-detect'
 
 export default function MusicCollection() {
   const router = useRouter()
+  const page_size = isMobile ? 3 : 9
 
   const [selectedToken, setSelectedToken] = useState({
     tokenId: '',
@@ -49,18 +51,16 @@ export default function MusicCollection() {
 
   useEffect(() => {
     const get = async () => {
-      let sheets = await get_sheets({ ttl: 60000 })
+      let sheets = await get_sheets(page_size * 2, { ttl: 60000 })
 
       setSheets(sheets)
-      setPaginatedSheets(paginate(sheets, 9, currentPage))
+      setPaginatedSheets(paginate(sheets, page_size, currentPage))
     }
 
-    if (sheets.length <= 0) get()
+    get()
   }, [])
 
   useEffect(() => {
-    const page_size = 9
-
     let moreSheets = paginate(sheets, page_size, currentPage)
     setPaginatedSheets(paginatedSheets.concat(moreSheets))
   }, [currentPage])

@@ -307,11 +307,13 @@ export function registerBeatsMyOp(...args: any) {
  
 
 export function get_sheets(
+    length: number,
     config?: {ttl?: number}
 ): Promise<{ cid: string; data_key: string; owner: string; token_id: number; }[]>;
 
 export function get_sheets(
     peer: FluencePeer,
+    length: number,
     config?: {ttl?: number}
 ): Promise<{ cid: string; data_key: string; owner: string; token_id: number; }[]>;
 
@@ -321,9 +323,12 @@ export function get_sheets(...args: any) {
                     (xor
                      (seq
                       (seq
-                       (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
-                       (new $sheets
-                        (new $datas
+                       (seq
+                        (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                        (call %init_peer_id% ("getDataSrv" "length") [] length)
+                       )
+                       (new $datas
+                        (new $sheets
                          (seq
                           (seq
                            (xor
@@ -379,7 +384,7 @@ export function get_sheets(...args: any) {
                                  (null)
                                 )
                                )
-                               (call -relay- ("math" "sub") [n 1] sub)
+                               (call -relay- ("math" "sub") [length 1] sub)
                               )
                               (new $datas_test
                                (seq
@@ -408,7 +413,7 @@ export function get_sheets(...args: any) {
                                )
                               )
                              )
-                             (call -relay- ("math" "sub") [n 1] sub-0)
+                             (call -relay- ("math" "sub") [length 1] sub-0)
                             )
                             (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
                            )
@@ -436,7 +441,10 @@ export function get_sheets(...args: any) {
         "domain" : {
             "tag" : "labeledProduct",
             "fields" : {
-                
+                "length" : {
+                    "tag" : "scalar",
+                    "name" : "i32"
+                }
             }
         },
         "codomain" : {
