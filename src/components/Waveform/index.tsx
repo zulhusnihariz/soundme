@@ -1,6 +1,5 @@
 import { PlayerState } from 'lib'
 import { useEffect, useRef, useState } from 'react'
-import wavesurfer from 'wavesurfer.js'
 import classNames from 'classnames'
 interface WaveformProps {
   url: string

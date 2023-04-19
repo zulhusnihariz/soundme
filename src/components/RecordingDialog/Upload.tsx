@@ -6,6 +6,7 @@ import { add_beat } from '_aqua/music'
 interface UploadProp {
   audioData: any
   dataKey: String
+  tokenId: String
   onHandlePlayClicked: () => void
   onHandleStopClicked: () => void
   onHandleRecordClicked: () => any
@@ -43,7 +44,15 @@ const Upload = (prop: UploadProp) => {
   }, [audioUrl, signMessage])
 
   const add_new_beat = async signature => {
-    add_beat(prop.dataKey.toString(), address, audioUrl, signature)
+    add_beat(
+      prop.dataKey.toString(),
+      process.env.NEXT_TOKEN_KEY,
+      prop.tokenId.toString(),
+      '',
+      address,
+      signature,
+      audioUrl
+    )
     prop.onHandleConfirmClicked()
   }
 

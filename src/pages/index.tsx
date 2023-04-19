@@ -51,7 +51,7 @@ export default function MusicCollection() {
     }
 
     if (sheets.length <= 0) get()
-  }, [sheets])
+  }, [sheets, currentPage])
 
   return (
     <div className="m-5">

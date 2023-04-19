@@ -1,162 +1,106 @@
 import "@fluencelabs/aqua-lib/builtin.aqua"
 import "@0x3zero/aqua-lib/builtin.aqua" 
-import "./dht.aqua"
-import "./collabeat.aqua"
+import "./transaction.aqua"
 import "./evmrpc.aqua"
 import "@fluencelabs/aqua-lib/math.aqua"
 
--- 
 const PEER_ID ?= "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK"
-const DHT_SERVICE_ID ?= "f73671ed-e333-42d1-bd00-0da11bb89c30"
--- COLLABEAT
-const NODE_URL = "https://goerli.infura.io/v3/106d9f764d6c4f248257a5a352e50a74"
-const COLLABEAT_SERVICE_ID ?= "e91cfe47-e87d-4fab-855d-e1e76a521fc9"
-const COLLABEAT_ABI_URL = "https://ipfs.xfero.io/ipfs/QmW4ZnFYDsp3CWezBu3s7arhJmEhukrvF8J9X61VBHz7ez?filename=CollaBeatUtility2-abi.json"
-const COLLABEAT_ADDRESS = "0xef7e2f7d3dedac01367652f661b468d3438c139b"
+const NODE_URL = "https://polygon-mumbai.infura.io/v3/106d9f764d6c4f248257a5a352e50a74"
+const COLLABEAT_ADDRESS = "0xD5123C9FB1206497E2e54fd1120AA2F896e273E9"
 const COLLABEAT_IPFS_ADDRESS = "/dns4/ipfs.xfero.io/tcp/5002"
-
--- EVM JSON-RPC
-const FEVM_JSON_RPC_SERVICE_ID = "676a3462-d46d-4ef6-8b9a-66873325ef1c"
 
 -- Data
 data Sheet:
   owner: string
   data_key: string
+  token_key: string
   cid: string
   token_id: u64
 
-data ForkedBeats:
- forked_beats: []Beat
-
--- 
-service EventLogParamsMyOp("op"):
-  array_length(results: []EventLogParamResult) -> u32
-
-service BeatsMyOp("op"):
-  array_length(results: []Beat) -> u32
-
-service NumberOfBeat("op"):
-  array_length(results: []FdbDht) -> u32
-
-service MyOp("op"):
-  array_length(fdb: []FdbDht) -> i64
--- 
-
-func generate_block(key: string, public_key: string, dt: string) -> string:
-  on HOST_PEER_ID:
-    serialize_dt <- BlockFormatter.serialize(public_key, dt, "")
-    <- serialize_dt
-
-func beat_max_up(key: string) -> []FdbDht:
-  on HOST_PEER_ID:
-    Dht DHT_SERVICE_ID
-
-    count = 0
-    dhts <- Dht.get_records_by_key(key)
-  <- dhts
-  --   for dht <- dhts:
-  --     if dht.alias == "":
-  --       count = Math.add(count, 1)
-  -- <- count > 10
-
 -- Add beat to the sheet
-func add_beat(key: string, public_key: string, content: string, signature: string):
-  on PEER_ID:
-    Dht DHT_SERVICE_ID
-
-    -- Check if there is record of dht
-    dht <- Dht.get_latest_record_by_pk_and_key(key, public_key)
-    -- format content to Block
-    formatted <- BlockFormatter.serialize(dht.alias, content, dht.cid)
-
-    -- push Block to ipfs
-    result <- IpfsDag.put(formatted, "", 0)
+func add_beat(data_key: string, token_key: string, token_id: string, alias: string, public_key: string, signature: string, data: string):
+  on HOST_PEER_ID:
+    Node.send_transaction(data_key, token_key, token_id, alias, public_key, signature, data, "metadata", 0)
     
-    -- -- Add data to DHT table
-    if dht.cid != "":
-      Dht.insert(key, dht.alias, result.cid, public_key, signature, content, "secp256k1")
-    else:
-      Dht.insert(key, "", result.cid, public_key, signature, content, "secp256k1")
+
 
 -- Fork sheet
-func dht_fork(old_data_key: string, new_data_key: string, alias: string, public_key: string) -> FdbResult:
-  on HOST_PEER_ID:
-    Dht DHT_SERVICE_ID
-    result <- Dht.fork(old_data_key, new_data_key, alias, public_key)
-  <- result
+-- func dht_fork(old_data_key: string, new_data_key: string, alias: string, public_key: string) -> FdbResult:
+--   on HOST_PEER_ID:
+--     Dht DHT_SERVICE_ID
+--     result <- Dht.fork(old_data_key, new_data_key, alias, public_key)
+--   <- result
 
 -- Get all sheets
 -- Retrieve the number of NFTs generated in ERC1155 address.
-func get_sheets() -> []Sheet:
-  on HOST_PEER_ID:
-    Collabeat COLLABEAT_SERVICE_ID
-    EvmRpc FEVM_JSON_RPC_SERVICE_ID
-    results <- EvmRpc.eth_get_logs(NODE_URL, COLLABEAT_ABI_URL, "0x0", "latest", COLLABEAT_ADDRESS, ["0xb6cf139cef7fa80097868d15e25a7cba51ec1c85e25f0aa709e5950f33321a2b"])
-    n <- EventLogParamsMyOp.array_length(results)
+-- func get_sheets() -> []Sheet:
+--   on HOST_PEER_ID:
+--     results <- FevmJsonRpc.eth_get_logs(NODE_URL, COLLABEAT_ABI_URL, "0x0", "latest", COLLABEAT_ADDRESS, ["0xb6cf139cef7fa80097868d15e25a7cba51ec1c85e25f0aa709e5950f33321a2b"])
+--     n <- EventLogParamsMyOp.array_length(results)
 
-    datas: *EventLogParamResult
-    sheets: *Sheet
+--     datas: *EventLogParamResult
+--     sheets: *Sheet
 
-    for result <- results par:
-      if result.data != "":
-        fork_data <- Collabeat.deserialize(result.data)
-        if fork_data.cid != "":
+--     for result <- results par:
+--       if result.data != "":
+--         fork_data <- Collabeat.deserialize(result.data)
+--         if fork_data.cid != "":
        
-              sheets <<- Sheet (
-                owner = fork_data.owner,
-                data_key = fork_data.data_key,
-                cid = fork_data.cid,
-                token_id = fork_data.token_id
-              )
-      datas <<- result
+--               sheets <<- Sheet (
+--                 owner = fork_data.owner,
+--                 data_key = fork_data.data_key,
+--                 cid = fork_data.cid,
+--                 token_id = fork_data.token_id
+--               )
+--       datas <<- result
 
-    join datas[n-1]
+--     join datas[n-1]
 
-  <- sheets
+--   <- sheets
 
-func get_metadata_uri(key: string) -> string:
-  Dht DHT_SERVICE_ID
+-- func get_metadata_uri(key: string) -> string:
+--   Dht DHT_SERVICE_ID
 
-  rss: *Block
+--   rss: *Block
 
-  on HOST_PEER_ID:
-    results = Dht.get_records_by_key(key)
-    n <- MyOp.array_length(results)
+--   on HOST_PEER_ID:
+--     results = Dht.get_records_by_key(key)
+--     n <- MyOp.array_length(results)
 
-    for rst <- results par:
-      rs = IpfsDag.get(rst.cid, "", 0)
-      sb: *string
-      if rst.alias != "":
-        sb <- BlockFormatter.serialize(rst.alias, rs.content, rst.cid)
-      else:
-        sb <- BlockFormatter.serialize(rst.public_key, rs.content, rst.cid)
-      sbt = sb!
-      rss <- BlockFormatter.deserialize(sbt)
-    join rss[n-1]
+--     for rst <- results par:
+--       rs = IpfsDag.get(rst.cid, "", 0)
+--       sb: *string
+--       if rst.alias != "":
+--         sb <- BlockFormatter.serialize(rst.alias, rs.content, rst.cid)
+--       else:
+--         sb <- BlockFormatter.serialize(rst.public_key, rs.content, rst.cid)
+--       sbt = sb!
+--       rss <- BlockFormatter.deserialize(sbt)
+--     join rss[n-1]
 
-    par Peer.timeout(9000, "timeout")
+--     par Peer.timeout(9000, "timeout")
 
-    metadata = BlockFormatter.format("", rss)
-  <- metadata
+--     metadata = BlockFormatter.format("", rss)
+--   <- metadata
 
-func get_forked_beats(cid:string, data_key:string) -> *ForkedBeats:
-    on HOST_PEER_ID:
-      Collabeat COLLABEAT_SERVICE_ID
+-- func get_forked_beats(cid:string, data_key:string) -> *ForkedBeats:
+--     on HOST_PEER_ID:
+--       Collabeat COLLABEAT_SERVICE_ID
 
-      forked_beats: *ForkedBeats
+--       forked_beats: *ForkedBeats
       
-      if cid != "":
-        content <- IpfsDag.get(cid, COLLABEAT_IPFS_ADDRESS, 0)
-        if content.success == true:
-          if content.content != "":
-            beats <- Collabeat.get_forked_beats(content.content)
-            o <- BeatsMyOp.array_length(beats)
+--       if cid != "":
+--         content <- IpfsDag.get(cid, COLLABEAT_IPFS_ADDRESS, 0)
+--         if content.success == true:
+--           if content.content != "":
+--             beats <- Collabeat.get_forked_beats(content.content)
+--             o <- BeatsMyOp.array_length(beats)
 
-            for beat <- beats par:
-              rst <- dht_fork(beat.data_key, data_key, "", beat.owner)
-            join beats[o-1]
+--             for beat <- beats par:
+--               rst <- dht_fork(beat.data_key, data_key, "", beat.owner)
+--             join beats[o-1]
             
-           forked_beats <<- ForkedBeats (
-              forked_beats = beats
-            ) 
-    <- forked_beats
+--            forked_beats <<- ForkedBeats (
+--               forked_beats = beats
+--             ) 
+--     <- forked_beats
