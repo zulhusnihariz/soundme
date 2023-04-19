@@ -18,29 +18,29 @@ import {
 
 // Functions
  
-
+export type Add_beatResult = { transaction_hash: string; }
 export function add_beat(
     data_key: string,
     token_key: string,
     token_id: string,
-    alias: string,
+    a: string,
     public_key: string,
     signature: string,
-    data: string,
+    d: string,
     config?: {ttl?: number}
-): Promise<void>;
+): Promise<Add_beatResult>;
 
 export function add_beat(
     peer: FluencePeer,
     data_key: string,
     token_key: string,
     token_id: string,
-    alias: string,
+    a: string,
     public_key: string,
     signature: string,
-    data: string,
+    d: string,
     config?: {ttl?: number}
-): Promise<void>;
+): Promise<Add_beatResult>;
 
 export function add_beat(...args: any) {
 
@@ -54,27 +54,42 @@ export function add_beat(...args: any) {
                           (seq
                            (seq
                             (seq
-                             (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
-                             (call %init_peer_id% ("getDataSrv" "data_key") [] data_key)
+                             (seq
+                              (seq
+                               (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                               (call %init_peer_id% ("getDataSrv" "data_key") [] data_key)
+                              )
+                              (call %init_peer_id% ("getDataSrv" "token_key") [] token_key)
+                             )
+                             (call %init_peer_id% ("getDataSrv" "token_id") [] token_id)
                             )
-                            (call %init_peer_id% ("getDataSrv" "token_key") [] token_key)
+                            (call %init_peer_id% ("getDataSrv" "a") [] a)
                            )
-                           (call %init_peer_id% ("getDataSrv" "token_id") [] token_id)
+                           (call %init_peer_id% ("getDataSrv" "public_key") [] public_key)
                           )
-                          (call %init_peer_id% ("getDataSrv" "alias") [] alias)
+                          (call %init_peer_id% ("getDataSrv" "signature") [] signature)
                          )
-                         (call %init_peer_id% ("getDataSrv" "public_key") [] public_key)
+                         (call %init_peer_id% ("getDataSrv" "d") [] d)
                         )
-                        (call %init_peer_id% ("getDataSrv" "signature") [] signature)
+                        (call -relay- ("op" "noop") [])
                        )
-                       (call %init_peer_id% ("getDataSrv" "data") [] data)
+                       (xor
+                        (seq
+                         (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("node" "send_transaction") [data_key token_key token_id a public_key signature d "metadata" 0] result)
+                         (call -relay- ("op" "noop") [])
+                        )
+                        (seq
+                         (call -relay- ("op" "noop") [])
+                         (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                        )
+                       )
                       )
                       (xor
-                       (call -relay- ("node" "send_transaction") [data_key token_key token_id alias public_key signature data "metadata" 0])
-                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
+                       (call %init_peer_id% ("callbackSrv" "response") [result])
+                       (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
                       )
                      )
-                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 2])
+                     (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 3])
                     )
     `
     return callFunction$$(
@@ -98,7 +113,7 @@ export function add_beat(...args: any) {
                     "tag" : "scalar",
                     "name" : "string"
                 },
-                "alias" : {
+                "a" : {
                     "tag" : "scalar",
                     "name" : "string"
                 },
@@ -110,14 +125,26 @@ export function add_beat(...args: any) {
                     "tag" : "scalar",
                     "name" : "string"
                 },
-                "data" : {
+                "d" : {
                     "tag" : "scalar",
                     "name" : "string"
                 }
             }
         },
         "codomain" : {
-            "tag" : "nil"
+            "tag" : "unlabeledProduct",
+            "items" : [
+                {
+                    "tag" : "struct",
+                    "name" : "FdbResult",
+                    "fields" : {
+                        "transaction_hash" : {
+                            "tag" : "scalar",
+                            "name" : "string"
+                        }
+                    }
+                }
+            ]
         }
     },
     "names" : {

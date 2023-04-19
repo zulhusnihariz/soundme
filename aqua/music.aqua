@@ -17,10 +17,10 @@ data Sheet:
   token_id: u64
 
 -- Add beat to the sheet
-func add_beat(data_key: string, token_key: string, token_id: string, alias: string, public_key: string, signature: string, data: string):
-  on HOST_PEER_ID:
-    Node.send_transaction(data_key, token_key, token_id, alias, public_key, signature, data, "metadata", 0)
-    
+func add_beat(data_key: string, token_key: string, token_id: string, a: string, public_key: string, signature: string, d: string) -> FdbResult:
+  on PEER_ID:
+    result <- Node.send_transaction(data_key, token_key, token_id, a, public_key, signature, d, "metadata", 0)
+  <- result  
 
 
 -- Fork sheet

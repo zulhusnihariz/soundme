@@ -44,15 +44,26 @@ const Upload = (prop: UploadProp) => {
   }, [audioUrl, signMessage])
 
   const add_new_beat = async signature => {
-    add_beat(
+    console.log(
       prop.dataKey.toString(),
-      process.env.NEXT_TOKEN_KEY,
+      process.env.NEXT_PUBLIC_TOKEN_KEY,
       prop.tokenId.toString(),
       '',
       address,
       signature,
       audioUrl
     )
+    let x = await add_beat(
+      prop.dataKey.toString(),
+      process.env.NEXT_PUBLIC_TOKEN_KEY,
+      prop.tokenId.toString(),
+      '',
+      address,
+      signature,
+      audioUrl
+    )
+
+    console.log(x)
     prop.onHandleConfirmClicked()
   }
 
