@@ -1,14 +1,13 @@
 import MusicCard from 'components/MusicCard'
 import { useEffect, useState } from 'react'
 import ShareDialog from 'components/ShareDialog'
-import { get_initial_sheets, get_sheets } from '../apollo-client'
+import { get_sheets } from '../apollo-client'
 import { Sheet } from 'lib'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useRouter } from 'next/router'
 import { RefreshIcon } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
-import { getRandomInt } from 'utils/class-names'
 
 enum CURRENT_SECTION {
   ALL,
@@ -58,20 +57,11 @@ export default function MusicCollection() {
 
   useEffect(() => {
     const getInitialSheets = async () => {
-      let results = await get_initial_sheets({
-        all: {
-          first: page_size,
-          skip: getRandomInt(0, 100),
-        },
-        forkeds: {
-          first: page_size,
-          skip: 0,
-          where: { from: address },
-        },
-      })
+      const all = await get_sheets({ first: page_size, skip: 0 })
+      const forkeds = await get_sheets({ first: page_size, skip: 0, where: { from: address } })
 
-      setSheets(results.all)
-      setForkedSheets(results.forkeds)
+      setForkedSheets(forkedSheets.concat(forkeds))
+      setSheets(sheets.concat(all))
     }
 
     getInitialSheets()
@@ -80,7 +70,7 @@ export default function MusicCollection() {
     const getMoreSheets = async () => {
       switch (currentSection) {
         case CURRENT_SECTION.ALL:
-          const all = await get_sheets({ first: page_size, skip: getRandomInt(0, 100) })
+          const all = await get_sheets({ first: page_size, skip: page_size })
           setSheets(sheets.concat(all))
           break
         case CURRENT_SECTION.BOOKMARKED:
