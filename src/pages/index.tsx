@@ -1,14 +1,25 @@
 import MusicCard from 'components/MusicCard'
 import { useEffect, useState } from 'react'
 import ShareDialog from 'components/ShareDialog'
-import { get_sheets } from '_aqua/music'
+import { get_initial_sheets, get_sheets } from '../apollo-client'
 import { Sheet } from 'lib'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useRouter } from 'next/router'
 import { RefreshIcon } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
+import { useAccount } from 'wagmi'
+import { getRandomInt } from 'utils/class-names'
+
+enum CURRENT_SECTION {
+  ALL,
+  FRESH,
+  BOOKMARKED,
+}
 
 export default function MusicCollection() {
+  let { address } = useAccount()
+  // address = '0xc20de1a30487ec70fc730866f297f2e2f1e411f7' // uncomment to test bookmarked beats ui
+
   const router = useRouter()
   const page_size = isMobile ? 3 : 9
 
@@ -23,9 +34,10 @@ export default function MusicCollection() {
   })
 
   const [sheets, setSheets] = useState<Sheet[]>([])
+  const [forkedSheets, setForkedSheets] = useState<Sheet[]>([])
+  const [currentSection, setCurrentSection] = useState<CURRENT_SECTION>(CURRENT_SECTION.ALL)
 
   const [currentPage, setCurrentPage] = useState<number>(1)
-  const [paginatedSheets, setPaginatedSheets] = useState<Sheet[]>([])
   const [refresh, setRefresh] = useState(false)
 
   const onHandleRecordClicked = tokenId => {
@@ -33,11 +45,6 @@ export default function MusicCollection() {
       tokenId: tokenId,
       dataKey: tokenId,
     })
-  }
-
-  function paginate(array: any[], page_size, page_number) {
-    // human-readable page numbers usually start with 1, so we reduce 1 in the first argument
-    return array.slice((page_number - 1) * page_size, page_number * page_size)
   }
 
   function handleMoreSheets() {
@@ -50,56 +57,128 @@ export default function MusicCollection() {
   }
 
   useEffect(() => {
-    const get = async () => {
-      let sheets = await get_sheets(page_size * 2, { ttl: 60000 })
+    const getInitialSheets = async () => {
+      let results = await get_initial_sheets({
+        all: {
+          first: page_size,
+          skip: getRandomInt(0, 100),
+        },
+        forkeds: {
+          first: page_size,
+          skip: 0,
+          where: { from: address },
+        },
+      })
 
-      setSheets(sheets)
-      setPaginatedSheets(paginate(sheets, page_size, currentPage))
+      setSheets(results.all)
+      setForkedSheets(results.forkeds)
     }
 
-    get()
+    getInitialSheets()
   }, [])
-
   useEffect(() => {
-    let moreSheets = paginate(sheets, page_size, currentPage)
-    setPaginatedSheets(paginatedSheets.concat(moreSheets))
+    const getMoreSheets = async () => {
+      switch (currentSection) {
+        case CURRENT_SECTION.ALL:
+          const all = await get_sheets({ first: page_size, skip: getRandomInt(0, 100) })
+          setSheets(sheets.concat(all))
+          break
+        case CURRENT_SECTION.BOOKMARKED:
+          const forkeds = await get_sheets({ first: page_size, skip: page_size, where: { from: address } })
+          setForkedSheets(forkedSheets.concat(forkeds))
+          break
+      }
+    }
+
+    getMoreSheets()
   }, [currentPage])
 
   return (
     <div className="m-5">
-      <main className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
-        {/* <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Musics</h1> */}
+      <main>
+        {sheets.length > 0 && currentSection !== CURRENT_SECTION.BOOKMARKED && (
+          <section className="mb-4">
+            <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Fresh beats</h1>
 
-        {paginatedSheets.map((sheet, index) => (
-          <MusicCard
-            sheet={sheet}
-            key={index}
-            tokenId={sheet.token_id.toString()}
-            name={sheet.data_key.toString()}
-            description={''}
-            audioUrls={[]}
-            onHandleRecordClicked={onHandleRecordClicked}
-            onHandleShareClicked={dataKey =>
-              setShareDialogState({
-                dataKey,
-                opened: true,
-              })
-            }
-          />
-        ))}
-        {shareDialogState.opened && (
-          <ShareDialog
-            dataKey={shareDialogState.dataKey}
-            onHandleCloseClicked={() =>
-              setShareDialogState({
-                dataKey: '',
-                opened: false,
-              })
-            }
-          />
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+              {sheets.map((sheet, index) => (
+                <MusicCard
+                  sheet={sheet}
+                  key={index}
+                  tokenId={sheet.token_id.toString()}
+                  name={sheet.data_key.toString()}
+                  description={''}
+                  audioUrls={[]}
+                  onHandleRecordClicked={onHandleRecordClicked}
+                  onHandleShareClicked={dataKey =>
+                    setShareDialogState({
+                      dataKey,
+                      opened: true,
+                    })
+                  }
+                />
+              ))}
+              {shareDialogState.opened && (
+                <ShareDialog
+                  dataKey={shareDialogState.dataKey}
+                  onHandleCloseClicked={() =>
+                    setShareDialogState({
+                      dataKey: '',
+                      opened: false,
+                    })
+                  }
+                />
+              )}
+            </div>
+          </section>
         )}
 
-        {paginatedSheets.length > 0 ? (
+        {forkedSheets.length > 0 && (
+          <section className="mb-4">
+            <h1
+              className="Inter mb-4 text-left text-3xl font-bold text-white"
+              onClick={() => {
+                setCurrentSection(CURRENT_SECTION.BOOKMARKED)
+                setRefresh(false)
+              }}
+            >
+              Bookmarked beats
+            </h1>
+
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+              {forkedSheets.map((sheet, index) => (
+                <MusicCard
+                  sheet={sheet}
+                  key={index}
+                  tokenId={sheet.token_id.toString()}
+                  name={sheet.data_key.toString()}
+                  description={''}
+                  audioUrls={[]}
+                  onHandleRecordClicked={onHandleRecordClicked}
+                  onHandleShareClicked={dataKey =>
+                    setShareDialogState({
+                      dataKey,
+                      opened: true,
+                    })
+                  }
+                />
+              ))}
+              {shareDialogState.opened && (
+                <ShareDialog
+                  dataKey={shareDialogState.dataKey}
+                  onHandleCloseClicked={() =>
+                    setShareDialogState({
+                      dataKey: '',
+                      opened: false,
+                    })
+                  }
+                />
+              )}
+            </div>
+          </section>
+        )}
+
+        {sheets.length > 0 ? (
           <button
             onClick={refresh ? handleRefreshSheets : handleMoreSheets}
             className="fixed inset-x-0 bottom-[15px] mx-auto flex w-28 cursor-pointer flex-row items-center justify-center rounded-3xl border border-[#232323] bg-black py-2 px-4"
