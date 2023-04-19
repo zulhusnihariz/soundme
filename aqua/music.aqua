@@ -7,7 +7,6 @@ import "@fluencelabs/aqua-lib/math.aqua"
 const PEER_ID ?= "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK"
 const NODE_URL = "https://polygon-mumbai.infura.io/v3/106d9f764d6c4f248257a5a352e50a74"
 const COLLABEAT_ADDRESS = "0xD5123C9FB1206497E2e54fd1120AA2F896e273E9"
-const COLLABEAT_IPFS_ADDRESS = "/dns4/ipfs.xfero.io/tcp/5002"
 
 -- Data
 data Sheet:

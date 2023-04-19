@@ -283,6 +283,7 @@ const SingleMusic = () => {
       {isDialogRecordingOpened && (
         <RecordingDialog
           dataKey={dataKey}
+          tokenId={tokenId}
           isOpened={isDialogRecordingOpened}
           onDialogClosed={() => onHandleDialogClosed()}
         />

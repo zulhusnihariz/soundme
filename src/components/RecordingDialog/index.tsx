@@ -14,6 +14,7 @@ import Upload from './Upload'
 import { AudioState, PlayerState } from 'lib'
 interface RecordingDialogProp {
   dataKey: String
+  tokenId: String
   isOpened: boolean
   onDialogClosed: () => void
 }
@@ -171,6 +172,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                           <Upload
                             audioData={audioData}
                             dataKey={prop.dataKey}
+                            tokenId={prop.tokenId}
                             onHandleConfirmClicked={() => onHandleConfirmClicked()}
                             onHandleRecordClicked={() => onRecordingStart()}
                             onHandlePlayClicked={() => onPlayOneAudio(filteredData[filteredData.length - 1])}
