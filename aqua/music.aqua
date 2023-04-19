@@ -87,7 +87,7 @@ func dht_fork(old_data_key: string, new_data_key: string, alias: string, public_
 
 -- Get all sheets
 -- Retrieve the number of NFTs generated in ERC1155 address.
-func get_sheets() -> []Sheet:
+func get_sheets(length: i32) -> []Sheet:
   on HOST_PEER_ID:
     Collabeat COLLABEAT_SERVICE_ID
     EvmRpc FEVM_JSON_RPC_SERVICE_ID
@@ -110,7 +110,7 @@ func get_sheets() -> []Sheet:
               )
       datas <<- result
 
-    join datas[n-1]
+    join datas[length-1]
 
   <- sheets
 
