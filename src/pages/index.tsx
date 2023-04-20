@@ -2,12 +2,13 @@ import MusicCard from 'components/MusicCard'
 import { useEffect, useState } from 'react'
 import ShareDialog from 'components/ShareDialog'
 import { get_sheets } from '../apollo-client'
-import { Sheet } from 'lib'
+import { PlayerState, Sheet } from 'lib'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useRouter } from 'next/router'
 import { RefreshIcon } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
+import { getSongLength, mixAudioBuffer } from 'utils/audio-web-api'
 
 enum CURRENT_SECTION {
   ALL,
@@ -39,11 +40,112 @@ export default function MusicCollection() {
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [refresh, setRefresh] = useState(false)
 
+  const [audioContext, setAudioContext] = useState(new AudioContext())
+  const [playerState, setPlayerState] = useState<{ [key: string]: PlayerState }>({})
+  const [mixedAudioNode, setMixedAudioNode] = useState<{ [key: string]: AudioBufferSourceNode }>({})
+  const [mixedAudio, setMixedAudio] = useState<{ [key: string]: AudioBuffer }>({})
+
   const onHandleRecordClicked = tokenId => {
     setSelectedToken({
       tokenId: tokenId,
       dataKey: tokenId,
     })
+  }
+
+  const updatePlayerState = (dataKey: string, state: PlayerState) => {
+    setPlayerState(prev => ({
+      ...prev,
+      [dataKey]: state,
+    }))
+  }
+
+  const playMixedAudio = (dataKey: string, buffer: AudioBuffer) => {
+    const mixed = audioContext.createBufferSource()
+    setMixedAudioNode(prev => ({ ...prev, [dataKey]: mixed }))
+
+    mixed.buffer = buffer
+    mixed.connect(audioContext.destination)
+    mixed.start()
+    mixed.onended = () => {
+      updatePlayerState(dataKey, PlayerState.PLAY)
+      setMixedAudioNode(prev => ({ ...prev, [dataKey]: null }))
+    }
+
+    updatePlayerState(dataKey, PlayerState.STOP)
+  }
+
+  const onPlayButtonClicked = async (dataKey: string) => {
+    updatePlayerState(dataKey, PlayerState.LOADING)
+
+    const audioExists = mixedAudio[dataKey]
+
+    if (audioExists) {
+      playMixedAudio(dataKey, audioExists)
+      return
+    }
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
+    let metadata = await res.json()
+
+    const urls = Object.values(metadata) as string[]
+
+    if (urls.length <= 0) {
+      updatePlayerState(dataKey, PlayerState.PLAY)
+      return
+    }
+
+    let promises = urls.map(url =>
+      fetch(url)
+        .then(response => response.arrayBuffer())
+        .then(buffer => audioContext.decodeAudioData(buffer))
+    )
+
+    let buffers = await Promise.all(promises)
+
+    const songLength = getSongLength(buffers)
+    let mixed = mixAudioBuffer(buffers, songLength, 1, audioContext)
+
+    playMixedAudio(dataKey, mixed)
+
+    setMixedAudio(prev => ({
+      ...prev,
+      [dataKey]: mixed,
+    }))
+  }
+  const onStopButtonClicked = (dataKey: string) => {
+    const nodeExists = mixedAudioNode[dataKey]
+    if (!nodeExists) return
+
+    nodeExists.playbackRate.value = 0 // pause
+    updatePlayerState(dataKey, PlayerState.PLAY)
+  }
+
+  const playerButtonHandler = async (dataKey: string) => {
+    const isFirstPlay = playerState[dataKey] === undefined
+
+    if (isFirstPlay) {
+      onPlayButtonClicked(dataKey)
+      return
+    }
+
+    switch (playerState[dataKey]) {
+      case PlayerState.STOP:
+        onStopButtonClicked(dataKey)
+        break
+      case PlayerState.PLAY:
+        const nodeExists = mixedAudioNode[dataKey]
+
+        if (nodeExists) {
+          nodeExists.playbackRate.value = 1 // resume
+          updatePlayerState(dataKey, PlayerState.STOP)
+        } else {
+          onPlayButtonClicked(dataKey)
+        }
+
+        break
+      default:
+        break
+    }
   }
 
   function handleMoreSheets() {
@@ -106,6 +208,8 @@ export default function MusicCollection() {
                       opened: true,
                     })
                   }
+                  onHandlePlayClicked={playerButtonHandler}
+                  audioState={playerState}
                 />
               ))}
               {shareDialogState.opened && (
@@ -151,6 +255,8 @@ export default function MusicCollection() {
                       opened: true,
                     })
                   }
+                  onHandlePlayClicked={playerButtonHandler}
+                  audioState={playerState}
                 />
               ))}
               {shareDialogState.opened && (

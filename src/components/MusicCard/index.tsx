@@ -1,12 +1,7 @@
 import MintButtonDialog from 'components/MintButtonDialog'
-import ShareButtonDialog from 'components/ShareDialog'
-import voice from '../../assets/img/voice.png'
-import mic from '../../assets/icon/mic.png'
-import { SpectrumVisualizer, SpectrumVisualizerTheme } from 'react-audio-visualizers'
-import RecordingDialog from 'components/RecordingDialog'
-import Link from 'next/link'
-import { Sheet } from 'lib'
+import { PlayerState, Sheet } from 'lib'
 import { useRouter } from 'next/router'
+import { LoadingSpinner, PlayIcon, StopIcon } from 'components/Icons/icons'
 
 interface MusicCardProp {
   tokenId: String
@@ -16,10 +11,26 @@ interface MusicCardProp {
   audioUrls: Array<string>
   onHandleRecordClicked: (tokenId) => void
   onHandleShareClicked: (datakey) => void
+  onHandlePlayClicked: (dataKey: string) => void
+  audioState: {
+    [key: string]: PlayerState
+  }
 }
 
 const MusicCard = (prop: MusicCardProp) => {
   const router = useRouter()
+  const { audioState, sheet } = prop
+
+  function setButtonIcon(state: PlayerState) {
+    switch (state) {
+      case PlayerState.LOADING:
+        return <LoadingSpinner />
+      case PlayerState.STOP:
+        return <StopIcon />
+      default:
+        return <PlayIcon />
+    }
+  }
 
   return (
     <>
@@ -37,6 +48,13 @@ const MusicCard = (prop: MusicCardProp) => {
           >
             <span>Collabeat</span>
           </button>
+          <button
+            onClick={() => prop.onHandlePlayClicked(prop.sheet.data_key.toString())}
+            className="flex cursor-pointer flex-row items-center justify-center  rounded-full border border-[#232323] bg-black p-2 "
+          >
+            {setButtonIcon(audioState[sheet.data_key.toString()])}
+          </button>
+
           <div className="flex flex-row gap-2">
             <MintButtonDialog tokenId={prop.tokenId} />
             <button
