@@ -18,7 +18,7 @@ import {
   rainbowWallet,
 } from '@rainbow-me/rainbowkit/wallets'
 import { Chain } from '@rainbow-me/rainbowkit'
-import { mainnet, goerli } from 'wagmi/chains'
+import { mainnet, goerli, polygonMumbai } from 'wagmi/chains'
 import { createClient, configureChains, WagmiConfig } from 'wagmi'
 import { infuraProvider } from 'wagmi/providers/infura'
 import { publicProvider } from 'wagmi/providers/public'
@@ -44,6 +44,9 @@ export default App
 
 const currentChain = []
 switch (process.env.NEXT_PUBLIC_CHAIN_ID) {
+  case '80001':
+    currentChain.push(polygonMumbai)
+    break
   case 'goerli':
   default:
     currentChain.push(goerli)
