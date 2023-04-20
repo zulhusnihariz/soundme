@@ -55,33 +55,24 @@ export function add_beat(...args: any) {
                            (seq
                             (seq
                              (seq
-                              (seq
-                               (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
-                               (call %init_peer_id% ("getDataSrv" "data_key") [] data_key)
-                              )
-                              (call %init_peer_id% ("getDataSrv" "token_key") [] token_key)
+                              (call %init_peer_id% ("getDataSrv" "-relay-") [] -relay-)
+                              (call %init_peer_id% ("getDataSrv" "data_key") [] data_key)
                              )
-                             (call %init_peer_id% ("getDataSrv" "token_id") [] token_id)
+                             (call %init_peer_id% ("getDataSrv" "token_key") [] token_key)
                             )
-                            (call %init_peer_id% ("getDataSrv" "a") [] a)
+                            (call %init_peer_id% ("getDataSrv" "token_id") [] token_id)
                            )
-                           (call %init_peer_id% ("getDataSrv" "public_key") [] public_key)
+                           (call %init_peer_id% ("getDataSrv" "a") [] a)
                           )
-                          (call %init_peer_id% ("getDataSrv" "signature") [] signature)
+                          (call %init_peer_id% ("getDataSrv" "public_key") [] public_key)
                          )
-                         (call %init_peer_id% ("getDataSrv" "d") [] d)
+                         (call %init_peer_id% ("getDataSrv" "signature") [] signature)
                         )
-                        (call -relay- ("op" "noop") [])
+                        (call %init_peer_id% ("getDataSrv" "d") [] d)
                        )
                        (xor
-                        (seq
-                         (call "12D3KooWHBG9oaVx4i3vi6c1rSBUm7MLBmyGmmbHoZ23pmjDCnvK" ("node" "send_transaction") [data_key token_key token_id a public_key signature d "metadata" 0] result)
-                         (call -relay- ("op" "noop") [])
-                        )
-                        (seq
-                         (call -relay- ("op" "noop") [])
-                         (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
-                        )
+                        (call -relay- ("transaction" "send_transaction") [data_key token_key token_id a public_key signature d "metadata" 0] result)
+                        (call %init_peer_id% ("errorHandlingSrv" "error") [%last_error% 1])
                        )
                       )
                       (xor
