@@ -58,7 +58,7 @@ export default function MusicCollection() {
     }))
   }
 
-  const onPlayButtonClicked = async (dataKey: string) => {
+  const createMixedAudio = async (dataKey: string) => {
     updatePlayerState(dataKey, PlayerState.LOADING)
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
@@ -94,14 +94,13 @@ export default function MusicCollection() {
     const isFirstPlay = audioPlayerState[dataKey] === undefined
 
     if (isFirstPlay) {
-      onPlayButtonClicked(dataKey)
+      createMixedAudio(dataKey)
       return
     }
 
     switch (audioPlayerState[dataKey]) {
       case PlayerState.STOP:
         updatePlayerState(dataKey, PlayerState.PLAY)
-      // wave current .stop
       case PlayerState.PLAY:
         updatePlayerState(dataKey, PlayerState.PAUSED)
         break
@@ -123,34 +122,28 @@ export default function MusicCollection() {
   }
 
   useEffect(() => {
-    const getInitialSheets = async () => {
-      const all = await get_sheets({ first: page_size, skip: 0 })
-      setSheets(sheets.concat(all))
+    const getSheets = async () => {
+      const isFirstPage = currentPage === 1
+      const skip = isFirstPage ? 0 : page_size
 
-      if (address) {
-        const forkeds = await get_sheets({ first: page_size, skip: 0, where: { from: address } })
-        setForkedSheets(forkedSheets.concat(forkeds))
-      }
-    }
-
-    getInitialSheets()
-  }, [])
-
-  useEffect(() => {
-    const getMoreSheets = async () => {
       switch (currentSection) {
         case CURRENT_SECTION.ALL:
-          const all = await get_sheets({ first: page_size, skip: page_size })
+          const all = await get_sheets({ first: page_size, skip })
           setSheets(sheets.concat(all))
+
+          if (address) {
+            const forkeds = await get_sheets({ first: page_size, skip, where: { from: address } })
+            setForkedSheets(forkedSheets.concat(forkeds))
+          }
           break
         case CURRENT_SECTION.BOOKMARKED:
-          const forkeds = await get_sheets({ first: page_size, skip: page_size, where: { from: address } })
+          const forkeds = await get_sheets({ first: page_size, skip, where: { from: address } })
           setForkedSheets(forkedSheets.concat(forkeds))
           break
       }
     }
 
-    getMoreSheets()
+    getSheets()
   }, [currentPage])
 
   return (
