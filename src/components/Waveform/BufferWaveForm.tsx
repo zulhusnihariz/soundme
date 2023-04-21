@@ -2,6 +2,7 @@ import { PlayerState } from 'lib'
 import { useEffect, useRef } from 'react'
 import classNames from 'classnames'
 import { MutedSpeakerIcon, UnmutedSpeakerIcon } from 'components/Icons/icons'
+import { isMobile } from 'react-device-detect'
 
 interface BufferWaveformProps {
   buffer: AudioBuffer
@@ -41,14 +42,14 @@ const BufferWaveform: React.FC<BufferWaveformProps> = ({
         wavesurferRef.current = WaveSurfer.create({
           container: waveformRef.current,
           waveColor: 'white',
-          progressColor: 'green',
+          progressColor: 'red',
           backend: 'WebAudio',
           hideCursor: true,
-          responsive: true,
           normalize: true,
           height: 35,
           barHeight: 10,
-          barWidth: 4,
+          barWidth: isMobile ? 2 : 4,
+          minPxPerSec: isMobile ? 4 : 8,
           fillParent: false,
           scrollParent: false,
         })
