@@ -41,8 +41,7 @@ export default function MusicCollection() {
   const [refresh, setRefresh] = useState(false)
 
   const [audioContext, setAudioContext] = useState(new AudioContext())
-  const [playerState, setPlayerState] = useState<{ [key: string]: PlayerState }>({})
-  const [mixedAudioNode, setMixedAudioNode] = useState<{ [key: string]: AudioBufferSourceNode }>({})
+  const [audioPlayerState, setAudioPlayerState] = useState<{ [key: string]: PlayerState }>({})
   const [mixedAudio, setMixedAudio] = useState<{ [key: string]: AudioBuffer }>({})
 
   const onHandleRecordClicked = tokenId => {
@@ -53,36 +52,14 @@ export default function MusicCollection() {
   }
 
   const updatePlayerState = (dataKey: string, state: PlayerState) => {
-    setPlayerState(prev => ({
+    setAudioPlayerState(prev => ({
       ...prev,
       [dataKey]: state,
     }))
   }
 
-  const playMixedAudio = (dataKey: string, buffer: AudioBuffer) => {
-    const mixed = audioContext.createBufferSource()
-    setMixedAudioNode(prev => ({ ...prev, [dataKey]: mixed }))
-
-    mixed.buffer = buffer
-    mixed.connect(audioContext.destination)
-    mixed.start()
-    mixed.onended = () => {
-      updatePlayerState(dataKey, PlayerState.PLAY)
-      setMixedAudioNode(prev => ({ ...prev, [dataKey]: null }))
-    }
-
-    updatePlayerState(dataKey, PlayerState.STOP)
-  }
-
   const onPlayButtonClicked = async (dataKey: string) => {
     updatePlayerState(dataKey, PlayerState.LOADING)
-
-    const audioExists = mixedAudio[dataKey]
-
-    if (audioExists) {
-      playMixedAudio(dataKey, audioExists)
-      return
-    }
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
     let metadata = await res.json()
@@ -90,7 +67,7 @@ export default function MusicCollection() {
     const urls = Object.values(metadata) as string[]
 
     if (urls.length <= 0) {
-      updatePlayerState(dataKey, PlayerState.PLAY)
+      updatePlayerState(dataKey, PlayerState.STOP)
       return
     }
 
@@ -105,43 +82,31 @@ export default function MusicCollection() {
     const songLength = getSongLength(buffers)
     let mixed = mixAudioBuffer(buffers, songLength, 1, audioContext)
 
-    playMixedAudio(dataKey, mixed)
+    updatePlayerState(dataKey, PlayerState.PLAY)
 
     setMixedAudio(prev => ({
       ...prev,
       [dataKey]: mixed,
     }))
   }
-  const onStopButtonClicked = (dataKey: string) => {
-    const nodeExists = mixedAudioNode[dataKey]
-    if (!nodeExists) return
-
-    nodeExists.playbackRate.value = 0 // pause
-    updatePlayerState(dataKey, PlayerState.PLAY)
-  }
 
   const playerButtonHandler = async (dataKey: string) => {
-    const isFirstPlay = playerState[dataKey] === undefined
+    const isFirstPlay = audioPlayerState[dataKey] === undefined
 
     if (isFirstPlay) {
       onPlayButtonClicked(dataKey)
       return
     }
 
-    switch (playerState[dataKey]) {
+    switch (audioPlayerState[dataKey]) {
       case PlayerState.STOP:
-        onStopButtonClicked(dataKey)
-        break
+        updatePlayerState(dataKey, PlayerState.PLAY)
+      // wave current .stop
       case PlayerState.PLAY:
-        const nodeExists = mixedAudioNode[dataKey]
-
-        if (nodeExists) {
-          nodeExists.playbackRate.value = 1 // resume
-          updatePlayerState(dataKey, PlayerState.STOP)
-        } else {
-          onPlayButtonClicked(dataKey)
-        }
-
+        updatePlayerState(dataKey, PlayerState.PAUSED)
+        break
+      case PlayerState.PAUSED:
+        updatePlayerState(dataKey, PlayerState.PLAY)
         break
       default:
         break
@@ -160,14 +125,17 @@ export default function MusicCollection() {
   useEffect(() => {
     const getInitialSheets = async () => {
       const all = await get_sheets({ first: page_size, skip: 0 })
-      const forkeds = await get_sheets({ first: page_size, skip: 0, where: { from: address } })
-
-      setForkedSheets(forkedSheets.concat(forkeds))
       setSheets(sheets.concat(all))
+
+      if (address) {
+        const forkeds = await get_sheets({ first: page_size, skip: 0, where: { from: address } })
+        setForkedSheets(forkedSheets.concat(forkeds))
+      }
     }
 
     getInitialSheets()
   }, [])
+
   useEffect(() => {
     const getMoreSheets = async () => {
       switch (currentSection) {
@@ -209,7 +177,9 @@ export default function MusicCollection() {
                     })
                   }
                   onHandlePlayClicked={playerButtonHandler}
-                  audioState={playerState}
+                  updatePlayerState={updatePlayerState}
+                  audioState={audioPlayerState}
+                  mixedAudio={mixedAudio[sheet.data_key.toString()]}
                 />
               ))}
               {shareDialogState.opened && (
@@ -256,7 +226,9 @@ export default function MusicCollection() {
                     })
                   }
                   onHandlePlayClicked={playerButtonHandler}
-                  audioState={playerState}
+                  updatePlayerState={updatePlayerState}
+                  audioState={audioPlayerState}
+                  mixedAudio={mixedAudio[sheet.data_key.toString()]}
                 />
               ))}
               {shareDialogState.opened && (
