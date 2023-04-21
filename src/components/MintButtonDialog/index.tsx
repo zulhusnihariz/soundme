@@ -11,7 +11,7 @@ const MintButtonDialog = (prop: MintDialogProp) => {
     <>
       <button
         type="button"
-        className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#fff] bg-[#F91969] py-2 px-4"
+        className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#fff] bg-[#F91969] py-2 px-4 md:hover:scale-105"
         onClick={() => setIsDialogOpened(true)}
       >
         Bookmark

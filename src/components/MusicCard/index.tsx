@@ -47,7 +47,7 @@ const MusicCard = (prop: MusicCardProp) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => prop.onHandlePlayClicked(prop.sheet.data_key.toString())}
-            className="flex cursor-pointer flex-row items-center justify-center  rounded-full border border-[#232323] bg-black p-2 "
+            className="flex cursor-pointer flex-row items-center justify-center  rounded-full border border-[#232323] bg-black p-2 md:hover:scale-105"
           >
             {setButtonIcon(prop.audioState[prop.sheet.data_key.toString()])}
           </button>
@@ -64,7 +64,7 @@ const MusicCard = (prop: MusicCardProp) => {
         <div className="z-10 flex items-center justify-between gap-2 py-2">
           <button
             onClick={e => router.push(`/${prop.sheet.data_key}${prop.sheet.token_id}`)}
-            className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#232323] bg-black py-2 px-4"
+            className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#232323] bg-black py-2 px-4 md:hover:scale-105"
           >
             <span>Collaborate</span>
           </button>
@@ -72,7 +72,7 @@ const MusicCard = (prop: MusicCardProp) => {
           <div className="flex flex-row gap-2">
             <MintButtonDialog tokenId={prop.tokenId} />
             <button
-              className="rounded-full bg-black px-2"
+              className="rounded-full bg-black px-2 md:hover:scale-105"
               type="button"
               onClick={() => prop.onHandleShareClicked(prop.sheet.data_key)}
             >
