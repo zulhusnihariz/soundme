@@ -2,12 +2,13 @@ import MusicCard from 'components/MusicCard'
 import { useEffect, useState } from 'react'
 import ShareDialog from 'components/ShareDialog'
 import { get_sheets } from '../apollo-client'
-import { Sheet } from 'lib'
+import { PlayerState, Sheet } from 'lib'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useRouter } from 'next/router'
 import { RefreshIcon } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
+import { getSongLength, mixAudioBuffer } from 'utils/audio-web-api'
 
 enum CURRENT_SECTION {
   ALL,
@@ -39,11 +40,76 @@ export default function MusicCollection() {
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [refresh, setRefresh] = useState(false)
 
+  const [audioContext, setAudioContext] = useState(new AudioContext())
+  const [audioPlayerState, setAudioPlayerState] = useState<{ [key: string]: PlayerState }>({})
+  const [mixedAudio, setMixedAudio] = useState<{ [key: string]: AudioBuffer }>({})
+
   const onHandleRecordClicked = tokenId => {
     setSelectedToken({
       tokenId: tokenId,
       dataKey: tokenId,
     })
+  }
+
+  const updatePlayerState = (dataKey: string, state: PlayerState) => {
+    setAudioPlayerState(prev => ({
+      ...prev,
+      [dataKey]: state,
+    }))
+  }
+
+  const createMixedAudio = async (dataKey: string) => {
+    updatePlayerState(dataKey, PlayerState.LOADING)
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
+    let metadata = await res.json()
+
+    const urls = Object.values(metadata) as string[]
+
+    if (urls.length <= 0) {
+      updatePlayerState(dataKey, PlayerState.STOP)
+      return
+    }
+
+    let promises = urls.map(url =>
+      fetch(url)
+        .then(response => response.arrayBuffer())
+        .then(buffer => audioContext.decodeAudioData(buffer))
+    )
+
+    let buffers = await Promise.all(promises)
+
+    const songLength = getSongLength(buffers)
+    let mixed = mixAudioBuffer(buffers, songLength, 1, audioContext)
+
+    updatePlayerState(dataKey, PlayerState.PLAY)
+
+    setMixedAudio(prev => ({
+      ...prev,
+      [dataKey]: mixed,
+    }))
+  }
+
+  const playerButtonHandler = async (dataKey: string) => {
+    const isFirstPlay = audioPlayerState[dataKey] === undefined
+
+    if (isFirstPlay) {
+      createMixedAudio(dataKey)
+      return
+    }
+
+    switch (audioPlayerState[dataKey]) {
+      case PlayerState.STOP:
+        updatePlayerState(dataKey, PlayerState.PLAY)
+      case PlayerState.PLAY:
+        updatePlayerState(dataKey, PlayerState.PAUSED)
+        break
+      case PlayerState.PAUSED:
+        updatePlayerState(dataKey, PlayerState.PLAY)
+        break
+      default:
+        break
+    }
   }
 
   function handleMoreSheets() {
@@ -56,31 +122,28 @@ export default function MusicCollection() {
   }
 
   useEffect(() => {
-    const getInitialSheets = async () => {
-      const all = await get_sheets({ first: page_size, skip: 0 })
-      const forkeds = await get_sheets({ first: page_size, skip: 0, where: { from: address } })
+    const getSheets = async () => {
+      const isFirstPage = currentPage === 1
+      const skip = isFirstPage ? 0 : page_size
 
-      setForkedSheets(forkedSheets.concat(forkeds))
-      setSheets(sheets.concat(all))
-    }
-
-    getInitialSheets()
-  }, [])
-  useEffect(() => {
-    const getMoreSheets = async () => {
       switch (currentSection) {
         case CURRENT_SECTION.ALL:
-          const all = await get_sheets({ first: page_size, skip: page_size })
+          const all = await get_sheets({ first: page_size, skip })
           setSheets(sheets.concat(all))
+
+          if (address) {
+            const forkeds = await get_sheets({ first: page_size, skip, where: { from: address } })
+            setForkedSheets(forkedSheets.concat(forkeds))
+          }
           break
         case CURRENT_SECTION.BOOKMARKED:
-          const forkeds = await get_sheets({ first: page_size, skip: page_size, where: { from: address } })
+          const forkeds = await get_sheets({ first: page_size, skip, where: { from: address } })
           setForkedSheets(forkedSheets.concat(forkeds))
           break
       }
     }
 
-    getMoreSheets()
+    getSheets()
   }, [currentPage])
 
   return (
@@ -106,6 +169,10 @@ export default function MusicCollection() {
                       opened: true,
                     })
                   }
+                  onHandlePlayClicked={playerButtonHandler}
+                  updatePlayerState={updatePlayerState}
+                  audioState={audioPlayerState}
+                  mixedAudio={mixedAudio[sheet.data_key.toString()]}
                 />
               ))}
               {shareDialogState.opened && (
@@ -151,6 +218,10 @@ export default function MusicCollection() {
                       opened: true,
                     })
                   }
+                  onHandlePlayClicked={playerButtonHandler}
+                  updatePlayerState={updatePlayerState}
+                  audioState={audioPlayerState}
+                  mixedAudio={mixedAudio[sheet.data_key.toString()]}
                 />
               ))}
               {shareDialogState.opened && (

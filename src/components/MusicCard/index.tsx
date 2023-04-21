@@ -1,12 +1,8 @@
 import MintButtonDialog from 'components/MintButtonDialog'
-import ShareButtonDialog from 'components/ShareDialog'
-import voice from '../../assets/img/voice.png'
-import mic from '../../assets/icon/mic.png'
-import { SpectrumVisualizer, SpectrumVisualizerTheme } from 'react-audio-visualizers'
-import RecordingDialog from 'components/RecordingDialog'
-import Link from 'next/link'
-import { Sheet } from 'lib'
+import { PlayerState, Sheet } from 'lib'
 import { useRouter } from 'next/router'
+import { LoadingSpinner, PlayIcon, StopIcon } from 'components/Icons/icons'
+import BufferWaveform from 'components/Waveform/BufferWaveForm'
 
 interface MusicCardProp {
   tokenId: String
@@ -16,10 +12,27 @@ interface MusicCardProp {
   audioUrls: Array<string>
   onHandleRecordClicked: (tokenId) => void
   onHandleShareClicked: (datakey) => void
+  onHandlePlayClicked: (dataKey: string) => void
+  updatePlayerState: (dataKey: string, state: PlayerState) => void
+  audioState: {
+    [key: string]: PlayerState
+  }
+  mixedAudio?: AudioBuffer
 }
 
 const MusicCard = (prop: MusicCardProp) => {
   const router = useRouter()
+
+  function setButtonIcon(state: PlayerState) {
+    switch (state) {
+      case PlayerState.LOADING:
+        return <LoadingSpinner />
+      case PlayerState.PLAY:
+        return <StopIcon />
+      default:
+        return <PlayIcon />
+    }
+  }
 
   return (
     <>
@@ -30,17 +43,36 @@ const MusicCard = (prop: MusicCardProp) => {
             <span className="text-[#FFE331]">{prop.sheet.owner}</span>
           </p>
         </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => prop.onHandlePlayClicked(prop.sheet.data_key.toString())}
+            className="flex cursor-pointer flex-row items-center justify-center  rounded-full border border-[#232323] bg-black p-2 md:hover:scale-105"
+          >
+            {setButtonIcon(prop.audioState[prop.sheet.data_key.toString()])}
+          </button>
+
+          {prop.mixedAudio && (
+            <BufferWaveform
+              buffer={prop.mixedAudio}
+              playerState={prop.audioState[prop.sheet.data_key.toString()]}
+              onFinish={() => prop.updatePlayerState(prop.sheet.data_key.toString(), PlayerState.STOP)}
+            />
+          )}
+        </div>
+
         <div className="z-10 flex items-center justify-between gap-2 py-2">
           <button
             onClick={e => router.push(`/${prop.sheet.data_key}${prop.sheet.token_id}`)}
-            className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#232323] bg-black py-2 px-4"
+            className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#232323] bg-black py-2 px-4 md:hover:scale-105"
           >
-            <span>Collabeat</span>
+            <span>Collaborate</span>
           </button>
+
           <div className="flex flex-row gap-2">
             <MintButtonDialog tokenId={prop.tokenId} />
             <button
-              className="rounded-full bg-black px-2"
+              className="rounded-full bg-black px-2 md:hover:scale-105"
               type="button"
               onClick={() => prop.onHandleShareClicked(prop.sheet.data_key)}
             >
@@ -59,12 +91,6 @@ const MusicCard = (prop: MusicCardProp) => {
             </button>
           </div>
         </div>
-        {/* <div className="z-1 fixed bottom-0 py-5">
-          <SpectrumVisualizer
-            audio="https://seedweb3.infura-ipfs.io/ipfs/Qmdc4hhF8S55JB7GBezS6PXs7bRrMibJDYUEnTkZs2Yk7J"
-            theme={SpectrumVisualizerTheme.roundBars}
-          />
-        </div> */}
       </div>
     </>
   )
