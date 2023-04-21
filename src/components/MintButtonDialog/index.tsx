@@ -11,10 +11,10 @@ const MintButtonDialog = (prop: MintDialogProp) => {
     <>
       <button
         type="button"
-        className="Inter mr-2 bg-[#D45BFF] px-4 py-2 text-base font-medium leading-5 text-white"
+        className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#fff] bg-[#F91969] py-2 px-4"
         onClick={() => setIsDialogOpened(true)}
       >
-        Mint
+        Bookmark
       </button>
       {isDialogOpened && (
         <div className="absolute inset-0 z-10 h-screen w-screen overflow-y-auto">
