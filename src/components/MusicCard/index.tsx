@@ -61,7 +61,7 @@ const MusicCard = (prop: MusicCardProp) => {
               onFinish={() => prop.updatePlayerState(prop.sheet.data_key.toString(), PlayerState.STOP)}
             />
           ) : (
-            <Image src="/double-wave.png" width={150} height={150} alt="wave-placeholder" />
+            <Image src="/assets/double-wave.png" width={150} height={150} alt="wave-placeholder" />
           )}
         </div>
 

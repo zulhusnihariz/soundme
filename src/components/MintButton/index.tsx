@@ -1,8 +1,7 @@
-import { useContractWrite, usePrepareContractWrite, useWaitForTransaction, useContractRead } from 'wagmi'
-import BN from 'bn.js'
-import { useEffect, useState } from 'react'
-import GetTotalSupply from './GetTotalSupply'
+import { useContractWrite, usePrepareContractWrite } from 'wagmi'
 import { ethers, BigNumber } from 'ethers'
+import Image from 'next/image'
+import GradientButton from 'components/Button/GradientButton'
 interface MintProp {
   tokenId: String
 }
@@ -35,9 +34,11 @@ const MintButton = (prop: MintProp) => {
   const { data, write } = useContractWrite(config)
 
   return (
-    <button className="mr-2 bg-blue-500 px-5 py-3 text-black" onClick={() => write?.()}>
-      Mint (<GetTotalSupply tokenId={prop.tokenId} />)
-    </button>
+    <GradientButton from="[#a726f8]" to="[#ffdd00]" callback={write}>
+      <Image className="mb-1 " src="/assets/plus-icon.png" height={20} width={20} alt="plus icon" />
+      <span>Bookmark</span>
+      <span>Beat</span>
+    </GradientButton>
   )
 }
 
