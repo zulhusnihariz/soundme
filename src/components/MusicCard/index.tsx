@@ -3,6 +3,8 @@ import { PlayerState, Sheet } from 'lib'
 import { useRouter } from 'next/router'
 import { LoadingSpinner, PlayIcon, StopIcon } from 'components/Icons/icons'
 import BufferWaveform from 'components/Waveform/BufferWaveForm'
+import { shortenAddress } from 'utils/shorten-address'
+import Image from 'next/image'
 
 interface MusicCardProp {
   tokenId: String
@@ -40,7 +42,7 @@ const MusicCard = (prop: MusicCardProp) => {
         <div className="my-4">
           <p className="mb-1 text-left text-base font-semibold text-[#F6F8FF]">{`Collabeat #${prop.tokenId}`}</p>
           <p className="text-left text-xs text-[#F6F8FF]">
-            <span className="text-[#FFE331]">{prop.sheet.owner}</span>
+            Started by <span className="text-[#FFE331]">{shortenAddress(prop.sheet.owner.toString())}</span>
           </p>
         </div>
 
@@ -52,12 +54,14 @@ const MusicCard = (prop: MusicCardProp) => {
             {setButtonIcon(prop.audioState[prop.sheet.data_key.toString()])}
           </button>
 
-          {prop.mixedAudio && (
+          {prop.mixedAudio ? (
             <BufferWaveform
               buffer={prop.mixedAudio}
               playerState={prop.audioState[prop.sheet.data_key.toString()]}
               onFinish={() => prop.updatePlayerState(prop.sheet.data_key.toString(), PlayerState.STOP)}
             />
+          ) : (
+            <Image src="/double-wave.png" width={150} height={150} alt="wave-placeholder" />
           )}
         </div>
 
