@@ -7,7 +7,11 @@ const ConfirmButton = ({ cid, onForkSuccess }) => {
     address: process.env.NEXT_PUBLIC_COLLABEAT as any,
     abi: [
       {
-        inputs: [{ internalType: 'string', name: 'cid', type: 'string' }],
+        inputs: [
+          { internalType: 'string', name: 'name', type: 'string' },
+          { internalType: 'string', name: 'ipfs_address', type: 'string' },
+          { internalType: 'string', name: 'cid', type: 'string' },
+        ],
         name: 'fork',
         outputs: [],
         stateMutability: 'payable',
@@ -15,7 +19,7 @@ const ConfirmButton = ({ cid, onForkSuccess }) => {
       },
     ],
     functionName: 'fork',
-    args: [cid],
+    args: ['', process.env.NEXT_PUBLIC_IPFS_FORK_MULTIADDRESS, cid],
     overrides: {
       value: ethers.utils.parseUnits('0.015', 'ether'),
     },

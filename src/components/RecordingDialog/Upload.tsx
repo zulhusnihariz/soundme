@@ -16,7 +16,7 @@ interface UploadProp {
 const Upload = (prop: UploadProp) => {
   const [audioUrl, setAudioUrl] = useState('')
 
-  const ipfs = useIpfs()
+  const { ipfs } = useIpfs()
   const { address } = useAccount()
 
   const { signMessage } = useSignMessage({
