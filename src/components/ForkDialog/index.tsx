@@ -20,12 +20,12 @@ interface ForkDialogProp {
 const ForkDialog = (prop: ForkDialogProp) => {
   const [uploadedCid, setUplodedCid] = useState('')
 
-  const ipfs = useIpfs()
+  const { ipfsFork } = useIpfs()
 
   useEffect(() => {
     const uploadToIpfs = async () => {
       try {
-        const cid = await ipfs.dag.put(prop.selectedAudios)
+        const cid = await ipfsFork.dag.put(prop.selectedAudios)
         setUplodedCid(cid.toString())
       } catch (e) {
         console.log(e)
@@ -35,7 +35,7 @@ const ForkDialog = (prop: ForkDialogProp) => {
     if (!uploadedCid) {
       uploadToIpfs()
     }
-  }, [uploadedCid, ipfs, prop])
+  }, [uploadedCid, ipfsFork, prop])
 
   return (
     <>
