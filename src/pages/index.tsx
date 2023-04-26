@@ -64,7 +64,10 @@ export default function MusicCollection() {
     const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
     let metadata = await res.json()
 
-    const urls = Object.values(metadata) as string[]
+    const urls = []
+    for (const [key, value] of Object.entries(metadata)) {
+      if (key.startsWith('0x')) urls.push(value)
+    }
 
     if (urls.length <= 0) {
       updatePlayerState(dataKey, PlayerState.STOP)
