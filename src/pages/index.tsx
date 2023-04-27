@@ -33,6 +33,8 @@ export default function MusicCollection() {
     opened: false,
   })
 
+  const [isFetching, setIsFetching] = useState(true)
+
   const [sheets, setSheets] = useState<Sheet[]>([])
   const [forkedSheets, setForkedSheets] = useState<Sheet[]>([])
   const [currentSection, setCurrentSection] = useState<CURRENT_SECTION>(CURRENT_SECTION.ALL)
@@ -144,6 +146,7 @@ export default function MusicCollection() {
           setForkedSheets(forkedSheets.concat(forkeds))
           break
       }
+      setIsFetching(false)
     }
 
     getSheets()
@@ -152,48 +155,7 @@ export default function MusicCollection() {
   return (
     <div className="m-5">
       <main>
-        {sheets.length > 0 && currentSection !== CURRENT_SECTION.BOOKMARKED && (
-          <section className="mb-4">
-            <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Fresh beats</h1>
-
-            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
-              {sheets.map((sheet, index) => (
-                <MusicCard
-                  sheet={sheet}
-                  key={index}
-                  tokenId={sheet.token_id.toString()}
-                  name={sheet.data_key.toString()}
-                  description={''}
-                  audioUrls={[]}
-                  onHandleRecordClicked={onHandleRecordClicked}
-                  onHandleShareClicked={dataKey =>
-                    setShareDialogState({
-                      dataKey,
-                      opened: true,
-                    })
-                  }
-                  onHandlePlayClicked={playerButtonHandler}
-                  updatePlayerState={updatePlayerState}
-                  audioState={audioPlayerState}
-                  mixedAudio={mixedAudio[sheet.data_key.toString()]}
-                />
-              ))}
-              {shareDialogState.opened && (
-                <ShareDialog
-                  dataKey={shareDialogState.dataKey}
-                  onHandleCloseClicked={() =>
-                    setShareDialogState({
-                      dataKey: '',
-                      opened: false,
-                    })
-                  }
-                />
-              )}
-            </div>
-          </section>
-        )}
-
-        {forkedSheets.length > 0 && (
+        {forkedSheets.length > 0 && !isFetching && (
           <section className="mb-4">
             <h1
               className="Inter mb-4 text-left text-3xl font-bold text-white"
@@ -242,7 +204,48 @@ export default function MusicCollection() {
           </section>
         )}
 
-        {sheets.length > 0 ? (
+        {sheets.length > 0 && !isFetching && currentSection !== CURRENT_SECTION.BOOKMARKED && (
+          <section className="mb-4">
+            <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Fresh beats</h1>
+
+            <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+              {sheets.map((sheet, index) => (
+                <MusicCard
+                  sheet={sheet}
+                  key={index}
+                  tokenId={sheet.token_id.toString()}
+                  name={sheet.data_key.toString()}
+                  description={''}
+                  audioUrls={[]}
+                  onHandleRecordClicked={onHandleRecordClicked}
+                  onHandleShareClicked={dataKey =>
+                    setShareDialogState({
+                      dataKey,
+                      opened: true,
+                    })
+                  }
+                  onHandlePlayClicked={playerButtonHandler}
+                  updatePlayerState={updatePlayerState}
+                  audioState={audioPlayerState}
+                  mixedAudio={mixedAudio[sheet.data_key.toString()]}
+                />
+              ))}
+              {shareDialogState.opened && (
+                <ShareDialog
+                  dataKey={shareDialogState.dataKey}
+                  onHandleCloseClicked={() =>
+                    setShareDialogState({
+                      dataKey: '',
+                      opened: false,
+                    })
+                  }
+                />
+              )}
+            </div>
+          </section>
+        )}
+
+        {!isFetching ? (
           <button
             onClick={refresh ? handleRefreshSheets : handleMoreSheets}
             className="fixed inset-x-0 bottom-[15px] mx-auto flex w-28 cursor-pointer flex-row items-center justify-center rounded-3xl border border-[#232323] bg-black py-2 px-4"
