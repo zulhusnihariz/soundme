@@ -1,5 +1,5 @@
 import { PlayerState } from 'lib'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import classNames from 'classnames'
 interface WaveformProps {
   url: string
@@ -10,6 +10,7 @@ interface WaveformProps {
   onToggleSound: (muted: boolean) => void
   onFinish?: () => void
   onSelectButtonClicked?: () => void
+  isMuteButtonHidden?: boolean
 }
 
 const Waveform: React.FC<WaveformProps> = ({
@@ -21,6 +22,7 @@ const Waveform: React.FC<WaveformProps> = ({
   isSelecting,
   isSelected,
   onSelectButtonClicked,
+  isMuteButtonHidden,
 }) => {
   const waveformRef = useRef<HTMLDivElement>(null)
   const wavesurferRef = useRef<WaveSurfer | null>(null)
@@ -92,7 +94,7 @@ const Waveform: React.FC<WaveformProps> = ({
   return (
     <div className="flex items-center justify-between">
       <div ref={waveformRef} />
-      {!isSelecting && (
+      {!isSelecting && !isMuteButtonHidden && (
         <button className="rounded-full" onClick={() => onToggleSound(!isMuted)}>
           {isMuted && (
             <svg fill="#000000" width="48px" height="48px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
