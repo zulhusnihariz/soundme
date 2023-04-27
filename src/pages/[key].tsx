@@ -8,6 +8,7 @@ import ForkDialog from 'components/ForkDialog'
 import ShareDialog from 'components/ShareDialog'
 import Image from 'next/image'
 import { JSONIcon, ShareIcon } from 'components/Icons/icons'
+import LoadingIndicator from 'components/LoadingIndicator'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -256,28 +257,32 @@ const SingleMusic = () => {
           </div>
         )}
         <div className="w-full">
-          {filteredData.map((audioState, key) => {
-            if (audioState.data) {
-              return (
-                <div key={key} className="border-1 m-1 h-[80px] rounded bg-white p-2 text-left">
-                  <div className="font-sm inline-block whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-sm text-black">
-                    {audioState.key}
+          {filteredData.length > 0 ? (
+            filteredData.map((audioState, key) => {
+              if (audioState.data) {
+                return (
+                  <div key={key} className="border-1 m-1 h-[80px] rounded bg-white p-2 text-left">
+                    <div className="font-sm inline-block whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-sm text-black">
+                      {audioState.key}
+                    </div>
+                    <div className="h-1/2 w-full">
+                      <Waveform
+                        url={audioState.data as string}
+                        playerState={audioState.playerState}
+                        isMuted={audioState.isMuted}
+                        onToggleSound={() => onToggleSound(audioState)}
+                        isSelecting={isForking}
+                        isSelected={audioState.selected}
+                        onSelectButtonClicked={() => onToggleSelection(audioState)}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1/2 w-full">
-                    <Waveform
-                      url={audioState.data as string}
-                      playerState={audioState.playerState}
-                      isMuted={audioState.isMuted}
-                      onToggleSound={() => onToggleSound(audioState)}
-                      isSelecting={isForking}
-                      isSelected={audioState.selected}
-                      onSelectButtonClicked={() => onToggleSelection(audioState)}
-                    />
-                  </div>
-                </div>
-              )
-            }
-          })}
+                )
+              }
+            })
+          ) : (
+            <LoadingIndicator text={'Fetching data...'} />
+          )}
         </div>
       </div>
       {isDialogRecordingOpened && (
