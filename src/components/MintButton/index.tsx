@@ -1,7 +1,7 @@
 import { useContractWrite, usePrepareContractWrite } from 'wagmi'
 import { ethers, BigNumber } from 'ethers'
 import Image from 'next/image'
-import GradientButton from 'components/Button/GradientButton'
+
 interface MintProp {
   tokenId: String
 }
@@ -34,11 +34,14 @@ const MintButton = (prop: MintProp) => {
   const { data, write } = useContractWrite(config)
 
   return (
-    <GradientButton from="[#a726f8]" to="[#ffdd00]" callback={write}>
+    <button
+      className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#FFDD00] to-[#A726F8] p-2 text-xs font-bold text-white md:hover:scale-105`}
+      onClick={() => write?.()}
+    >
       <Image className="mb-1 " src="/assets/plus-icon.png" height={20} width={20} alt="plus icon" />
       <span>Bookmark</span>
       <span>Beat</span>
-    </GradientButton>
+    </button>
   )
 }
 
