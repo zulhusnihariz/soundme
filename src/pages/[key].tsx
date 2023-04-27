@@ -211,7 +211,7 @@ const SingleMusic = () => {
 
             {isForking && (
               <button
-                className="from-20% mr-2 min-w-[8rem] rounded-xl bg-gradient-to-t from-[#F5517B] to-[#FEDC00] px-8   py-3 font-bold text-white md:hover:scale-105"
+                className="from-20% mr-2 min-w-[8rem] rounded-xl bg-gradient-to-t from-[#F5517B] to-[#FEDC00] px-8 py-3 font-bold text-white md:hover:scale-105"
                 onClick={() => {
                   fork()
                   setIsDialogForkOpened(true)
