@@ -11,10 +11,11 @@ const CountdownTimer = (prop: CountdownProp) => {
       isPlaying
       duration={3}
       colors={['#8500B4', '#DE296A', '#FFDD00']}
-      colorsTime={[3, 2, 1]}
+      colorsTime={[3, 2, 0]}
       onComplete={prop.onCountdownFinish}
+      size={100}
     >
-      {({ remainingTime }) => <div className="time-wrapper">{remainingTime}</div>}
+      {({ remainingTime }) => <div className="text-2xl">{remainingTime}</div>}
     </CountdownCircleTimer>
   )
 }
