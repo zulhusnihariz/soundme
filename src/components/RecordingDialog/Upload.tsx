@@ -12,7 +12,9 @@ interface UploadProp {
   onHandleStopClicked: () => void
   onHandleRecordClicked: () => any
   onHandleConfirmClicked: () => void
+  onHandleMuteClicked: (muted: boolean) => void
   isRecordedPlaying: boolean
+  isAllBeatsMuted: boolean
 }
 
 const Upload = (prop: UploadProp) => {
@@ -100,8 +102,11 @@ const Upload = (prop: UploadProp) => {
         <button className="rounded-md bg-red-600 py-2 px-2 md:px-5 md:hover:scale-105" onClick={() => add_to_nft()}>
           Add Beat to NFT
         </button>
-        <button className="rounded-md bg-indigo-600 py-2 px-2 md:px-5 md:hover:scale-105" onClick={() => {}}>
-          Mute Beats
+        <button
+          className="rounded-md bg-indigo-600 py-2 px-2 md:px-5 md:hover:scale-105"
+          onClick={() => prop.onHandleMuteClicked(!prop.isAllBeatsMuted)}
+        >
+          {prop.isAllBeatsMuted ? 'Unmute Beats' : 'Mute Beats'}
         </button>
       </div>
     </div>

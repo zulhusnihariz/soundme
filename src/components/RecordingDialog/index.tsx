@@ -13,6 +13,8 @@ interface RecordingDialogProp {
   tokenId: String
   isOpened: boolean
   onDialogClosed: () => void
+  setAllMuted: (muted: boolean) => void
+  setAllState: (state: PlayerState) => void
 }
 
 export enum RecordingDialogState {
@@ -32,10 +34,15 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   const [filteredData, setFilteredData] = useState<Array<AudioState>>([])
   const { address } = useAccount()
 
-  const [isRecordedPlaying, setIsRecordedPlaying] = useState(false)
+  const [isAllBeatsMuted, setIsAllBeatsMuted] = useState(false)
 
   const onHandleConfirmClicked = () => {
     prop.onDialogClosed()
+  }
+
+  const onHandleMuteClicked = (muted: boolean) => {
+    prop.setAllMuted(muted)
+    setIsAllBeatsMuted(muted)
   }
 
   async function onRecordingStart() {
@@ -54,6 +61,12 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
       setState(RecordingDialogState.START)
     }
     removeMicrophoneAccess()
+    prop.setAllState(PlayerState.STOP)
+  }
+
+  const onCountdownFinished = () => {
+    setState(RecordingDialogState.RECORD)
+    prop.setAllState(PlayerState.PLAY)
   }
 
   useEffect(() => {
@@ -91,7 +104,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
     }
 
     setFilteredData(updatedData)
-    setIsRecordedPlaying(true)
+    prop.setAllState(PlayerState.PLAY)
   }
 
   const onStopOneAudio = (state: AudioState) => {
@@ -104,7 +117,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
     }
 
     setFilteredData(updatedData)
-    setIsRecordedPlaying(false)
+    prop.setAllState(PlayerState.STOP)
   }
 
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null)
@@ -150,7 +163,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                     <StartRecording onHandleStartRecordingClicked={onRecordingStart} />
                   )}
                   {state === RecordingDialogState.COUNTDOWN && (
-                    <CountdownTimer onCountdownFinish={() => setState(RecordingDialogState.RECORD)} />
+                    <CountdownTimer onCountdownFinish={() => onCountdownFinished()} />
                   )}
                   {state === RecordingDialogState.RECORD && (
                     <Recording
@@ -169,13 +182,16 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
                           isMuted={filteredData[filteredData.length - 1].isMuted}
                           onToggleSound={() => onToggleSound(filteredData[filteredData.length - 1])}
                           isMuteButtonHidden={true}
+                          onFinish={() => onStopOneAudio(filteredData[filteredData.length - 1])}
                         />
                       )}
                       <Upload
                         audioData={audioData}
                         dataKey={prop.dataKey}
                         tokenId={prop.tokenId}
-                        isRecordedPlaying={isRecordedPlaying}
+                        isAllBeatsMuted={isAllBeatsMuted}
+                        isRecordedPlaying={filteredData[filteredData.length - 1].playerState === PlayerState.PLAY}
+                        onHandleMuteClicked={muted => onHandleMuteClicked(muted)}
                         onHandleConfirmClicked={() => onHandleConfirmClicked()}
                         onHandleRecordClicked={() => onRecordingStart()}
                         onHandlePlayClicked={() => onPlayOneAudio(filteredData[filteredData.length - 1])}

@@ -1,10 +1,11 @@
 import { PlayerState } from 'lib'
 import { useEffect, useRef } from 'react'
 import classNames from 'classnames'
+
 interface WaveformProps {
   url: string
   playerState: PlayerState
-  isMuted: Boolean
+  isMuted: boolean
   isSelecting?: Boolean
   isSelected?: Boolean
   onToggleSound: (muted: boolean) => void
@@ -52,14 +53,14 @@ const Waveform: React.FC<WaveformProps> = ({
           minPxPerSec: window.innerWidth < 720 ? 1 : 5,
           scrollParent: false,
         })
+
         wavesurferRef.current.load(url)
+        wavesurferRef.current.setMute(isMuted)
 
         wavesurferRef.current.on('ready', () => {
           switch (playerState) {
             case PlayerState.PLAY:
-              if (!isMuted) {
-                wavesurferRef.current?.play()
-              }
+              wavesurferRef.current?.play()
               break
             case PlayerState.PAUSED:
               if (wavesurferRef.current?.isPlaying) {
@@ -87,9 +88,14 @@ const Waveform: React.FC<WaveformProps> = ({
       isMounted = false
       wavesurferRef.current?.destroy()
     }
-  }, [url, playerState, isMuted, onFinish])
+  }, [url, playerState, onFinish])
 
-  const onSelectedButtonClicked = () => {}
+  useEffect(() => {
+    // this.backend is referred inside setMute, it can be null since wavesurfer is destroyed in cleanup function
+    if (wavesurferRef?.current && wavesurferRef.current.backend !== null) {
+      wavesurferRef?.current?.setMute(isMuted)
+    }
+  }, [isMuted])
 
   return (
     <div className="flex items-center justify-between">

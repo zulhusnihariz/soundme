@@ -291,6 +291,8 @@ const SingleMusic = () => {
           tokenId={tokenId}
           isOpened={isDialogRecordingOpened}
           onDialogClosed={() => onHandleDialogClosed()}
+          setAllMuted={muted => setAllMuted(muted)}
+          setAllState={state => setAllState(state)}
         />
       )}
       {isDialogForkOpened && (
