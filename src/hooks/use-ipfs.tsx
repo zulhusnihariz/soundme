@@ -38,7 +38,7 @@ export const IpfsProvider: React.FC<IpfsProviderProps> = ({ children }) => {
           if (!isIPFSConnected) {
             try {
               const client = await create({
-                url: process.env.NEXT_PUBLIC_IPFS_FORK_MULTIADDRESS,
+                url: process.env.NEXT_PUBLIC_IPFS_FORK_URL,
               })
 
               setIpfsFork(client)
