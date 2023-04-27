@@ -7,7 +7,6 @@ import MintButton from 'components/MintButton'
 import ForkDialog from 'components/ForkDialog'
 import ShareDialog from 'components/ShareDialog'
 import Image from 'next/image'
-import GradientButton from 'components/Button/GradientButton'
 import { JSONIcon, ShareIcon } from 'components/Icons/icons'
 
 const SingleMusic = () => {
@@ -203,7 +202,7 @@ const SingleMusic = () => {
 
             {!isForking && canRecord && (
               <button
-                className="mr-2 inline-block min-w-[8rem] rounded-xl bg-gradient-to-t from-[#FF3065] to-[#7224A7] px-8 py-3  font-bold text-white md:hover:scale-105"
+                className="from-20% mr-2 inline-block min-w-[8rem] rounded-xl bg-gradient-to-t from-[#7224A7] to-[#FF3065] px-8 py-3  font-bold text-white md:hover:scale-105"
                 onClick={() => setIsDialogRecordingOpened(!isDialogRecordingOpened)}
               >
                 Record
@@ -212,7 +211,7 @@ const SingleMusic = () => {
 
             {isForking && (
               <button
-                className="mr-2 min-w-[8rem] rounded-xl bg-gradient-to-t from-[#FEDC00] to-[#F5517B] px-8 py-3   font-bold text-white md:hover:scale-105"
+                className="from-20% mr-2 min-w-[8rem] rounded-xl bg-gradient-to-t from-[#F5517B] to-[#FEDC00] px-8   py-3 font-bold text-white md:hover:scale-105"
                 onClick={() => {
                   fork()
                   setIsDialogForkOpened(true)
@@ -229,15 +228,21 @@ const SingleMusic = () => {
               {tokenId && <MintButton tokenId={tokenId} />}
 
               {isForking ? (
-                <GradientButton bg="red-500" callback={toggleForkingMode}>
+                <button
+                  className={`flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-red-500 p-2 text-xs font-bold text-white md:hover:scale-105`}
+                  onClick={() => toggleForkingMode()}
+                >
                   <span> Cancel</span>
-                </GradientButton>
+                </button>
               ) : (
-                <GradientButton from="[#FEDC00]" to="[#F5517B]" callback={toggleForkingMode}>
+                <button
+                  className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#F5517B] to-[#FEDC00] p-2 text-xs font-bold text-white md:hover:scale-105`}
+                  onClick={() => toggleForkingMode()}
+                >
                   <Image className="mb-1" src="/assets/fork-icon.png" height={20} width={20} alt="fork icon" />
                   <span>Fork</span>
                   <span>This Beat</span>
-                </GradientButton>
+                </button>
               )}
             </div>
             <div className="inline-block">
