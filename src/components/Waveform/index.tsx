@@ -88,14 +88,7 @@ const Waveform: React.FC<WaveformProps> = ({
       isMounted = false
       wavesurferRef.current?.destroy()
     }
-  }, [url, playerState, onFinish])
-
-  useEffect(() => {
-    // this.backend is referred inside setMute, it can be null since wavesurfer is destroyed in cleanup function
-    if (wavesurferRef?.current && wavesurferRef.current.backend !== null) {
-      wavesurferRef?.current?.setMute(isMuted)
-    }
-  }, [isMuted])
+  }, [url, playerState, onFinish, isMuted])
 
   return (
     <div className="flex items-center justify-between">
