@@ -122,7 +122,10 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
 
   const getMicrophoneAccess = async () => {
     try {
-      const constraints = { audio: true, video: false }
+      const constraints = {
+        audio: { autoGainControl: false, echoCancellation: false, noiseSuppression: false },
+        video: false,
+      }
       let stream = await navigator.mediaDevices.getUserMedia(constraints)
       setMediaStream(stream)
     } catch (ex) {
