@@ -1,4 +1,3 @@
-import MintButtonDialog from 'components/MintButtonDialog'
 import { PlayerState, Sheet } from 'lib'
 import { useRouter } from 'next/router'
 import { LoadingSpinner, PlayIcon, StopIcon } from 'components/Icons/icons'
@@ -15,6 +14,7 @@ interface MusicCardProp {
   onHandleRecordClicked: (tokenId) => void
   onHandleShareClicked: (datakey) => void
   onHandlePlayClicked: (dataKey: string) => void
+  onHandleMintClicked: (data: { tokenId: String; owner: String }) => void
   updatePlayerState: (dataKey: string, state: PlayerState) => void
   audioState: {
     [key: string]: PlayerState
@@ -74,7 +74,13 @@ const MusicCard = (prop: MusicCardProp) => {
           </button>
 
           <div className="flex flex-row gap-2">
-            <MintButtonDialog tokenId={prop.tokenId} />
+            <button
+              type="button"
+              className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#F91969] bg-[#F91969] py-2 px-4 md:hover:scale-105"
+              onClick={() => prop.onHandleMintClicked({ tokenId: prop.tokenId, owner: prop.sheet.owner.toString() })}
+            >
+              Bookmark
+            </button>
             <button
               className="rounded-full bg-black px-2 md:hover:scale-105"
               type="button"

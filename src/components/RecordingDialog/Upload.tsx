@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react'
 import { useAccount, useSignMessage } from 'wagmi'
 import { add_beat } from '_aqua/music'
 import { PlayIcon, StopIcon } from 'components/Icons/icons'
-import { ErrorMessageContext } from 'hooks/use-error-message'
+import { AlertMessageContext } from 'hooks/use-alert-message'
 
 interface UploadProp {
   audioData: any
@@ -30,7 +30,7 @@ const Upload = (prop: UploadProp) => {
     },
   })
 
-  const { showError } = useContext(ErrorMessageContext)
+  const { showError } = useContext(AlertMessageContext)
 
   const add_to_nft = async () => {
     if (!prop.audioData.blob) return

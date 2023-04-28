@@ -1,7 +1,7 @@
 import Waveform from 'components/Waveform'
 import { AudioState, PlayerState, SelectedAudio } from 'lib'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import RecordingDialog from 'components/RecordingDialog'
 import MintButton from 'components/MintButton'
 import ForkDialog from 'components/ForkDialog'
@@ -9,9 +9,13 @@ import ShareDialog from 'components/ShareDialog'
 import Image from 'next/image'
 import { JSONIcon, ShareIcon } from 'components/Icons/icons'
 import LoadingIndicator from 'components/LoadingIndicator'
+import { useAccount } from 'wagmi'
+import { AlertMessageContext } from 'hooks/use-alert-message'
 
 const SingleMusic = () => {
   const router = useRouter()
+  const { address } = useAccount()
+  const { showError } = useContext(AlertMessageContext)
 
   const [dataKey, setDataKey] = useState('')
   const [tokenId, setTokenId] = useState('')
@@ -148,6 +152,11 @@ const SingleMusic = () => {
   }
 
   const toggleForkingMode = () => {
+    if (!address) {
+      showError('Connect your wallet to fork this beat')
+      return
+    }
+
     setIsForking(!isForking)
 
     if (isForking) {
