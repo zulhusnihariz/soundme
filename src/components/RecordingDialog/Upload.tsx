@@ -1,8 +1,9 @@
 import { useIpfs } from 'hooks/use-ipfs'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useAccount, useSignMessage } from 'wagmi'
 import { add_beat } from '_aqua/music'
 import { PlayIcon, StopIcon } from 'components/Icons/icons'
+import { ErrorMessageContext } from 'hooks/use-error-message'
 
 interface UploadProp {
   audioData: any
@@ -29,8 +30,15 @@ const Upload = (prop: UploadProp) => {
     },
   })
 
+  const { showError } = useContext(ErrorMessageContext)
+
   const add_to_nft = async () => {
     if (!prop.audioData.blob) return
+
+    if (!address) {
+      showError('Connect your wallet to add beat to NFT')
+      return
+    }
 
     try {
       const resp = await ipfs.storeBlob(prop.audioData.blob)
