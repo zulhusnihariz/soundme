@@ -1,5 +1,5 @@
 import MusicCard from 'components/MusicCard'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import ShareDialog from 'components/ShareDialog'
 import { get_sheets } from '../apollo-client'
 import { PlayerState, Sheet } from 'lib'
@@ -9,6 +9,8 @@ import { RefreshIcon } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
 import { getSongLength, mixAudioBuffer } from 'utils/audio-web-api'
+import MintDialog from 'components/MintDialog'
+import { AlertMessageContext } from 'hooks/use-alert-message'
 
 enum CURRENT_SECTION {
   ALL,
@@ -18,6 +20,8 @@ enum CURRENT_SECTION {
 
 export default function MusicCollection() {
   let { address } = useAccount()
+  const { showError } = useContext(AlertMessageContext)
+
   // address = '0xc20de1a30487ec70fc730866f297f2e2f1e411f7' // uncomment to test bookmarked beats ui
 
   const router = useRouter()
@@ -34,6 +38,8 @@ export default function MusicCollection() {
   })
 
   const [isFetching, setIsFetching] = useState(true)
+  const [isDialogMintOpened, setIsDialogMintOpened] = useState(false)
+  const [beatToBookmark, setBeatToBookmark] = useState({ tokenId: '', owner: '' })
 
   const [sheets, setSheets] = useState<Sheet[]>([])
   const [forkedSheets, setForkedSheets] = useState<Sheet[]>([])
@@ -51,6 +57,21 @@ export default function MusicCollection() {
       tokenId: tokenId,
       dataKey: tokenId,
     })
+  }
+
+  const onHandleMintClicked = data => {
+    if (!address) {
+      showError('Connect your wallet to bookmark this beat')
+      return
+    }
+
+    setBeatToBookmark(data)
+    setIsDialogMintOpened(true)
+  }
+
+  const onHandleMintDialogClosed = () => {
+    setBeatToBookmark(null)
+    setIsDialogMintOpened(false)
   }
 
   const updatePlayerState = (dataKey: string, state: PlayerState) => {
@@ -155,6 +176,14 @@ export default function MusicCollection() {
   return (
     <div className="m-5">
       <main>
+        {isDialogMintOpened && (
+          <MintDialog
+            beat={beatToBookmark}
+            isOpened={isDialogMintOpened}
+            onDialogClosed={() => onHandleMintDialogClosed()}
+          />
+        )}
+
         {forkedSheets.length > 0 && !isFetching && (
           <section className="mb-4">
             <h1
@@ -184,6 +213,7 @@ export default function MusicCollection() {
                     })
                   }
                   onHandlePlayClicked={playerButtonHandler}
+                  onHandleMintClicked={data => onHandleMintClicked(data)}
                   updatePlayerState={updatePlayerState}
                   audioState={audioPlayerState}
                   mixedAudio={mixedAudio[sheet.data_key.toString()]}
@@ -218,6 +248,7 @@ export default function MusicCollection() {
                   description={''}
                   audioUrls={[]}
                   onHandleRecordClicked={onHandleRecordClicked}
+                  onHandleMintClicked={data => onHandleMintClicked(data)}
                   onHandleShareClicked={dataKey =>
                     setShareDialogState({
                       dataKey,

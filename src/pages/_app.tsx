@@ -17,8 +17,7 @@ import {
   ledgerWallet,
   rainbowWallet,
 } from '@rainbow-me/rainbowkit/wallets'
-import { Chain } from '@rainbow-me/rainbowkit'
-import { mainnet, goerli, polygonMumbai } from 'wagmi/chains'
+import { goerli, polygonMumbai } from 'wagmi/chains'
 import { createClient, configureChains, WagmiConfig } from 'wagmi'
 import { infuraProvider } from 'wagmi/providers/infura'
 import { publicProvider } from 'wagmi/providers/public'
@@ -26,7 +25,7 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { FluenceProvider } from 'hooks/use-fluence'
 import { IpfsProvider } from 'hooks/use-ipfs'
 import MainLayout from 'layout/MainLayout'
-import { ErrorMessageProvider } from 'hooks/use-error-message'
+import { AlertMessageProvider } from 'hooks/use-alert-message'
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -108,7 +107,7 @@ export function Web3Wrapper({ children }) {
       >
         <IpfsProvider>
           <FluenceProvider>
-            <ErrorMessageProvider>{children}</ErrorMessageProvider>
+            <AlertMessageProvider>{children}</AlertMessageProvider>
           </FluenceProvider>
         </IpfsProvider>
       </RainbowKitProvider>

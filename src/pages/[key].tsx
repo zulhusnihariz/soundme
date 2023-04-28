@@ -10,12 +10,12 @@ import Image from 'next/image'
 import { JSONIcon, ShareIcon } from 'components/Icons/icons'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useAccount } from 'wagmi'
-import { ErrorMessageContext } from 'hooks/use-error-message'
+import { AlertMessageContext } from 'hooks/use-alert-message'
 
 const SingleMusic = () => {
   const router = useRouter()
   const { address } = useAccount()
-  const { showError } = useContext(ErrorMessageContext)
+  const { showError } = useContext(AlertMessageContext)
 
   const [dataKey, setDataKey] = useState('')
   const [tokenId, setTokenId] = useState('')
