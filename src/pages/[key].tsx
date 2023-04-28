@@ -21,12 +21,17 @@ const SingleMusic = () => {
   const [filteredData, setFilteredData] = useState<Array<AudioState>>([])
   const [forkData, setForkData] = useState<Array<SelectedAudio>>([])
   const [isForking, setIsForking] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
 
   const [isDialogRecordingOpened, setIsDialogRecordingOpened] = useState(false)
   const [isDialogForkOpened, setIsDialogForkOpened] = useState(false)
   const [isShareDialogShow, setIsShareDialogShow] = useState(false)
   const [canRecord, setCanRecord] = useState(false)
+
+  // simple way to keep track whether all beats finished playing; once finished, set button to play
+  const [finishedCounter, setFinishedCounter] = useState(-1)
+  useEffect(() => {
+    if (finishedCounter === 0) setAllState(PlayerState.STOP)
+  }, [finishedCounter])
 
   useEffect(() => {
     if (data && !isLoad) {
@@ -85,8 +90,8 @@ const SingleMusic = () => {
 
     setFilteredData(data)
 
-    if (state === PlayerState.PLAY) setIsPlaying(true)
-    if (state === PlayerState.STOP) setIsPlaying(false)
+    if (state === PlayerState.PLAY) setFinishedCounter(filteredData.length)
+    if (state === PlayerState.STOP) setFinishedCounter(-1)
   }
 
   const setAllMuted = (muted: boolean) => {
@@ -173,7 +178,7 @@ const SingleMusic = () => {
       <div className="px-2 pb-5">
         <div className="fixed bottom-0 left-0 mb-5 flex w-full items-center justify-center">
           <div className="flex items-center justify-between rounded-xl bg-gray-700 p-2">
-            {!isPlaying ? (
+            {finishedCounter <= 0 ? (
               <button
                 className="mr-2 rounded-xl px-8 py-3 text-black text-black hover:bg-[#1C1C1C]"
                 onClick={() => setAllState(PlayerState.PLAY)}
@@ -274,6 +279,7 @@ const SingleMusic = () => {
                         isSelecting={isForking}
                         isSelected={audioState.selected}
                         onSelectButtonClicked={() => onToggleSelection(audioState)}
+                        onFinish={() => setFinishedCounter(prev => prev - 1)}
                       />
                     </div>
                   </div>

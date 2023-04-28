@@ -88,7 +88,7 @@ const Waveform: React.FC<WaveformProps> = ({
       isMounted = false
       wavesurferRef.current?.destroy()
     }
-  }, [url, playerState, onFinish, isMuted])
+  }, [url, playerState, isMuted])
 
   return (
     <div className="flex items-center justify-between">
