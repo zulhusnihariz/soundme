@@ -145,59 +145,57 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
         })}
       >
         <div className="mx-10 flex min-h-screen items-end justify-center px-4 py-4 pb-28 text-center text-sm text-white md:text-lg">
-          <div className="border-gradient align-center flex transform items-center justify-center overflow-hidden rounded-md bg-transparent text-left align-bottom shadow-xl transition-all sm:my-8  sm:min-w-full sm:align-middle">
-            <div className=" min-w-[16rem] bg-gray-900 px-2 py-4 md:w-full md:max-w-lg md:px-8">
-              <div className="flex justify-end pr-4 md:pr-0">
-                <button
-                  className="rounded-md bg-red-600 py-2 px-2  md:px-5  md:hover:scale-105"
-                  onClick={() => prop.onDialogClosed()}
-                >
-                  Close
-                </button>
-              </div>
-              <div className="border-1 m-1 h-[180px] rounded p-2 text-left">
-                <div className="flex h-full items-center justify-center">
-                  {state == RecordingDialogState.START && (
-                    <StartRecording onHandleStartRecordingClicked={onRecordingStart} />
-                  )}
-                  {state === RecordingDialogState.COUNTDOWN && (
-                    <CountdownTimer onCountdownFinish={() => onCountdownFinished()} />
-                  )}
-                  {state === RecordingDialogState.RECORD && (
-                    <Recording
-                      state={state}
-                      onHandleStopRecordingClicked={() => onRecordingFinished()}
-                      setAudioData={setAudioData}
-                      mediaStream={mediaStream}
-                    />
-                  )}
-                  {state === RecordingDialogState.UPLOAD && (
-                    <div className="items-center justify-center">
-                      {audioData.url && (
-                        <Waveform
-                          url={audioData.url as string}
-                          playerState={filteredData[filteredData.length - 1].playerState}
-                          isMuted={filteredData[filteredData.length - 1].isMuted}
-                          onToggleSound={() => onToggleSound(filteredData[filteredData.length - 1])}
-                          isMuteButtonHidden={true}
-                          onFinish={() => onStopOneAudio(filteredData[filteredData.length - 1])}
-                        />
-                      )}
-                      <Upload
-                        audioData={audioData}
-                        dataKey={prop.dataKey}
-                        tokenId={prop.tokenId}
-                        isAllBeatsMuted={isAllBeatsMuted}
-                        isRecordedPlaying={filteredData[filteredData.length - 1].playerState === PlayerState.PLAY}
-                        onHandleMuteClicked={muted => onHandleMuteClicked(muted)}
-                        onHandleConfirmClicked={() => onHandleConfirmClicked()}
-                        onHandleRecordClicked={() => onRecordingStart()}
-                        onHandlePlayClicked={() => onPlayOneAudio(filteredData[filteredData.length - 1])}
-                        onHandleStopClicked={() => onStopOneAudio(filteredData[filteredData.length - 1])}
+          <div className=" min-w-[16rem] bg-gray-900 px-2 py-4 md:w-full md:max-w-lg md:px-8">
+            <div className="flex justify-end pr-4 md:pr-0">
+              <button
+                className="rounded-md bg-red-600 py-2 px-2  md:px-5  md:hover:scale-105"
+                onClick={() => prop.onDialogClosed()}
+              >
+                Close
+              </button>
+            </div>
+            <div className="border-1 m-1 h-[180px] rounded p-2 text-left">
+              <div className="flex h-full items-center justify-center">
+                {state == RecordingDialogState.START && (
+                  <StartRecording onHandleStartRecordingClicked={onRecordingStart} />
+                )}
+                {state === RecordingDialogState.COUNTDOWN && (
+                  <CountdownTimer onCountdownFinish={() => onCountdownFinished()} />
+                )}
+                {state === RecordingDialogState.RECORD && (
+                  <Recording
+                    state={state}
+                    onHandleStopRecordingClicked={() => onRecordingFinished()}
+                    setAudioData={setAudioData}
+                    mediaStream={mediaStream}
+                  />
+                )}
+                {state === RecordingDialogState.UPLOAD && (
+                  <div className="items-center justify-center">
+                    {audioData.url && (
+                      <Waveform
+                        url={audioData.url as string}
+                        playerState={filteredData[filteredData.length - 1].playerState}
+                        isMuted={filteredData[filteredData.length - 1].isMuted}
+                        onToggleSound={() => onToggleSound(filteredData[filteredData.length - 1])}
+                        isMuteButtonHidden={true}
+                        onFinish={() => onStopOneAudio(filteredData[filteredData.length - 1])}
                       />
-                    </div>
-                  )}
-                </div>
+                    )}
+                    <Upload
+                      audioData={audioData}
+                      dataKey={prop.dataKey}
+                      tokenId={prop.tokenId}
+                      isAllBeatsMuted={isAllBeatsMuted}
+                      isRecordedPlaying={filteredData[filteredData.length - 1].playerState === PlayerState.PLAY}
+                      onHandleMuteClicked={muted => onHandleMuteClicked(muted)}
+                      onHandleConfirmClicked={() => onHandleConfirmClicked()}
+                      onHandleRecordClicked={() => onRecordingStart()}
+                      onHandlePlayClicked={() => onPlayOneAudio(filteredData[filteredData.length - 1])}
+                      onHandleStopClicked={() => onStopOneAudio(filteredData[filteredData.length - 1])}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
