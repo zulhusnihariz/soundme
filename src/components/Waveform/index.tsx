@@ -100,7 +100,6 @@ const Waveform: React.FC<WaveformProps> = ({
 
   return (
     <div className="flex items-center justify-between">
-      <div className="text-black">{`${isMuted}`}</div>
       <div ref={waveformRef} />
 
       {!isSelecting && !isMuteButtonHidden && (
