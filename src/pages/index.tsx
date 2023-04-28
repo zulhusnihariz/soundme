@@ -1,7 +1,7 @@
 import MusicCard from 'components/MusicCard'
 import { useContext, useEffect, useState } from 'react'
 import ShareDialog from 'components/ShareDialog'
-import { get_sheets } from '../apollo-client'
+import { get_bookmarked_sheets, get_sheets } from '../apollo-client'
 import { PlayerState, Sheet } from 'lib'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useRouter } from 'next/router'
@@ -22,7 +22,7 @@ export default function MusicCollection() {
   let { address } = useAccount()
   const { showError } = useContext(AlertMessageContext)
 
-  // address = '0xc20de1a30487ec70fc730866f297f2e2f1e411f7' // uncomment to test bookmarked beats ui
+  address = '0xc20de1a30487ec70fc730866f297f2e2f1e411f7' // uncomment to test bookmarked beats ui
 
   const router = useRouter()
   const page_size = isMobile ? 3 : 9
@@ -155,16 +155,28 @@ export default function MusicCollection() {
       switch (currentSection) {
         case CURRENT_SECTION.ALL:
           const all = await get_sheets({ first: page_size, skip })
-          setSheets(sheets.concat(all))
+          setSheets(sheets.concat(all.beats))
 
           if (address) {
-            const forkeds = await get_sheets({ first: page_size, skip, where: { from: address } })
-            setForkedSheets(forkedSheets.concat(forkeds))
+            const bookmarked = await get_bookmarked_sheets({
+              first: page_size,
+              skip,
+              where: { from: address, to: address },
+            })
+
+            setForkedSheets(forkedSheets.concat(bookmarked.beats))
           }
+
           break
         case CURRENT_SECTION.BOOKMARKED:
-          const forkeds = await get_sheets({ first: page_size, skip, where: { from: address } })
-          setForkedSheets(forkedSheets.concat(forkeds))
+          const bookmarked = await get_bookmarked_sheets({
+            first: page_size,
+            skip,
+            where: { from: address, to: address },
+          })
+
+          setForkedSheets(forkedSheets.concat(bookmarked.beats))
+
           break
       }
       setIsFetching(false)
