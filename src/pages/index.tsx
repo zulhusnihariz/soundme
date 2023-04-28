@@ -22,7 +22,7 @@ export default function MusicCollection() {
   let { address } = useAccount()
   const { showError } = useContext(AlertMessageContext)
 
-  address = '0xc20de1a30487ec70fc730866f297f2e2f1e411f7' // uncomment to test bookmarked beats ui
+  // address = '0xc20de1a30487ec70fc730866f297f2e2f1e411f7' // uncomment to test bookmarked beats ui
 
   const router = useRouter()
   const page_size = isMobile ? 3 : 9
