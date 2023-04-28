@@ -39,8 +39,13 @@ const format = (minted: MintedNft) => {
   let eth = new AbiCoder()
 
   const types = ['string', 'bytes']
-  let [data_key, bytes] = eth.decode(types, minted.data)
-  return { id: minted.id, data_key, token_id: minted.tokenId, owner: minted.to }
+
+  try {
+    let [data_key, bytes] = eth.decode(types, minted.data)
+    return { id: minted.id, data_key, token_id: minted.tokenId, owner: minted.to }
+  } catch (e) {}
+
+  return null
 }
 
 export const get_sheets = async (variables: {
@@ -70,7 +75,13 @@ export const get_bookmarked_sheets = async (variables: {
   let minted_data = minted.data
   let forked_data = forked.data
 
-  const formatted_minteds = minted_data.collaBeatNftMinteds.map((nft: MintedNft) => format(nft))
+  const formatted_minteds = minted_data.collaBeatNftMinteds
+    .map((nft: MintedNft) => {
+      let formatted = format(nft)
+      if (formatted !== null) return formatted
+    })
+    .filter(item => item !== undefined)
+
   const combined = forked_data.forkeds.concat(formatted_minteds)
 
   const uniqueBeats = combined.filter(
