@@ -170,7 +170,7 @@ const SingleMusic = () => {
 
   return (
     <>
-      <div className="pb-5">
+      <div className="px-2 pb-5">
         <div className="fixed bottom-0 left-0 mb-5 flex w-full items-center justify-center">
           <div className="flex items-center justify-between rounded-xl bg-gray-700 p-2">
             {!isPlaying ? (
@@ -262,8 +262,8 @@ const SingleMusic = () => {
               if (audioState.data) {
                 return (
                   <div key={key} className="border-1 m-1 h-[80px] rounded bg-white p-2 text-left">
-                    <div className="font-sm inline-block whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-sm text-black">
-                      {audioState.key}
+                    <div className="whitespace-nowrap rounded-full bg-purple-100 px-1 py-0.5 text-xs text-black md:text-sm">
+                      {audioState.key.toString()}
                     </div>
                     <div className="h-1/2 w-full">
                       <Waveform
