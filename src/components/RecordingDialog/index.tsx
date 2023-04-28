@@ -44,7 +44,6 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
     prop.setAllMuted(muted)
     setIsAllBeatsMuted(muted)
   }
-
   async function onRecordingStart() {
     try {
       await getMicrophoneAccess()
@@ -71,7 +70,6 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
 
   useEffect(() => {
     const filtered = []
-
     filtered.push({
       key: address,
       data: '',

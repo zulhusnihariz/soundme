@@ -84,30 +84,30 @@ const SingleMusic = () => {
   }, [router, dataKey, tokenId])
 
   const setAllState = (state: PlayerState) => {
-    const data = filteredData.map(audio => {
-      return { ...audio, playerState: state }
-    })
-
-    setFilteredData(data)
+    setFilteredData(prev =>
+      prev.map(audio => {
+        return { ...audio, playerState: state }
+      })
+    )
 
     if (state === PlayerState.PLAY) setFinishedCounter(filteredData.length)
     if (state === PlayerState.STOP) setFinishedCounter(-1)
   }
 
   const setAllMuted = (muted: boolean) => {
-    const data = filteredData.map(audio => {
-      return { ...audio, isMuted: muted }
-    })
-
-    setFilteredData(data)
+    setFilteredData(prev =>
+      prev.map(audio => {
+        return { ...audio, isMuted: muted }
+      })
+    )
   }
 
   const resetAllSelection = () => {
-    const data = filteredData.map(audio => {
-      return { ...audio, selected: false, isMuted: false }
-    })
-
-    setFilteredData(data)
+    setFilteredData(prev =>
+      prev.map(audio => {
+        return { ...audio, selected: false, isMuted: false }
+      })
+    )
   }
 
   const onToggleSound = (state: AudioState) => {
