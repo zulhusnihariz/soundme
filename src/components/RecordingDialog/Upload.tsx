@@ -1,7 +1,9 @@
 import { useIpfs } from 'hooks/use-ipfs'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useAccount, useSignMessage } from 'wagmi'
 import { add_beat } from '_aqua/music'
+import { PlayIcon, StopIcon } from 'components/Icons/icons'
+import { ErrorMessageContext } from 'hooks/use-error-message'
 
 interface UploadProp {
   audioData: any
@@ -11,6 +13,9 @@ interface UploadProp {
   onHandleStopClicked: () => void
   onHandleRecordClicked: () => any
   onHandleConfirmClicked: () => void
+  onHandleMuteClicked: (muted: boolean) => void
+  isRecordedPlaying: boolean
+  isAllBeatsMuted: boolean
 }
 
 const Upload = (prop: UploadProp) => {
@@ -25,8 +30,15 @@ const Upload = (prop: UploadProp) => {
     },
   })
 
+  const { showError } = useContext(ErrorMessageContext)
+
   const add_to_nft = async () => {
     if (!prop.audioData.blob) return
+
+    if (!address) {
+      showError('Connect your wallet to add beat to NFT')
+      return
+    }
 
     try {
       const resp = await ipfs.storeBlob(prop.audioData.blob)
@@ -68,21 +80,43 @@ const Upload = (prop: UploadProp) => {
   }
 
   return (
-    <div className="mt-4 text-center">
-      <div>
-        <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandlePlayClicked}>
-          Play
-        </button>
-        <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandleStopClicked}>
-          Stop
+    <div className="mt-4 flex flex-col items-center justify-center gap-4 text-center text-sm text-white md:text-lg">
+      <div className="flex gap-2">
+        {prop.isRecordedPlaying ? (
+          <button
+            className="rounded-md bg-indigo-600 py-2 px-2 md:px-5 md:hover:scale-105"
+            onClick={prop.onHandleStopClicked}
+          >
+            <StopIcon />
+          </button>
+        ) : (
+          <button
+            className="rounded-md bg-indigo-600 py-2 px-2 md:px-5 md:hover:scale-105"
+            onClick={prop.onHandlePlayClicked}
+          >
+            <PlayIcon />
+          </button>
+        )}
+
+        <button
+          className="from-20% rounded-md bg-gradient-to-t from-[#7224A7] to-[#FF3065] py-2 px-2 md:px-5 md:hover:scale-105"
+          onClick={prop.onHandleRecordClicked}
+        >
+          Record again
         </button>
       </div>
-      <button className="mx-3 bg-indigo-600 px-5 py-3" onClick={prop.onHandleRecordClicked}>
-        Recording again
-      </button>
-      <button className="bg-red-600 px-5 py-3" onClick={() => add_to_nft()}>
-        Add to NFT
-      </button>
+
+      <div className="flex gap-2">
+        <button className="rounded-md bg-red-600 py-2 px-2 md:px-5 md:hover:scale-105" onClick={() => add_to_nft()}>
+          Add Beat to NFT
+        </button>
+        <button
+          className="rounded-md bg-indigo-600 py-2 px-2 md:px-5 md:hover:scale-105"
+          onClick={() => prop.onHandleMuteClicked(!prop.isAllBeatsMuted)}
+        >
+          {prop.isAllBeatsMuted ? 'Unmute Beats' : 'Mute Beats'}
+        </button>
+      </div>
     </div>
   )
 }

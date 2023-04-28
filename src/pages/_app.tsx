@@ -26,6 +26,7 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 import { FluenceProvider } from 'hooks/use-fluence'
 import { IpfsProvider } from 'hooks/use-ipfs'
 import MainLayout from 'layout/MainLayout'
+import { ErrorMessageProvider } from 'hooks/use-error-message'
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -106,7 +107,9 @@ export function Web3Wrapper({ children }) {
         theme={resolvedTheme === 'dark' ? darkTheme() : lightTheme()}
       >
         <IpfsProvider>
-          <FluenceProvider>{children}</FluenceProvider>
+          <FluenceProvider>
+            <ErrorMessageProvider>{children}</ErrorMessageProvider>
+          </FluenceProvider>
         </IpfsProvider>
       </RainbowKitProvider>
     </WagmiConfig>

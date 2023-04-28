@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { Fluence } from '@fluencelabs/fluence'
+import LoadingIndicator from 'components/LoadingIndicator'
 
 interface FluenceContextInterface {
   fluence: typeof Fluence
@@ -43,7 +44,11 @@ export const FluenceProvider: React.FC<FluenceProviderProps> = ({ children }) =>
   }, [])
 
   if (!isConnected) {
-    return <div>Connecting to Fluence...</div>
+    return (
+      <div className="mt-8">
+        <LoadingIndicator text={'Connecting to Fluence...'} />
+      </div>
+    )
   }
 
   return (

@@ -8,6 +8,7 @@ import ForkDialog from 'components/ForkDialog'
 import ShareDialog from 'components/ShareDialog'
 import Image from 'next/image'
 import { JSONIcon, ShareIcon } from 'components/Icons/icons'
+import LoadingIndicator from 'components/LoadingIndicator'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -20,12 +21,17 @@ const SingleMusic = () => {
   const [filteredData, setFilteredData] = useState<Array<AudioState>>([])
   const [forkData, setForkData] = useState<Array<SelectedAudio>>([])
   const [isForking, setIsForking] = useState(false)
-  const [isPlaying, setIsPlaying] = useState(false)
 
   const [isDialogRecordingOpened, setIsDialogRecordingOpened] = useState(false)
   const [isDialogForkOpened, setIsDialogForkOpened] = useState(false)
   const [isShareDialogShow, setIsShareDialogShow] = useState(false)
   const [canRecord, setCanRecord] = useState(false)
+
+  // simple way to keep track whether all beats finished playing; once finished, set button to play
+  const [finishedCounter, setFinishedCounter] = useState(-1)
+  useEffect(() => {
+    if (finishedCounter === 0) setAllState(PlayerState.STOP)
+  }, [finishedCounter])
 
   useEffect(() => {
     if (data && !isLoad) {
@@ -78,30 +84,30 @@ const SingleMusic = () => {
   }, [router, dataKey, tokenId])
 
   const setAllState = (state: PlayerState) => {
-    const data = filteredData.map(audio => {
-      return { ...audio, playerState: state }
-    })
+    setFilteredData(prev =>
+      prev.map(audio => {
+        return { ...audio, playerState: state }
+      })
+    )
 
-    setFilteredData(data)
-
-    if (state === PlayerState.PLAY) setIsPlaying(true)
-    if (state === PlayerState.STOP) setIsPlaying(false)
+    if (state === PlayerState.PLAY) setFinishedCounter(filteredData.length)
+    if (state === PlayerState.STOP) setFinishedCounter(-1)
   }
 
   const setAllMuted = (muted: boolean) => {
-    const data = filteredData.map(audio => {
-      return { ...audio, isMuted: muted }
-    })
-
-    setFilteredData(data)
+    setFilteredData(prev =>
+      prev.map(audio => {
+        return { ...audio, isMuted: muted }
+      })
+    )
   }
 
   const resetAllSelection = () => {
-    const data = filteredData.map(audio => {
-      return { ...audio, selected: false, isMuted: false }
-    })
-
-    setFilteredData(data)
+    setFilteredData(prev =>
+      prev.map(audio => {
+        return { ...audio, selected: false, isMuted: false }
+      })
+    )
   }
 
   const onToggleSound = (state: AudioState) => {
@@ -169,10 +175,10 @@ const SingleMusic = () => {
 
   return (
     <>
-      <div className="pb-5">
+      <div className="px-2 pb-5">
         <div className="fixed bottom-0 left-0 mb-5 flex w-full items-center justify-center">
           <div className="flex items-center justify-between rounded-xl bg-gray-700 p-2">
-            {!isPlaying ? (
+            {finishedCounter <= 0 ? (
               <button
                 className="mr-2 rounded-xl px-8 py-3 text-black text-black hover:bg-[#1C1C1C]"
                 onClick={() => setAllState(PlayerState.PLAY)}
@@ -211,7 +217,7 @@ const SingleMusic = () => {
 
             {isForking && (
               <button
-                className="from-20% mr-2 min-w-[8rem] rounded-xl bg-gradient-to-t from-[#F5517B] to-[#FEDC00] px-8   py-3 font-bold text-white md:hover:scale-105"
+                className="from-20% mr-2 min-w-[8rem] rounded-xl bg-gradient-to-t from-[#F5517B] to-[#FEDC00] px-8 py-3 font-bold text-white md:hover:scale-105"
                 onClick={() => {
                   fork()
                   setIsDialogForkOpened(true)
@@ -256,28 +262,33 @@ const SingleMusic = () => {
           </div>
         )}
         <div className="w-full">
-          {filteredData.map((audioState, key) => {
-            if (audioState.data) {
-              return (
-                <div key={key} className="border-1 m-1 h-[80px] rounded bg-white p-2 text-left">
-                  <div className="font-sm inline-block whitespace-nowrap rounded-full bg-purple-100 px-2.5 py-0.5 text-sm text-black">
-                    {audioState.key}
+          {filteredData.length > 0 ? (
+            filteredData.map((audioState, key) => {
+              if (audioState.data) {
+                return (
+                  <div key={key} className="border-1 m-1 h-[80px] rounded bg-white p-2 text-left">
+                    <div className="whitespace-nowrap rounded-full bg-purple-100 px-1 py-0.5 text-xs text-black md:text-sm">
+                      {audioState.key.toString()}
+                    </div>
+                    <div className="h-1/2 w-full">
+                      <Waveform
+                        url={audioState.data as string}
+                        playerState={audioState.playerState}
+                        isMuted={audioState.isMuted}
+                        onToggleSound={() => onToggleSound(audioState)}
+                        isSelecting={isForking}
+                        isSelected={audioState.selected}
+                        onSelectButtonClicked={() => onToggleSelection(audioState)}
+                        onFinish={() => setFinishedCounter(prev => prev - 1)}
+                      />
+                    </div>
                   </div>
-                  <div className="h-1/2 w-full">
-                    <Waveform
-                      url={audioState.data as string}
-                      playerState={audioState.playerState}
-                      isMuted={audioState.isMuted}
-                      onToggleSound={() => onToggleSound(audioState)}
-                      isSelecting={isForking}
-                      isSelected={audioState.selected}
-                      onSelectButtonClicked={() => onToggleSelection(audioState)}
-                    />
-                  </div>
-                </div>
-              )
-            }
-          })}
+                )
+              }
+            })
+          ) : (
+            <LoadingIndicator text={'Fetching data...'} />
+          )}
         </div>
       </div>
       {isDialogRecordingOpened && (
@@ -286,6 +297,8 @@ const SingleMusic = () => {
           tokenId={tokenId}
           isOpened={isDialogRecordingOpened}
           onDialogClosed={() => onHandleDialogClosed()}
+          setAllMuted={muted => setAllMuted(muted)}
+          setAllState={state => setAllState(state)}
         />
       )}
       {isDialogForkOpened && (

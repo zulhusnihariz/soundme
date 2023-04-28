@@ -35,7 +35,7 @@ const MintButton = (prop: MintProp) => {
 
   return (
     <button
-      className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#FFDD00] to-[#A726F8] p-2 text-xs font-bold text-white md:hover:scale-105`}
+      className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#A726F8] to-[#FFDD00] p-2 text-xs font-bold text-white md:hover:scale-105`}
       onClick={() => write?.()}
     >
       <Image className="mb-1 " src="/assets/plus-icon.png" height={20} width={20} alt="plus icon" />
