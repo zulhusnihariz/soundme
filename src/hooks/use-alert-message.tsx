@@ -47,13 +47,13 @@ export const AlertMessageProvider = ({ children }: AlertMessageProviderProps) =>
     if (errorMessage) {
       timeout = setTimeout(() => {
         hideError()
-      }, 2000)
+      }, 3000)
     }
 
     if (successMessage) {
       timeout = setTimeout(() => {
         hideSuccess()
-      }, 2000)
+      }, 3000)
     }
 
     return () => {
