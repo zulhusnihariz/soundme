@@ -161,7 +161,7 @@ export default function MusicCollection() {
             const bookmarked = await get_bookmarked_sheets({
               first: page_size,
               skip,
-              where: { from: address, to: address },
+              where: { to: address },
             })
 
             setForkedSheets(forkedSheets.concat(bookmarked.beats))
@@ -172,7 +172,7 @@ export default function MusicCollection() {
           const bookmarked = await get_bookmarked_sheets({
             first: page_size,
             skip,
-            where: { from: address, to: address },
+            where: { to: address },
           })
 
           setForkedSheets(forkedSheets.concat(bookmarked.beats))
