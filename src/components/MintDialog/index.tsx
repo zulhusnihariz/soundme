@@ -1,7 +1,7 @@
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import classNames from 'classnames'
 import ConfirmButton from './ConfirmButton'
-import { shortenAddress } from 'utils/shorten-address'
+import { shortenAddress } from 'utils/'
 import { useContext } from 'react'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 

@@ -2,7 +2,7 @@ import { PlayerState, Sheet } from 'lib'
 import { useRouter } from 'next/router'
 import { LoadingSpinner, PlayIcon, StopIcon } from 'components/Icons/icons'
 import BufferWaveform from 'components/Waveform/BufferWaveForm'
-import { shortenAddress } from 'utils/shorten-address'
+import { shortenAddress } from 'utils/'
 import Image from 'next/image'
 
 interface MusicCardProp {

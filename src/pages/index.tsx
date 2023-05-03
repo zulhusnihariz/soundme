@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { RefreshIcon } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
-import { getSongLength, mixAudioBuffer } from 'utils/audio-web-api'
+import { getSongLength, mixAudioBuffer } from 'utils/'
 import MintDialog from 'components/MintDialog'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 
@@ -161,7 +161,7 @@ export default function MusicCollection() {
             const bookmarked = await get_bookmarked_sheets({
               first: page_size,
               skip,
-              where: { from: address, to: address },
+              where: { to: address },
             })
 
             setForkedSheets(forkedSheets.concat(bookmarked.beats))
@@ -172,7 +172,7 @@ export default function MusicCollection() {
           const bookmarked = await get_bookmarked_sheets({
             first: page_size,
             skip,
-            where: { from: address, to: address },
+            where: { to: address },
           })
 
           setForkedSheets(forkedSheets.concat(bookmarked.beats))

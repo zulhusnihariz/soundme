@@ -11,6 +11,7 @@ import { JSONIcon, ShareIcon } from 'components/Icons/icons'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useAccount } from 'wagmi'
 import { AlertMessageContext } from 'hooks/use-alert-message'
+import { getDataKeyAndTokenId } from 'utils/'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -79,11 +80,11 @@ const SingleMusic = () => {
 
   useEffect(() => {
     if (!dataKey && !tokenId) {
-      let regex = new RegExp('.{1,' + 64 + '}', 'g')
-      let result = router.query.key.toString().match(regex)
+      const url = location.pathname
+      const { data_key, token_id } = getDataKeyAndTokenId(url, '/')
 
-      setDataKey(result[0])
-      setTokenId(result[1])
+      setDataKey(data_key)
+      setTokenId(token_id)
     }
   }, [router, dataKey, tokenId])
 
@@ -275,8 +276,8 @@ const SingleMusic = () => {
             filteredData.map((audioState, key) => {
               if (audioState.data) {
                 return (
-                  <div key={key} className="border-1 m-1 h-[80px] rounded bg-white p-2 text-left">
-                    <div className="whitespace-nowrap rounded-full bg-purple-100 px-1 py-0.5 text-xs text-black md:text-sm">
+                  <div key={key} className="border-1 m-1 h-[80px] rounded-full bg-white px-8 py-2 text-left">
+                    <div className="mb-2 whitespace-nowrap rounded-full bg-purple-100 px-2 py-0.5 text-xs text-black md:text-sm">
                       {audioState.key.toString()}
                     </div>
                     <div className="h-1/2 w-full">
