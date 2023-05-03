@@ -18,6 +18,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
@@ -171,4 +181,10 @@ code {
 .MuiLinearProgress-root {
   height: 10px;
   position: absolute;
+}
+
+.gradient-border {
+  border-image: linear-gradient(#f14d77, #fedc00) 30;
+  border-width: 2px;
+  border-style: solid;
 }
