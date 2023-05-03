@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { RefreshIcon } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
-import { getSongLength, mixAudioBuffer } from 'utils/audio-web-api'
+import { getSongLength, mixAudioBuffer } from 'utils/'
 import MintDialog from 'components/MintDialog'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 

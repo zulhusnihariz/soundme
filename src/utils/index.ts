@@ -35,3 +35,33 @@ export function mixAudioBuffer(
 
   return finalMix
 }
+
+export const getDataKeyAndTokenId = (pathname: string, toSliceString: string) => {
+  const keyStartingIndex = pathname.indexOf(toSliceString) + toSliceString.length
+  const substring = pathname.substring(keyStartingIndex)
+  let regex = new RegExp('.{1,' + 64 + '}', 'g')
+  const result = substring.match(regex)
+  return { data_key: result[0], token_id: result[1] }
+}
+
+export function classNames(...classes: (false | null | undefined | string)[]): string {
+  return classes.filter(Boolean).join(' ')
+}
+
+export function getRandomInt(min: number, max: number) {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+export function shortenAddress(address: string, n: number = 4) {
+  if (!address) return ''
+  if (n < 1 || n >= address?.length) {
+    return address
+  }
+
+  const firstNChars = address.slice(0, n)
+  const lastNChars = address.slice(-n)
+
+  return `${firstNChars}...${lastNChars}`
+}
