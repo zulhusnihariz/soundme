@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { RecordingDialogState } from '.'
 
 interface RecordingProp {
@@ -12,8 +12,6 @@ const Recording = (prop: RecordingProp) => {
   const [second, setSecond] = useState('00')
   const [minute, setMinute] = useState('00')
   const [timer, setTimer] = useState(0)
-
-  const mediaRecorder = useRef(null)
 
   useEffect(() => {
     let intervalIdTime
@@ -38,8 +36,6 @@ const Recording = (prop: RecordingProp) => {
   }, [prop.state, timer])
 
   const onHandleStop = () => {
-    mediaRecorder.current.stop()
-
     setSecond('00')
     setMinute('00')
 
@@ -47,31 +43,6 @@ const Recording = (prop: RecordingProp) => {
 
     prop.onHandleStopRecordingClicked()
   }
-
-  useEffect(() => {
-    const startRecord = () => {
-      if (prop.state !== RecordingDialogState.RECORD) return
-
-      mediaRecorder.current = new MediaRecorder(prop.mediaStream)
-      mediaRecorder.current.start()
-
-      const chunks = []
-      mediaRecorder.current.addEventListener('dataavailable', event => {
-        chunks.push(event.data)
-      })
-
-      mediaRecorder.current.addEventListener('stop', () => {
-        const blob = new Blob(chunks, { type: 'audio/mpeg' })
-        const url = URL.createObjectURL(blob)
-        prop.setAudioData({
-          blob,
-          url,
-        })
-      })
-    }
-
-    startRecord()
-  }, [prop, mediaRecorder])
 
   return (
     <div className="text-center">

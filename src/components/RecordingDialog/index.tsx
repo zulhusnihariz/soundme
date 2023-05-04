@@ -54,6 +54,8 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   }
 
   const onRecordingFinished = () => {
+    mediaRecorder.stop()
+
     if (audioData) {
       setState(RecordingDialogState.UPLOAD)
     } else {
@@ -119,6 +121,8 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   }
 
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null)
+  const [chunks, setChunks] = useState<Blob[]>([])
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>(null)
 
   const getMicrophoneAccess = async () => {
     try {
@@ -126,7 +130,17 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
         audio: { autoGainControl: false, echoCancellation: false, noiseSuppression: false },
         video: false,
       }
+
       let stream = await navigator.mediaDevices.getUserMedia(constraints)
+
+      const recorder = new MediaRecorder(stream)
+      setChunks([])
+
+      recorder.ondataavailable = event => {
+        setChunks(prev => [...prev, event.data])
+      }
+
+      setMediaRecorder(recorder)
       setMediaStream(stream)
     } catch (ex) {
       console.log(ex)
@@ -139,6 +153,21 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
       setMediaStream(null)
     }
   }
+
+  useEffect(() => {
+    if (mediaRecorder && state === RecordingDialogState.RECORD) mediaRecorder.start()
+  }, [state])
+
+  useEffect(() => {
+    if (chunks.length > 0) {
+      const blob = new Blob(chunks, { type: 'audio/mpeg' })
+      const url = URL.createObjectURL(blob)
+      setAudioData({
+        blob,
+        url,
+      })
+    }
+  }, [chunks])
 
   return (
     <>
