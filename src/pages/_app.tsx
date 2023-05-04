@@ -106,9 +106,9 @@ export function Web3Wrapper({ children }) {
         theme={resolvedTheme === 'dark' ? darkTheme() : lightTheme()}
       >
         <IpfsProvider>
-          {/* <FluenceProvider> */}
-          <AlertMessageProvider>{children}</AlertMessageProvider>
-          {/* </FluenceProvider> */}
+          <FluenceProvider>
+            <AlertMessageProvider>{children}</AlertMessageProvider>
+          </FluenceProvider>
         </IpfsProvider>
       </RainbowKitProvider>
     </WagmiConfig>
