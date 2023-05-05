@@ -36,14 +36,6 @@ export function mixAudioBuffer(
   return finalMix
 }
 
-export const getDataKeyAndTokenId = (pathname: string, toSliceString: string) => {
-  const keyStartingIndex = pathname.indexOf(toSliceString) + toSliceString.length
-  const substring = pathname.substring(keyStartingIndex)
-  let regex = new RegExp('.{1,' + 64 + '}', 'g')
-  const result = substring.match(regex)
-  return { data_key: result[0], token_id: result[1] }
-}
-
 export function classNames(...classes: (false | null | undefined | string)[]): string {
   return classes.filter(Boolean).join(' ')
 }
