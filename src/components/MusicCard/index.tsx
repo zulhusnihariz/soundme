@@ -67,7 +67,7 @@ const MusicCard = (prop: MusicCardProp) => {
 
         <div className="z-10 flex items-center justify-between gap-2 py-2">
           <button
-            onClick={e => router.push(`/${prop.sheet.data_key}${prop.sheet.token_id}`)}
+            onClick={e => router.push(`/collaborate/${prop.sheet.data_key}${prop.sheet.token_id}`)}
             className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#232323] bg-black py-2 px-4 md:hover:scale-105"
           >
             <span>Collaborate</span>

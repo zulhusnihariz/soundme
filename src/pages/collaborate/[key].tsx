@@ -11,6 +11,7 @@ import { JSONIcon, ShareIcon } from 'components/Icons/icons'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useAccount } from 'wagmi'
 import { AlertMessageContext } from 'hooks/use-alert-message'
+import Script from 'next/script'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -81,6 +82,8 @@ const SingleMusic = () => {
     if (!dataKey && !tokenId) {
       let regex = new RegExp('.{1,' + 64 + '}', 'g')
       let result = router.query.key.toString().match(regex)
+
+      console.log(result)
 
       setDataKey(result[0])
       setTokenId(result[1])
@@ -184,6 +187,7 @@ const SingleMusic = () => {
 
   return (
     <>
+      <Script src="/marine-js.web.js" strategy="worker" />
       <div className="px-2 pb-5">
         <div className="fixed bottom-0 left-0 mb-5 flex w-full items-center justify-center">
           <div className="flex items-center justify-between rounded-xl bg-gray-700 p-2">
