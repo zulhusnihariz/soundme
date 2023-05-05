@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import AudioMotionAnalyzer from '../../../node_modules/audiomotion-analyzer/src/audioMotion-analyzer'
 import { PlayerState } from 'lib'
-import { getSongLength, mixAudioBuffer, getDataKeyAndTokenId } from 'utils/'
+import { getSongLength, mixAudioBuffer } from 'utils/'
 import audioBuffertoWav from 'audiobuffer-to-wav'
 import { PlayIcon, StopIcon, LoadingSpinner } from 'components/Icons/icons'
+import { useRouter } from 'next/router'
 
 export default function OpenseaPreview() {
+  const router = useRouter()
+
   const [audioContext] = useState(new AudioContext())
   const [mixedAudio, setMixedAudio] = useState<AudioBuffer>()
 
@@ -46,15 +49,15 @@ export default function OpenseaPreview() {
 
   useEffect(() => {
     if (!dataKey && !tokenId) {
-      const url = location.pathname
-      const { data_key, token_id } = getDataKeyAndTokenId(url, 'music/')
+      let regex = new RegExp('.{1,' + 64 + '}', 'g')
+      let result = router.query.key.toString().match(regex)
 
-      setDataKey(data_key)
-      setTokenId(token_id)
+      setDataKey(result[0])
+      setTokenId(result[1])
 
-      createMixedAudio(data_key)
+      createMixedAudio(result[0])
     }
-  }, [dataKey, tokenId])
+  }, [router, dataKey, tokenId])
 
   const container = useRef<HTMLDivElement>(null)
   const htmlAudioElementRef = useRef<HTMLAudioElement>(null)
