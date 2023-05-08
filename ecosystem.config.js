@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      script: 'npm start',
+      script: 'yarn start',
     },
   ],
   deploy: {
@@ -14,7 +14,7 @@ module.exports = {
       'path': '/home/ubuntu',
       'pre-deploy-local': '',
       'post-deploy':
-        'source ~/.nvm/nvm.sh && npm install && npm run build && pm2 reload ecosystem.config.js --env production',
+        'source ~/.nvm/nvm.sh && yarn install && yarn build && pm2 reload ecosystem.config.js --env production',
       'pre-setup': '',
       'ssh-options': 'ForwardAgent=yes',
     },
