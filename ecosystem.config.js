@@ -9,7 +9,7 @@ module.exports = {
       'key': '~/.ssh/zhrz-soundme-key.pem',
       'user': 'ubuntu',
       'host': '54.87.43.221',
-      'ref': 'origin/main',
+      'ref': 'origin/aws-testing',
       'repo': 'https://github.com/zulhusnihariz/soundme.git',
       'path': '/home/ubuntu',
       'pre-deploy-local': '',
