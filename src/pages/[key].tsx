@@ -11,7 +11,6 @@ import { JSONIcon, ShareIcon } from 'components/Icons/icons'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useAccount } from 'wagmi'
 import { AlertMessageContext } from 'hooks/use-alert-message'
-import { getDataKeyAndTokenId } from 'utils/'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -80,11 +79,11 @@ const SingleMusic = () => {
 
   useEffect(() => {
     if (!dataKey && !tokenId) {
-      const url = location.pathname
-      const { data_key, token_id } = getDataKeyAndTokenId(url, '/')
+      let regex = new RegExp('.{1,' + 64 + '}', 'g')
+      let result = router.query.key.toString().match(regex)
 
-      setDataKey(data_key)
-      setTokenId(token_id)
+      setDataKey(result[0])
+      setTokenId(result[1])
     }
   }, [router, dataKey, tokenId])
 
