@@ -1,5 +1,6 @@
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
 import { ethers, BigNumber } from 'ethers'
+import { LoadingSpinner } from 'components/Icons/icons'
 
 interface ConfirmButton {
   tokenId: String
@@ -42,8 +43,8 @@ const ConfirmButton = ({ tokenId, onBookmarkSuccess }: ConfirmButton) => {
   })
 
   return (
-    <button className="mr-2 bg-green-500 px-5 py-3 text-black" onClick={() => write?.()}>
-      Confirm
+    <button className="mr-2 bg-green-500 px-5 py-3 " disabled={isLoading} onClick={() => write?.()}>
+      {isLoading ? <LoadingSpinner /> : 'Confirm'}
     </button>
   )
 }

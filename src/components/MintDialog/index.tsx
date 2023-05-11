@@ -42,7 +42,7 @@ const MintDialog = ({ beat, isOpened, onDialogClosed }: MintDialogProp) => {
                   You are bookmarking <b> {`Collabeat #${beat.tokenId} - Started By ${shortenAddress(beat.owner)}`}</b>
                 </p>
               </div>
-              <div className="mt-6">
+              <div className=" mt-6 flex justify-center">
                 {beat.tokenId && <ConfirmButton tokenId={beat.tokenId} onBookmarkSuccess={() => handleSuccess()} />}
                 <button className="bg-red-600 px-5 py-3 text-white" onClick={() => onDialogClosed()}>
                   CANCEL

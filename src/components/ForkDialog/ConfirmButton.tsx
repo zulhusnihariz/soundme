@@ -1,5 +1,5 @@
+import { LoadingSpinner } from 'components/Icons/icons'
 import { ethers } from 'ethers'
-import { useEffect } from 'react'
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
 
 const ConfirmButton = ({ cid, onForkSuccess }) => {
@@ -38,8 +38,8 @@ const ConfirmButton = ({ cid, onForkSuccess }) => {
   })
 
   return (
-    <button className="mr-2 bg-green-500 px-5 py-3 text-black" onClick={() => write?.()}>
-      Confirm
+    <button className="mr-2 bg-green-500 px-5 py-3 text-black" disabled={isLoading} onClick={() => write?.()}>
+      {isLoading ? <LoadingSpinner /> : 'Confirm'}
     </button>
   )
 }

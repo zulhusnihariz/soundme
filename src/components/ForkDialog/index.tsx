@@ -67,7 +67,7 @@ const ForkDialog = (prop: ForkDialogProp) => {
                   You are forking <b>{`${prop.selectedAudios.length}`} beat(s)</b>
                 </p>
               </div>
-              <div className="mt-6">
+              <div className="mt-6 flex justify-center">
                 {uploadedCid && <ConfirmButton cid={uploadedCid} onForkSuccess={() => handleSuccess()} />}
                 <button className="bg-red-600 px-5 py-3 text-white" onClick={() => prop.onDialogClosed()}>
                   CANCEL
