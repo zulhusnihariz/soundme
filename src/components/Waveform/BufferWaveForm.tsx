@@ -48,8 +48,8 @@ const BufferWaveform: React.FC<BufferWaveformProps> = ({
           normalize: true,
           height: 35,
           barHeight: 10,
-          barWidth: isMobile ? 2 : 4,
-          minPxPerSec: isMobile ? 4 : 8,
+          barWidth: 4,
+          minPxPerSec: 8,
           fillParent: false,
           scrollParent: false,
         })

@@ -101,10 +101,8 @@ export default function OpenseaPreview() {
       audioMotion.current.registerGradient('colla-vibrant-orchid', options)
       audioMotion.current.gradient = 'colla-vibrant-orchid'
 
-      let pTagHeight = 24
-
       audioMotion.current.setFreqRange(500, 10000)
-      audioMotion.current.setCanvasSize(250, 250 - pTagHeight)
+      audioMotion.current.setCanvasSize(250, 250)
     }
   }, [mixedAudio])
 
@@ -113,7 +111,6 @@ export default function OpenseaPreview() {
       <main>
         {mixedAudio ? (
           <div className="gradient-border mx-4">
-            <p className="z-50 mt-4">Collabeat #{`${tokenId}`}</p>
             <div className="flex items-center justify-center ">
               <div id="container" ref={container} />
               <audio id="audio" ref={htmlAudioElementRef} />
