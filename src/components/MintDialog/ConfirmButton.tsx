@@ -1,6 +1,8 @@
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
 import { ethers, BigNumber } from 'ethers'
 import { LoadingSpinner } from 'components/Icons/icons'
+import { useContext, useState } from 'react'
+import { AlertMessageContext } from 'hooks/use-alert-message'
 
 interface ConfirmButton {
   tokenId: String
@@ -8,6 +10,8 @@ interface ConfirmButton {
 }
 
 const ConfirmButton = ({ tokenId, onBookmarkSuccess }: ConfirmButton) => {
+  const { showError } = useContext(AlertMessageContext)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   // logic same as MintButton/index.tsx component
   const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_COLLABEAT as any,
@@ -33,17 +37,30 @@ const ConfirmButton = ({ tokenId, onBookmarkSuccess }: ConfirmButton) => {
     },
   })
 
-  const { data, write } = useContractWrite(config)
+  const { data, writeAsync } = useContractWrite(config)
 
-  const { isLoading, isSuccess } = useWaitForTransaction({
+  const { isSuccess } = useWaitForTransaction({
     hash: data?.hash,
     onSuccess: () => {
       onBookmarkSuccess()
+      setIsLoading(false)
     },
   })
 
+  const onHandleConfirmClicked = async () => {
+    setIsLoading(true)
+
+    try {
+      await writeAsync?.()
+    } catch (e: unknown) {
+      const error = e as Error
+      showError(`${error.message}`)
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <button className="mr-2 bg-green-500 px-5 py-3 " disabled={isLoading} onClick={() => write?.()}>
+    <button className="mr-2 bg-green-500 px-5 py-3 " disabled={isLoading} onClick={() => onHandleConfirmClicked()}>
       {isLoading ? <LoadingSpinner /> : 'Confirm'}
     </button>
   )

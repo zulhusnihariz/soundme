@@ -2,7 +2,7 @@ import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransa
 import { ethers, BigNumber } from 'ethers'
 import Image from 'next/image'
 import { AlertMessageContext } from 'hooks/use-alert-message'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { LoadingSpinner } from 'components/Icons/icons'
 
 interface MintProp {
@@ -12,6 +12,7 @@ interface MintProp {
 const MintButton = (prop: MintProp) => {
   const { address } = useAccount()
   const { showError, showSuccess } = useContext(AlertMessageContext)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_COLLABEAT as any,
@@ -37,20 +38,29 @@ const MintButton = (prop: MintProp) => {
     },
   })
 
-  const { data, write } = useContractWrite(config)
+  const { data, writeAsync } = useContractWrite(config)
 
-  function handleBookmark() {
+  const handleBookmark = async () => {
     if (!address) {
       showError('Connect your wallet to bookmark this beat')
       return
     }
-    write?.()
+    setIsLoading(true)
+
+    try {
+      await writeAsync?.()
+    } catch (e: unknown) {
+      const error = e as Error
+      showError(`${error.message}`)
+      setIsLoading(false)
+    }
   }
 
-  const { isLoading, isSuccess } = useWaitForTransaction({
+  const { isSuccess } = useWaitForTransaction({
     hash: data?.hash,
     onSuccess: () => {
       showSuccess('Your NFT is a true masterpiece...said no one ever.')
+      setIsLoading(false)
     },
   })
 
