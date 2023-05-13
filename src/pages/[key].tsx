@@ -232,7 +232,7 @@ const SingleMusic = () => {
                   setIsDialogForkOpened(true)
                 }}
               >
-                Fork
+                Remix
               </button>
             )}
           </div>
@@ -255,7 +255,7 @@ const SingleMusic = () => {
                   onClick={() => toggleForkingMode()}
                 >
                   <Image className="mb-1" src="/assets/fork-icon.png" height={20} width={20} alt="fork icon" />
-                  <span>Fork</span>
+                  <span>Remix</span>
                   <span>This Beat</span>
                 </button>
               )}

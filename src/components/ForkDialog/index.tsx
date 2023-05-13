@@ -60,11 +60,11 @@ const ForkDialog = (prop: ForkDialogProp) => {
             </div>
             <div className="text-center">
               <h3 className="Roboto mb-8 text-lg font-medium leading-6 text-[#DCDCDC]" id="modal-headline">
-                Fork Sheet
+                Remix Sheet
               </h3>
               <div className="mt-2">
                 <p className="Roboto text-xs text-[#DCDCDC]">
-                  You are forking <b>{`${prop.selectedAudios.length}`} beat(s)</b>
+                  You are remixing <b>{`${prop.selectedAudios.length}`} beat(s)</b>
                 </p>
               </div>
               <div className="mt-6 flex justify-center">
