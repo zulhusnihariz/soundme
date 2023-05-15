@@ -2,7 +2,7 @@ import { useIpfs } from 'hooks/use-ipfs'
 import { useContext, useEffect, useState } from 'react'
 import { useAccount, useSignMessage } from 'wagmi'
 import { add_beat } from '_aqua/music'
-import { PlayIcon, StopIcon } from 'components/Icons/icons'
+import { LoadingSpinner, PlayIcon, StopIcon } from 'components/Icons/icons'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 
 interface UploadProp {
@@ -24,13 +24,14 @@ const Upload = (prop: UploadProp) => {
   const { ipfs } = useIpfs()
   const { address } = useAccount()
 
-  const { signMessage } = useSignMessage({
+  const { signMessageAsync } = useSignMessage({
     onSuccess(signature) {
       add_new_beat(signature)
     },
   })
 
-  const { showError } = useContext(AlertMessageContext)
+  const { showError, showSuccess } = useContext(AlertMessageContext)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const add_to_nft = async () => {
     if (!prop.audioData.blob) return
@@ -40,43 +41,50 @@ const Upload = (prop: UploadProp) => {
       return
     }
 
+    setIsLoading(true)
+
     try {
       const resp = await ipfs.storeBlob(prop.audioData.blob)
       const url = `${process.env.NEXT_PUBLIC_IPFS_BEAT_STORAGE_URL}/${resp}`
       setAudioUrl(url)
-    } catch (err) {
-      console.log(err)
+    } catch (e: unknown) {
+      const error = e as Error
+      showError(`${error.message}`)
+      setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    if (audioUrl) {
-      signMessage({ message: audioUrl })
+    const signMessage = async () => {
+      try {
+        await signMessageAsync({ message: audioUrl })
+      } catch (e: unknown) {
+        const error = e as Error
+        showError(`${error.message}`)
+        setIsLoading(false)
+        setAudioUrl(null)
+      }
     }
-  }, [audioUrl, signMessage])
+
+    if (audioUrl) signMessage()
+  }, [audioUrl, signMessageAsync])
 
   const add_new_beat = async signature => {
-    console.log(
-      prop.dataKey.toString(),
-      process.env.NEXT_PUBLIC_TOKEN_KEY,
-      prop.tokenId.toString(),
-      '',
-      address,
-      signature,
-      audioUrl
-    )
-    let x = await add_beat(
-      prop.dataKey.toString(),
-      process.env.NEXT_PUBLIC_TOKEN_KEY,
-      prop.tokenId.toString(),
-      '',
-      address,
-      signature,
-      audioUrl
-    )
+    try {
+      await add_beat(
+        prop.dataKey.toString(),
+        process.env.NEXT_PUBLIC_TOKEN_KEY,
+        prop.tokenId.toString(),
+        '',
+        address,
+        signature,
+        audioUrl
+      )
+    } catch (e: unknown) {}
 
-    console.log(x)
     prop.onHandleConfirmClicked()
+    showSuccess(`Congratulations, you've succeeded in making that terrible sound even more unbearable.`)
+    setIsLoading(false)
   }
 
   return (
@@ -107,8 +115,12 @@ const Upload = (prop: UploadProp) => {
       </div>
 
       <div className="flex gap-2">
-        <button className="rounded-md bg-red-600 py-2 px-2 md:px-5 md:hover:scale-105" onClick={() => add_to_nft()}>
-          Add Beat to NFT
+        <button
+          className=" rounded-md bg-red-600 py-2 px-2 md:px-5 md:hover:scale-105"
+          disabled={isLoading}
+          onClick={() => add_to_nft()}
+        >
+          {isLoading ? <LoadingSpinner /> : 'Add Beat to NFT'}
         </button>
         <button
           className="rounded-md bg-indigo-600 py-2 px-2 md:px-5 md:hover:scale-105"

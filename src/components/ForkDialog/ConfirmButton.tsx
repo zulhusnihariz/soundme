@@ -1,8 +1,13 @@
+import { LoadingSpinner } from 'components/Icons/icons'
 import { ethers } from 'ethers'
-import { useEffect } from 'react'
+import { AlertMessageContext } from 'hooks/use-alert-message'
+import { useContext, useState } from 'react'
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
 
 const ConfirmButton = ({ cid, onForkSuccess }) => {
+  const { showError } = useContext(AlertMessageContext)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
   const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_COLLABEAT as any,
     abi: [
@@ -28,18 +33,35 @@ const ConfirmButton = ({ cid, onForkSuccess }) => {
     },
   })
 
-  const { data, write } = useContractWrite(config)
+  const { data, writeAsync } = useContractWrite(config)
 
-  const { isLoading, isSuccess } = useWaitForTransaction({
+  const { isSuccess } = useWaitForTransaction({
     hash: data?.hash,
     onSuccess: () => {
       onForkSuccess()
+      setIsLoading(false)
     },
   })
 
+  const onHandleConfirmClicked = async () => {
+    setIsLoading(true)
+
+    try {
+      await writeAsync?.()
+    } catch (e: unknown) {
+      const error = e as Error
+      showError(`${error.message}`)
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <button className="mr-2 bg-green-500 px-5 py-3 text-black" onClick={() => write?.()}>
-      Confirm
+    <button
+      className="mr-2 bg-green-500 px-5 py-3 text-black"
+      disabled={isLoading}
+      onClick={() => onHandleConfirmClicked()}
+    >
+      {isLoading ? <LoadingSpinner /> : 'Confirm'}
     </button>
   )
 }

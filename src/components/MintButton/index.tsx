@@ -1,8 +1,9 @@
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi'
+import { useAccount, useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi'
 import { ethers, BigNumber } from 'ethers'
 import Image from 'next/image'
 import { AlertMessageContext } from 'hooks/use-alert-message'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
+import { LoadingSpinner } from 'components/Icons/icons'
 
 interface MintProp {
   tokenId: String
@@ -10,7 +11,8 @@ interface MintProp {
 
 const MintButton = (prop: MintProp) => {
   const { address } = useAccount()
-  const { showError } = useContext(AlertMessageContext)
+  const { showError, showSuccess } = useContext(AlertMessageContext)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { config } = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_COLLABEAT as any,
@@ -36,24 +38,47 @@ const MintButton = (prop: MintProp) => {
     },
   })
 
-  const { data, write } = useContractWrite(config)
+  const { data, writeAsync } = useContractWrite(config)
 
-  function handleBookmark() {
+  const handleBookmark = async () => {
     if (!address) {
       showError('Connect your wallet to bookmark this beat')
       return
     }
-    write?.()
+    setIsLoading(true)
+
+    try {
+      await writeAsync?.()
+    } catch (e: unknown) {
+      const error = e as Error
+      showError(`${error.message}`)
+      setIsLoading(false)
+    }
   }
+
+  const { isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+    onSuccess: () => {
+      showSuccess('Your NFT is a true masterpiece...said no one ever.')
+      setIsLoading(false)
+    },
+  })
 
   return (
     <button
       className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#A726F8] to-[#FFDD00] p-2 text-xs font-bold text-white md:hover:scale-105`}
+      disabled={isLoading}
       onClick={() => handleBookmark()}
     >
-      <Image className="mb-1 " src="/assets/plus-icon.png" height={20} width={20} alt="plus icon" />
-      <span>Bookmark</span>
-      <span>Beat</span>
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <Image className="mb-1 " src="/assets/plus-icon.png" height={20} width={20} alt="plus icon" />
+          <span>Bookmark</span>
+          <span>Beat</span>
+        </>
+      )}
     </button>
   )
 }
