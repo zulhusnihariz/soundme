@@ -7,10 +7,12 @@ import MintButton from 'components/MintButton'
 import ForkDialog from 'components/ForkDialog'
 import ShareDialog from 'components/ShareDialog'
 import Image from 'next/image'
-import { JSONIcon, ShareIcon } from 'components/Icons/icons'
+import { DownloadIcon, JSONIcon, ShareIcon } from 'components/Icons/icons'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useAccount } from 'wagmi'
 import { AlertMessageContext } from 'hooks/use-alert-message'
+import { createMixedAudio } from 'utils'
+import audioBuffertoWav from 'audiobuffer-to-wav'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -182,6 +184,20 @@ const SingleMusic = () => {
     setForkData(selections)
   }
 
+  const [audioContext] = useState(new AudioContext())
+
+  async function downloadBeat() {
+    const mixed = await createMixedAudio(audioContext, dataKey)
+    const blob = new Blob([audioBuffertoWav(mixed)], { type: 'audio/wav' })
+
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `Collabeat #${tokenId}`)
+    document.body.appendChild(link)
+    link.click()
+  }
+
   return (
     <>
       <div className="px-2 pb-5">
@@ -239,7 +255,7 @@ const SingleMusic = () => {
         </div>
         {dataKey && tokenId && (
           <div className="flex items-center justify-between py-5">
-            <div className="flex gap-2">
+            <div className="flex gap-1 md:gap-2">
               {tokenId && <MintButton tokenId={tokenId} />}
 
               {isForking ? (
@@ -259,8 +275,17 @@ const SingleMusic = () => {
                   <span>This Beat</span>
                 </button>
               )}
+
+              <button
+                className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#F7507B] to-[#7523A7] p-2 text-xs font-bold text-white md:hover:scale-105`}
+                onClick={() => downloadBeat()}
+              >
+                <DownloadIcon />
+                <span>Download</span>
+                <span>Beat</span>
+              </button>
             </div>
-            <div className="inline-block">
+            <div className="ml-2 inline-block">
               <button className="mr-2 bg-green-100 p-3" onClick={onHandleCheckMetadata}>
                 <JSONIcon />
               </button>
