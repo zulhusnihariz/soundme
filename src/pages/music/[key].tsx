@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import AudioMotionAnalyzer from '../../../node_modules/audiomotion-analyzer/src/audioMotion-analyzer'
 import { PlayerState } from 'lib'
-import { getSongLength, mixAudioBuffer } from 'utils/'
+import { createMixedAudio } from 'utils/'
 import audioBuffertoWav from 'audiobuffer-to-wav'
 import { PlayIcon, StopIcon, LoadingSpinner } from 'components/Icons/icons'
 import { useRouter } from 'next/router'
@@ -17,28 +17,6 @@ export default function OpenseaPreview() {
   const [dataKey, setDataKey] = useState('')
   const [tokenId, setTokenId] = useState('')
 
-  const createMixedAudio = async (dataKey: string) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
-    let metadata = await res.json()
-
-    const urls = []
-    for (const [key, value] of Object.entries(metadata)) {
-      if (key.startsWith('0x')) urls.push(value)
-    }
-
-    let promises = urls.map(url =>
-      fetch(url)
-        .then(response => response.arrayBuffer())
-        .then(buffer => audioContext.decodeAudioData(buffer))
-    )
-
-    let buffers = await Promise.all(promises)
-
-    const songLength = getSongLength(buffers)
-    let mixed = mixAudioBuffer(buffers, songLength, 1, audioContext)
-    setMixedAudio(mixed)
-  }
-
   function playAudio() {
     htmlAudioElementRef.current.play()
   }
@@ -48,6 +26,11 @@ export default function OpenseaPreview() {
   }
 
   useEffect(() => {
+    const getMixedAudio = async (dataKey: string) => {
+      const mixed = await createMixedAudio(audioContext, dataKey)
+      setMixedAudio(mixed)
+    }
+
     if (!dataKey && !tokenId) {
       let regex = new RegExp('.{1,' + 64 + '}', 'g')
       let result = router.query.key.toString().match(regex)
@@ -55,7 +38,7 @@ export default function OpenseaPreview() {
       setDataKey(result[0])
       setTokenId(result[1])
 
-      createMixedAudio(result[0])
+      getMixedAudio(result[0])
     }
   }, [router, dataKey, tokenId])
 
