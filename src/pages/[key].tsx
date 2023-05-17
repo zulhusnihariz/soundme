@@ -7,10 +7,13 @@ import MintButton from 'components/MintButton'
 import ForkDialog from 'components/ForkDialog'
 import ShareDialog from 'components/ShareDialog'
 import Image from 'next/image'
-import { JSONIcon, ShareIcon } from 'components/Icons/icons'
+import { DownloadIcon, JSONIcon, LoadingSpinner, ShareIcon } from 'components/Icons/icons'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useAccount } from 'wagmi'
 import { AlertMessageContext } from 'hooks/use-alert-message'
+import { createMixedAudio } from 'utils'
+import audioBuffertoWav from 'audiobuffer-to-wav'
+import { check_if_bookmarked } from 'apollo-client'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -19,6 +22,8 @@ const SingleMusic = () => {
 
   const [dataKey, setDataKey] = useState('')
   const [tokenId, setTokenId] = useState('')
+  const [displayDownloadButton, setDisplayDownloadButton] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const [data, setData] = useState(null)
   const [isLoad, setIsLoad] = useState(false)
@@ -78,10 +83,16 @@ const SingleMusic = () => {
   }, [dataKey, data, router])
 
   useEffect(() => {
+    const checkBookmarked = async (tokenId: string) => {
+      const isMinted = await check_if_bookmarked(address, tokenId)
+      setDisplayDownloadButton(isMinted)
+    }
+
     if (!dataKey && !tokenId) {
       let regex = new RegExp('.{1,' + 64 + '}', 'g')
       let result = router.query.key.toString().match(regex)
 
+      checkBookmarked(result[1])
       setDataKey(result[0])
       setTokenId(result[1])
     }
@@ -182,6 +193,35 @@ const SingleMusic = () => {
     setForkData(selections)
   }
 
+  const [audioContext] = useState(new AudioContext())
+
+  async function downloadBeat() {
+    setIsDownloading(true)
+
+    const mixed = await createMixedAudio(audioContext, dataKey)
+    const blob = new Blob([audioBuffertoWav(mixed)], { type: 'audio/wav' })
+
+    const url = window.URL.createObjectURL(blob)
+
+    const id = 'download-beats-link'
+    const fileName = `Collabeat #${tokenId}`
+    let linkEl = document.getElementById(id) as HTMLAnchorElement
+
+    if (linkEl) {
+      linkEl.href = url
+      linkEl.setAttribute('download', fileName)
+    } else {
+      linkEl = document.createElement('a')
+      linkEl.id = id
+      linkEl.href = url
+      linkEl.setAttribute('download', fileName)
+      document.body.appendChild(linkEl)
+    }
+
+    linkEl.click()
+    setIsDownloading(false)
+  }
+
   return (
     <>
       <div className="px-2 pb-5">
@@ -239,7 +279,7 @@ const SingleMusic = () => {
         </div>
         {dataKey && tokenId && (
           <div className="flex items-center justify-between py-5">
-            <div className="flex gap-2">
+            <div className="flex gap-1 md:gap-2">
               {tokenId && <MintButton tokenId={tokenId} />}
 
               {isForking ? (
@@ -259,8 +299,26 @@ const SingleMusic = () => {
                   <span>This Beat</span>
                 </button>
               )}
+
+              {displayDownloadButton && (
+                <button
+                  className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#F7507B] to-[#7523A7] p-2 text-xs font-bold text-white md:hover:scale-105`}
+                  disabled={isDownloading}
+                  onClick={() => downloadBeat()}
+                >
+                  {isDownloading ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <>
+                      <DownloadIcon />
+                      <span>Download</span>
+                      <span>Beat</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
-            <div className="inline-block">
+            <div className="ml-2 inline-block">
               <button className="mr-2 bg-green-100 p-3" onClick={onHandleCheckMetadata}>
                 <JSONIcon />
               </button>

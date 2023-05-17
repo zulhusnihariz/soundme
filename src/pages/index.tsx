@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { RefreshIcon } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
-import { getSongLength, mixAudioBuffer } from 'utils/'
+import { createMixedAudio } from 'utils/'
 import MintDialog from 'components/MintDialog'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 
@@ -81,46 +81,20 @@ export default function MusicCollection() {
     }))
   }
 
-  const createMixedAudio = async (dataKey: string) => {
-    updatePlayerState(dataKey, PlayerState.LOADING)
-
-    const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
-    let metadata = await res.json()
-
-    const urls = []
-    for (const [key, value] of Object.entries(metadata)) {
-      if (key.startsWith('0x')) urls.push(value)
-    }
-
-    if (urls.length <= 0) {
-      updatePlayerState(dataKey, PlayerState.STOP)
-      return
-    }
-
-    let promises = urls.map(url =>
-      fetch(url)
-        .then(response => response.arrayBuffer())
-        .then(buffer => audioContext.decodeAudioData(buffer))
-    )
-
-    let buffers = await Promise.all(promises)
-
-    const songLength = getSongLength(buffers)
-    let mixed = mixAudioBuffer(buffers, songLength, 1, audioContext)
-
-    updatePlayerState(dataKey, PlayerState.PLAY)
-
-    setMixedAudio(prev => ({
-      ...prev,
-      [dataKey]: mixed,
-    }))
-  }
-
   const playerButtonHandler = async (dataKey: string) => {
     const isFirstPlay = audioPlayerState[dataKey] === undefined
 
     if (isFirstPlay) {
-      createMixedAudio(dataKey)
+      updatePlayerState(dataKey, PlayerState.LOADING)
+
+      const mixed = await createMixedAudio(audioContext, dataKey)
+
+      updatePlayerState(dataKey, PlayerState.PLAY)
+
+      setMixedAudio(prev => ({
+        ...prev,
+        [dataKey]: mixed,
+      }))
       return
     }
 
@@ -147,6 +121,14 @@ export default function MusicCollection() {
     router.reload()
   }
 
+  function getUniqueSheets(oldSheets: Sheet[], newSheets: Sheet[]) {
+    let combined = oldSheets.concat(newSheets)
+
+    return combined.filter(
+      (obj: Sheet, index: number, self: Sheet[]) => index === self.findIndex(t => t.token_id === obj.token_id)
+    )
+  }
+
   useEffect(() => {
     const getSheets = async () => {
       const isFirstPage = currentPage === 1
@@ -164,7 +146,8 @@ export default function MusicCollection() {
               where: { to: address },
             })
 
-            setForkedSheets(forkedSheets.concat(bookmarked.beats))
+            const unique = getUniqueSheets(forkedSheets, bookmarked.beats)
+            setForkedSheets(unique)
           }
 
           break
@@ -175,8 +158,8 @@ export default function MusicCollection() {
             where: { to: address },
           })
 
-          setForkedSheets(forkedSheets.concat(bookmarked.beats))
-
+          const unique = getUniqueSheets(forkedSheets, bookmarked.beats)
+          setForkedSheets(unique)
           break
       }
       setIsFetching(false)

@@ -36,6 +36,28 @@ export function mixAudioBuffer(
   return finalMix
 }
 
+export const createMixedAudio = async (audioContext: AudioContext, dataKey: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_LINEAGE_NODE_URL}metadata/${dataKey}`)
+  let metadata = await res.json()
+
+  const urls = []
+  for (const [key, value] of Object.entries(metadata)) {
+    if (key.startsWith('0x')) urls.push(value)
+  }
+
+  let promises = urls.map(url =>
+    fetch(url)
+      .then(response => response.arrayBuffer())
+      .then(buffer => audioContext.decodeAudioData(buffer))
+  )
+
+  let buffers = await Promise.all(promises)
+
+  const songLength = getSongLength(buffers)
+  let mixed = mixAudioBuffer(buffers, songLength, 1, audioContext)
+
+  return mixed
+}
 export function classNames(...classes: (false | null | undefined | string)[]): string {
   return classes.filter(Boolean).join(' ')
 }
