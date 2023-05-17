@@ -7,7 +7,7 @@ import MintButton from 'components/MintButton'
 import ForkDialog from 'components/ForkDialog'
 import ShareDialog from 'components/ShareDialog'
 import Image from 'next/image'
-import { DownloadIcon, JSONIcon, ShareIcon } from 'components/Icons/icons'
+import { DownloadIcon, JSONIcon, LoadingSpinner, ShareIcon } from 'components/Icons/icons'
 import LoadingIndicator from 'components/LoadingIndicator'
 import { useAccount } from 'wagmi'
 import { AlertMessageContext } from 'hooks/use-alert-message'
@@ -23,6 +23,7 @@ const SingleMusic = () => {
   const [dataKey, setDataKey] = useState('')
   const [tokenId, setTokenId] = useState('')
   const [displayDownloadButton, setDisplayDownloadButton] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const [data, setData] = useState(null)
   const [isLoad, setIsLoad] = useState(false)
@@ -195,15 +196,30 @@ const SingleMusic = () => {
   const [audioContext] = useState(new AudioContext())
 
   async function downloadBeat() {
+    setIsDownloading(true)
+
     const mixed = await createMixedAudio(audioContext, dataKey)
     const blob = new Blob([audioBuffertoWav(mixed)], { type: 'audio/wav' })
 
     const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', `Collabeat #${tokenId}`)
-    document.body.appendChild(link)
-    link.click()
+
+    const id = 'download-beats-link'
+    const fileName = `Collabeat #${tokenId}`
+    let linkEl = document.getElementById(id) as HTMLAnchorElement
+
+    if (linkEl) {
+      linkEl.href = url
+      linkEl.setAttribute('download', fileName)
+    } else {
+      linkEl = document.createElement('a')
+      linkEl.id = id
+      linkEl.href = url
+      linkEl.setAttribute('download', fileName)
+      document.body.appendChild(linkEl)
+    }
+
+    linkEl.click()
+    setIsDownloading(false)
   }
 
   return (
@@ -287,11 +303,18 @@ const SingleMusic = () => {
               {displayDownloadButton && (
                 <button
                   className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#F7507B] to-[#7523A7] p-2 text-xs font-bold text-white md:hover:scale-105`}
+                  disabled={isDownloading}
                   onClick={() => downloadBeat()}
                 >
-                  <DownloadIcon />
-                  <span>Download</span>
-                  <span>Beat</span>
+                  {isDownloading ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <>
+                      <DownloadIcon />
+                      <span>Download</span>
+                      <span>Beat</span>
+                    </>
+                  )}
                 </button>
               )}
             </div>
