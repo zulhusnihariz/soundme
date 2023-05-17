@@ -121,6 +121,14 @@ export default function MusicCollection() {
     router.reload()
   }
 
+  function getUniqueSheets(oldSheets: Sheet[], newSheets: Sheet[]) {
+    let combined = oldSheets.concat(newSheets)
+
+    return combined.filter(
+      (obj: Sheet, index: number, self: Sheet[]) => index === self.findIndex(t => t.token_id === obj.token_id)
+    )
+  }
+
   useEffect(() => {
     const getSheets = async () => {
       const isFirstPage = currentPage === 1
@@ -138,7 +146,8 @@ export default function MusicCollection() {
               where: { to: address },
             })
 
-            setForkedSheets(forkedSheets.concat(bookmarked.beats))
+            const unique = getUniqueSheets(forkedSheets, bookmarked.beats)
+            setForkedSheets(unique)
           }
 
           break
@@ -149,8 +158,8 @@ export default function MusicCollection() {
             where: { to: address },
           })
 
-          setForkedSheets(forkedSheets.concat(bookmarked.beats))
-
+          const unique = getUniqueSheets(forkedSheets, bookmarked.beats)
+          setForkedSheets(unique)
           break
       }
       setIsFetching(false)

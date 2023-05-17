@@ -13,6 +13,7 @@ import { useAccount } from 'wagmi'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 import { createMixedAudio } from 'utils'
 import audioBuffertoWav from 'audiobuffer-to-wav'
+import { check_if_bookmarked } from 'apollo-client'
 
 const SingleMusic = () => {
   const router = useRouter()
@@ -21,6 +22,7 @@ const SingleMusic = () => {
 
   const [dataKey, setDataKey] = useState('')
   const [tokenId, setTokenId] = useState('')
+  const [displayDownloadButton, setDisplayDownloadButton] = useState(false)
 
   const [data, setData] = useState(null)
   const [isLoad, setIsLoad] = useState(false)
@@ -80,10 +82,16 @@ const SingleMusic = () => {
   }, [dataKey, data, router])
 
   useEffect(() => {
+    const checkBookmarked = async (tokenId: string) => {
+      const isMinted = await check_if_bookmarked(address, tokenId)
+      setDisplayDownloadButton(isMinted)
+    }
+
     if (!dataKey && !tokenId) {
       let regex = new RegExp('.{1,' + 64 + '}', 'g')
       let result = router.query.key.toString().match(regex)
 
+      checkBookmarked(result[1])
       setDataKey(result[0])
       setTokenId(result[1])
     }
@@ -276,14 +284,16 @@ const SingleMusic = () => {
                 </button>
               )}
 
-              <button
-                className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#F7507B] to-[#7523A7] p-2 text-xs font-bold text-white md:hover:scale-105`}
-                onClick={() => downloadBeat()}
-              >
-                <DownloadIcon />
-                <span>Download</span>
-                <span>Beat</span>
-              </button>
+              {displayDownloadButton && (
+                <button
+                  className={`from-20% flex h-20 w-20 flex-col items-center justify-center rounded-sm bg-gradient-to-t from-[#F7507B] to-[#7523A7] p-2 text-xs font-bold text-white md:hover:scale-105`}
+                  onClick={() => downloadBeat()}
+                >
+                  <DownloadIcon />
+                  <span>Download</span>
+                  <span>Beat</span>
+                </button>
+              )}
             </div>
             <div className="ml-2 inline-block">
               <button className="mr-2 bg-green-100 p-3" onClick={onHandleCheckMetadata}>
