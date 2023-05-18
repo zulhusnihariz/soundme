@@ -3,14 +3,14 @@ name: Collabeat CI
 on:
   push:
     branches: [ci-testing]
-  pull_request:
-    branches: [ci-testing]
-    types:
-      - closed
+ # pull_request:
+ #   branches: [ci-testing]
+ #   types:
+ #     - closed
 
 jobs:
   integration:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged) }}
+ #  if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged) }}
     name: re-deploy
     runs-on: self-hosted
     strategy:
