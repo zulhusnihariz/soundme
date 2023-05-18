@@ -248,7 +248,7 @@ export default function MusicCollection() {
 
         {sheets.length > 0 && !isFetching && currentSection !== CURRENT_SECTION.BOOKMARKED && (
           <section className="mb-4">
-            <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Fresh beatszzz</h1>
+            <h1 className="Inter mb-4 text-left text-3xl font-bold text-white">Fresh beats</h1>
 
             <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
               {sheets.map((sheet, index) => (
