@@ -10,6 +10,9 @@ on:
 
 jobs:
   integration:
+    if: |
+      github.event == 'push' ||
+      github.event_name == 'pull_request' && github.event.pull_request.merged == true
     name: re-deploy
     runs-on: self-hosted
     strategy:
