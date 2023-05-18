@@ -40,7 +40,8 @@ export const FluenceProvider: React.FC<FluenceProviderProps> = ({ children }) =>
         }
       }
     }
-    connectToFluence()
+    setIsConnected(true)
+    // connectToFluence()
   }, [])
 
   if (!isConnected) {
