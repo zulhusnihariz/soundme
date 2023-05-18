@@ -1,0 +1,32 @@
+name: Collabeat CI
+
+on:
+  push:
+    branches: [ci-testing]
+  pull_request:
+    branches: [ci-testing]
+    types:
+      - closed
+
+jobs:
+  integration:
+    name: re-deploy
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+      - name: Install project dependencies
+        run: yarn
+      - run: yarn build
+      - run: pm2 reload all
