@@ -101,7 +101,7 @@ export function Web3Wrapper({ children }) {
           learnMoreUrl: app.url,
         }}
         chains={chains}
-        initialChain={goerli} // Optional, initialChain={1}, initialChain={chain.mainnet}, initialChain={gnosisChain}
+        initialChain={polygonMumbai} // Optional, initialChain={1}, initialChain={chain.mainnet}, initialChain={gnosisChain}
         showRecentTransactions={true}
         theme={resolvedTheme === 'dark' ? darkTheme() : lightTheme()}
       >
