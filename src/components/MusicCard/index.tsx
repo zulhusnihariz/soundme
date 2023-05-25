@@ -58,7 +58,7 @@ const MusicCard = (prop: MusicCardProp) => {
             <BufferWaveform
               buffer={prop.mixedAudio}
               playerState={prop.audioState[prop.sheet.data_key.toString()]}
-              onFinish={() => prop.updatePlayerState(prop.sheet.data_key.toString(), PlayerState.STOP)}
+              onFinish={() => prop.updatePlayerState(prop.sheet.data_key.toString(), PlayerState.PAUSED)}
             />
           ) : (
             <Image src="/assets/double-wave.png" width={150} height={150} alt="wave-placeholder" />

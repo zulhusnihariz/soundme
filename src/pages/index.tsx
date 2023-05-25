@@ -4,8 +4,7 @@ import ShareDialog from 'components/ShareDialog'
 import { get_bookmarked_sheets, get_sheets } from '../apollo-client'
 import { PlayerState, Sheet } from 'lib'
 import LoadingIndicator from 'components/LoadingIndicator'
-import { useRouter } from 'next/router'
-import { RefreshIcon } from 'components/Icons/icons'
+import { LoadingSpinner } from 'components/Icons/icons'
 import { isMobile } from 'react-device-detect'
 import { useAccount } from 'wagmi'
 import { createMixedAudio } from 'utils/'
@@ -24,7 +23,6 @@ export default function MusicCollection() {
 
   // address = '0xc20de1a30487ec70fc730866f297f2e2f1e411f7' // uncomment to test bookmarked beats ui
 
-  const router = useRouter()
   const page_size = isMobile ? 3 : 9
 
   const [selectedToken, setSelectedToken] = useState({
@@ -46,7 +44,8 @@ export default function MusicCollection() {
   const [currentSection, setCurrentSection] = useState<CURRENT_SECTION>(CURRENT_SECTION.ALL)
 
   const [currentPage, setCurrentPage] = useState<number>(1)
-  const [refresh, setRefresh] = useState(false)
+  const [skip, setSkip] = useState(0)
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
 
   const [audioContext, setAudioContext] = useState(new AudioContext())
   const [audioPlayerState, setAudioPlayerState] = useState<{ [key: string]: PlayerState }>({})
@@ -114,11 +113,7 @@ export default function MusicCollection() {
 
   function handleMoreSheets() {
     setCurrentPage(prev => prev + 1)
-    setRefresh(true)
-  }
-
-  function handleRefreshSheets() {
-    router.reload()
+    setIsFetchingMore(true)
   }
 
   function getUniqueSheets(oldSheets: Sheet[], newSheets: Sheet[]) {
@@ -131,13 +126,14 @@ export default function MusicCollection() {
 
   useEffect(() => {
     const getSheets = async () => {
-      const isFirstPage = currentPage === 1
-      const skip = isFirstPage ? 0 : page_size
+      setSkip(prev => prev + page_size)
 
       switch (currentSection) {
         case CURRENT_SECTION.ALL:
           const all = await get_sheets({ first: page_size, skip })
-          setSheets(sheets.concat(all.beats))
+
+          const uniqueAll = getUniqueSheets(sheets, all.beats)
+          setSheets(uniqueAll)
 
           if (address) {
             const bookmarked = await get_bookmarked_sheets({
@@ -146,8 +142,8 @@ export default function MusicCollection() {
               where: { to: address },
             })
 
-            const unique = getUniqueSheets(forkedSheets, bookmarked.beats)
-            setForkedSheets(unique)
+            const uniqueBookmarked = getUniqueSheets(forkedSheets, bookmarked.beats)
+            setForkedSheets(uniqueBookmarked)
           }
 
           break
@@ -163,6 +159,7 @@ export default function MusicCollection() {
           break
       }
       setIsFetching(false)
+      setIsFetchingMore(false)
     }
 
     getSheets()
@@ -185,7 +182,6 @@ export default function MusicCollection() {
               className="Inter mb-4 text-left text-3xl font-bold text-white"
               onClick={() => {
                 setCurrentSection(CURRENT_SECTION.BOOKMARKED)
-                setRefresh(false)
               }}
             >
               Bookmarked beats
@@ -273,10 +269,11 @@ export default function MusicCollection() {
 
         {!isFetching ? (
           <button
-            onClick={refresh ? handleRefreshSheets : handleMoreSheets}
+            onClick={handleMoreSheets}
             className="fixed inset-x-0 bottom-[15px] mx-auto flex w-28 cursor-pointer flex-row items-center justify-center rounded-3xl border border-[#232323] bg-black py-2 px-4"
+            disabled={isFetchingMore}
           >
-            {refresh ? <RefreshIcon /> : <span>More</span>}
+            {isFetchingMore ? <LoadingSpinner /> : <span>More</span>}
           </button>
         ) : (
           <LoadingIndicator text={'Fetching data...'} />
