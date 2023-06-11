@@ -1,4 +1,12 @@
 module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/music/(.*)',
+        headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
+      },
+    ]
+  },
   reactStrictMode: true,
   // output: 'export',
   /*  AssetPrefix
