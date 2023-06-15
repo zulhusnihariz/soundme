@@ -30,7 +30,6 @@ export const rainbowWeb3AuthConnector =  ({ chains }: any) => {
 			appLogo: 'https://web3auth.io/images/w3a-L-Favicon-1.svg', // Your App Logo Here
 			modalZIndex: '2147483647',
 		},
-		web3AuthNetwork: 'cyan',
 	});
 
 	// Add openlogin adapter for customisations
@@ -40,7 +39,7 @@ export const rainbowWeb3AuthConnector =  ({ chains }: any) => {
 	const openloginAdapterInstance = new OpenloginAdapter({
 		privateKeyProvider,
 		adapterSettings: {
-			network: 'cyan',
+			network: 'testnet',
 			uxMode: 'popup',
 			whiteLabel: {
 				name: 'Web3Auth',
