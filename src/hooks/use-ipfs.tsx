@@ -23,14 +23,14 @@ interface IpfsProviderProps {
 
 export const IpfsProvider: React.FC<IpfsProviderProps> = ({ children }) => {
   const [isIPFSConnected, setIsIPFSConnected] = useState(false)
-  const [ipfs, setIpfs] = useState(null)
-  const [ipfsFork, setIpfsFork] = useState(null)
+  const [ipfs, setIpfs] = useState<NFTStorage>()
+  const [ipfsFork, setIpfsFork] = useState<IPFSHTTPClient>()
 
   useEffect(() => {
     async function startIpfs() {
       if (!isIPFSConnected) {
         try {
-          const NFT_STORAGE_TOKEN = process.env.NEXT_PUBLIC_NFTSTORAGE_TOKEN
+          const NFT_STORAGE_TOKEN = process.env.NEXT_PUBLIC_NFTSTORAGE_TOKEN ?? ''
           const client = new NFTStorage({ token: NFT_STORAGE_TOKEN })
 
           setIpfs(client)

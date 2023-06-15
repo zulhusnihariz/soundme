@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 import { useContext, useState } from 'react'
 import { LoadingSpinner } from 'components/Icons/icons'
+import { parseEther } from 'viem'
 
 interface MintProp {
   tokenId: String
@@ -15,7 +16,7 @@ const MintButton = (prop: MintProp) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { config } = usePrepareContractWrite({
-    address: process.env.NEXT_PUBLIC_COLLABEAT as any,
+    address: String(process.env.NEXT_PUBLIC_COLLABEAT) as `0x${string}`,
     abi: [
       {
         inputs: [
@@ -29,14 +30,14 @@ const MintButton = (prop: MintProp) => {
       },
     ],
     functionName: 'mint',
-    args: [BigNumber.from(prop.tokenId), 1],
-    overrides: {
-      value: ethers.utils.parseUnits('0.015', 'ether'),
-    },
+    //@ts-ignore
+    args: [BigNumber.from(prop.tokenId)._hex, 1],
+    value: parseEther('0.015'),
     onError(error) {
       console.log('Error', error)
     },
   })
+
 
   const { data, writeAsync } = useContractWrite(config)
 

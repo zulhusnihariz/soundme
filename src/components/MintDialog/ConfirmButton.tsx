@@ -1,8 +1,10 @@
 import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
-import { ethers, BigNumber } from 'ethers'
+import {  BigNumber } from 'ethers'
 import { LoadingSpinner } from 'components/Icons/icons'
 import { useContext, useState } from 'react'
 import { AlertMessageContext } from 'hooks/use-alert-message'
+import { parseEther } from 'viem'
+
 
 interface ConfirmButton {
   tokenId: String
@@ -14,7 +16,7 @@ const ConfirmButton = ({ tokenId, onBookmarkSuccess }: ConfirmButton) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   // logic same as MintButton/index.tsx component
   const { config } = usePrepareContractWrite({
-    address: process.env.NEXT_PUBLIC_COLLABEAT as any,
+    address: String(process.env.NEXT_PUBLIC_COLLABEAT) as `0x${string}`,
     abi: [
       {
         inputs: [
@@ -28,10 +30,9 @@ const ConfirmButton = ({ tokenId, onBookmarkSuccess }: ConfirmButton) => {
       },
     ],
     functionName: 'mint',
-    args: [BigNumber.from(tokenId), 1],
-    overrides: {
-      value: ethers.utils.parseUnits('0.015', 'ether'),
-    },
+    //@ts-ignore
+    args: [BigNumber.from(tokenId)._hex, 1],
+    value: parseEther('0.015'),
     onError(error) {
       console.log('Error', error)
     },

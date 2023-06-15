@@ -11,10 +11,10 @@ interface MusicCardProp {
   description: String
   sheet: Sheet
   audioUrls: Array<string>
-  onHandleRecordClicked: (tokenId) => void
-  onHandleShareClicked: (datakey) => void
+  onHandleRecordClicked: (tokenId: string) => void
+  onHandleShareClicked: (datakey: string) => void
   onHandlePlayClicked: (dataKey: string) => void
-  onHandleMintClicked: (data: { tokenId: String; owner: String }) => void
+  onHandleMintClicked: (data: { tokenId: string; owner: string }) => void
   updatePlayerState: (dataKey: string, state: PlayerState) => void
   audioState: {
     [key: string]: PlayerState
@@ -77,14 +77,14 @@ const MusicCard = (prop: MusicCardProp) => {
             <button
               type="button"
               className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-3xl border border-[#F91969] bg-[#F91969] py-2 px-4 md:hover:scale-105"
-              onClick={() => prop.onHandleMintClicked({ tokenId: prop.tokenId, owner: prop.sheet.owner.toString() })}
+              onClick={() => prop.onHandleMintClicked({ tokenId: `${prop.tokenId}`, owner: prop.sheet.owner.toString() })}
             >
               Bookmark
             </button>
             <button
               className="rounded-full bg-black px-2 md:hover:scale-105"
               type="button"
-              onClick={() => prop.onHandleShareClicked(prop.sheet.data_key)}
+              onClick={() => prop.onHandleShareClicked(`${prop.sheet.data_key}`)}
             >
               <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" stroke="#fff">
                 <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
