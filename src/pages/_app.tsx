@@ -8,17 +8,8 @@ import { useState, useEffect } from 'react'
 import HeadGlobal from 'components/HeadGlobal'
 // Web3Wrapper deps:
 import { connectorsForWallets, RainbowKitProvider, lightTheme, darkTheme } from '@rainbow-me/rainbowkit'
-import {
-  injectedWallet,
-  metaMaskWallet,
-  braveWallet,
-  coinbaseWallet,
-  walletConnectWallet,
-  ledgerWallet,
-  rainbowWallet,
-} from '@rainbow-me/rainbowkit/wallets'
 import { goerli, polygonMumbai } from 'wagmi/chains'
-import { createClient, configureChains, WagmiConfig } from 'wagmi'
+import { createConfig, configureChains, WagmiConfig } from 'wagmi'
 import { infuraProvider } from 'wagmi/providers/infura'
 import { publicProvider } from 'wagmi/providers/public'
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
@@ -26,6 +17,8 @@ import { FluenceProvider } from 'hooks/use-fluence'
 import { IpfsProvider } from 'hooks/use-ipfs'
 import MainLayout from 'layout/MainLayout'
 import { AlertMessageProvider } from 'hooks/use-alert-message'
+import { rainbowWeb3AuthConnector } from 'hooks/rainbow-web3auth-connector'
+
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -53,8 +46,8 @@ switch (process.env.NEXT_PUBLIC_CHAIN_ID) {
 }
 
 // Web3 Configs
-const { chains, provider } = configureChains(currentChain, [
-  infuraProvider({ apiKey: process.env.NEXT_PUBLIC_INFURA_ID !== '' && process.env.NEXT_PUBLIC_INFURA_ID }),
+const { chains, publicClient } = configureChains(currentChain, [
+  infuraProvider({ apiKey: String(process.env.NEXT_PUBLIC_INFURA_ID)  }),
   jsonRpcProvider({
     rpc: chain => {
       return {
@@ -65,28 +58,18 @@ const { chains, provider } = configureChains(currentChain, [
   publicProvider(),
 ])
 
-const otherWallets = [
-  braveWallet({ chains }),
-  ledgerWallet({ chains }),
-  coinbaseWallet({ chains, appName: app.name }),
-  rainbowWallet({ chains }),
-]
 
 const connectors = connectorsForWallets([
   {
     groupName: 'Recommended',
-    wallets: [injectedWallet({ chains }), metaMaskWallet({ chains }), walletConnectWallet({ chains })],
-  },
-  {
-    groupName: 'Other Wallets',
-    wallets: otherWallets,
+    wallets: [rainbowWeb3AuthConnector({chains})],
   },
 ])
 
-const wagmiClient = createClient({ autoConnect: true, connectors, provider })
+const wagmiConfig = createConfig({ autoConnect: true, connectors, publicClient })
 
 // Web3Wrapper
-export function Web3Wrapper({ children }) {
+export function Web3Wrapper({ children }: {children: React.ReactNode}) {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 
@@ -94,7 +77,7 @@ export function Web3Wrapper({ children }) {
   if (!mounted) return null
 
   return (
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider
         appInfo={{
           appName: app.name,

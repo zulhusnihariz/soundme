@@ -1,15 +1,20 @@
 import { LoadingSpinner } from 'components/Icons/icons'
-import { ethers } from 'ethers'
 import { AlertMessageContext } from 'hooks/use-alert-message'
 import { useContext, useState } from 'react'
-import { usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
+import { parseEther } from 'viem'
+import { useContractWrite, usePrepareContractWrite, useWaitForTransaction } from 'wagmi'
 
-const ConfirmButton = ({ cid, onForkSuccess }) => {
+interface Props { 
+  cid:string, 
+  onForkSuccess: () => void
+}
+
+const ConfirmButton = ({ cid, onForkSuccess }: Props) => {
   const { showError } = useContext(AlertMessageContext)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const { config } = usePrepareContractWrite({
-    address: process.env.NEXT_PUBLIC_COLLABEAT as any,
+    address: String(process.env.NEXT_PUBLIC_COLLABEAT) as `0x${string}`,
     abi: [
       {
         inputs: [
@@ -25,9 +30,7 @@ const ConfirmButton = ({ cid, onForkSuccess }) => {
     ],
     functionName: 'fork',
     args: ['', process.env.NEXT_PUBLIC_IPFS_FORK_MULTIADDRESS, cid],
-    overrides: {
-      value: ethers.utils.parseUnits('0.015', 'ether'),
-    },
+    value: parseEther('0.015'),
     onError(error) {
       console.log('Error', error)
     },
