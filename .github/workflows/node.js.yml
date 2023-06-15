@@ -25,4 +25,4 @@ jobs:
       - name: Install project dependencies
         run: yarn
       - run: yarn build
-      - run: pm2 reload all
+      - run: pm2 reload CB
