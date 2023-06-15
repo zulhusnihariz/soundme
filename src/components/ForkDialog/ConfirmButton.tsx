@@ -29,7 +29,7 @@ const ConfirmButton = ({ cid, onForkSuccess }: Props) => {
       },
     ],
     functionName: 'fork',
-    args: ['', process.env.NEXT_PUBLIC_IPFS_FORK_MULTIADDRESS, cid],
+    args: ['', process.env.NEXT_PUBLIC_IPFS_FORK_MULTIADDRESS ?? '', cid],
     value: parseEther('0.015'),
     onError(error) {
       console.log('Error', error)

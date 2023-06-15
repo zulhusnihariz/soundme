@@ -27,7 +27,7 @@ export enum RecordingDialogState {
 
 const RecordingDialog = (prop: RecordingDialogProp) => {
   const [state, setState] = useState<RecordingDialogState>(RecordingDialogState.START)
-  const [audioData, setAudioData] = useState({
+  const [audioData, setAudioData] = useState<{blob: Blob | null, url: string}>({
     blob: null,
     url: '',
   })
@@ -54,7 +54,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   }
 
   const onRecordingFinished = () => {
-    mediaRecorder.stop()
+    mediaRecorder?.stop()
 
     if (audioData) {
       setState(RecordingDialogState.UPLOAD)
@@ -73,7 +73,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   useEffect(() => {
     const filtered = []
     filtered.push({
-      key: address,
+      key: address ?? '',
       data: '',
       isMuted: false,
       playerState: PlayerState.STOP,
@@ -120,9 +120,9 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
     prop.setAllState(PlayerState.STOP)
   }
 
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null)
+  const [mediaStream, setMediaStream] = useState<MediaStream>()
   const [chunks, setChunks] = useState<Blob[]>([])
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>(null)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
   const getMicrophoneAccess = async () => {
     try {
@@ -150,7 +150,7 @@ const RecordingDialog = (prop: RecordingDialogProp) => {
   const removeMicrophoneAccess = async () => {
     if (mediaStream) {
       mediaStream.getTracks().forEach(track => track.stop())
-      setMediaStream(null)
+      setMediaStream(undefined)
     }
   }
 

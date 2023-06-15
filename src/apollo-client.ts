@@ -50,7 +50,7 @@ query Minteds($first: Int, $skip: Int, $where: CollaBeatNftMinted_filter) {
 const format = (minted: MintedNft) => {
   // generate data_key & update data structure
   try {
-    const contract_address = process.env.NEXT_PUBLIC_COLLABEAT_NFT.toLowerCase()
+    const contract_address = `${process.env.NEXT_PUBLIC_COLLABEAT_NFT}`.toLowerCase()
     const tokenId = minted.tokenId
     const chainId = process.env.NEXT_PUBLIC_CHAIN_ID
     const nonce = process.env.NEXT_PUBLIC_NONCE
@@ -110,7 +110,7 @@ export const get_bookmarked_sheets = async (variables: { first: number; skip?: n
       let formatted = format(nft)
       if (formatted !== null) return formatted
     })
-    .filter(item => item !== undefined)
+    .filter((item:Sheet) => item !== undefined)
 
   return { beats: formatted } as { beats: Sheet[] }
 }

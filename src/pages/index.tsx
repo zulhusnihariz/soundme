@@ -51,14 +51,17 @@ export default function MusicCollection() {
   const [audioPlayerState, setAudioPlayerState] = useState<{ [key: string]: PlayerState }>({})
   const [mixedAudio, setMixedAudio] = useState<{ [key: string]: AudioBuffer }>({})
 
-  const onHandleRecordClicked = tokenId => {
+  const onHandleRecordClicked = (tokenId: string) => {
     setSelectedToken({
       tokenId: tokenId,
       dataKey: tokenId,
     })
   }
 
-  const onHandleMintClicked = data => {
+  const onHandleMintClicked = (data: {
+    tokenId: string;
+    owner: string;
+}) => {
     if (!address) {
       showError('Connect your wallet to bookmark this beat')
       return
@@ -69,7 +72,7 @@ export default function MusicCollection() {
   }
 
   const onHandleMintDialogClosed = () => {
-    setBeatToBookmark(null)
+    setBeatToBookmark({tokenId :'', owner:''})
     setIsDialogMintOpened(false)
   }
 
@@ -151,7 +154,7 @@ export default function MusicCollection() {
           const bookmarked = await get_bookmarked_sheets({
             first: page_size,
             skip,
-            where: { to: address },
+            where: { to: address as '0x'},
           })
 
           const unique = getUniqueSheets(forkedSheets, bookmarked.beats)

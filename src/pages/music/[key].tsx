@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import AudioMotionAnalyzer from '../../../node_modules/audiomotion-analyzer/src/audioMotion-analyzer'
+
+//@ts-ignore
+import AudioMotionAnalyzer from '../../../node_modules/audiomotion-analyzer/src/audioMotion-analyzer' 
 import { PlayerState } from 'lib'
 import { createMixedAudio } from 'utils/'
 import audioBuffertoWav from 'audiobuffer-to-wav'
@@ -18,11 +20,11 @@ export default function OpenseaPreview() {
   const [tokenId, setTokenId] = useState('')
 
   function playAudio() {
-    htmlAudioElementRef.current.play()
+    htmlAudioElementRef.current?.play()
   }
 
   function stopAudio() {
-    htmlAudioElementRef.current.pause()
+    htmlAudioElementRef.current?.pause()
   }
 
   useEffect(() => {
@@ -33,12 +35,15 @@ export default function OpenseaPreview() {
 
     if (!dataKey && !tokenId) {
       let regex = new RegExp('.{1,' + 64 + '}', 'g')
+
+      if(!router.query.key) return
       let result = router.query.key.toString().match(regex)
 
-      setDataKey(result[0])
-      setTokenId(result[1])
-
-      getMixedAudio(result[0])
+      if (result && result[0] && result[1]){
+        setDataKey(result[0])
+        setTokenId(result[1])
+        getMixedAudio(result[0])
+      }
     }
   }, [router, dataKey, tokenId])
 
@@ -47,9 +52,12 @@ export default function OpenseaPreview() {
   const audioMotion = useRef<AudioMotionAnalyzer>()
 
   useEffect(() => {
+    if(!htmlAudioElementRef.current) return
+
     if (mixedAudio) {
       const blob = new Blob([audioBuffertoWav(mixedAudio)], { type: 'audio/wav' })
       const url = window.URL.createObjectURL(blob)
+   
       htmlAudioElementRef.current.src = url
     }
 

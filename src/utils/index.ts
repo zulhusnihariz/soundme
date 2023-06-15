@@ -46,7 +46,7 @@ export const createMixedAudio = async (audioContext: AudioContext, dataKey: stri
   }
 
   let promises = urls.map(url =>
-    fetch(url)
+    fetch(url as URL)
       .then(response => response.arrayBuffer())
       .then(buffer => audioContext.decodeAudioData(buffer))
   )

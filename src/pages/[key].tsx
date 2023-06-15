@@ -25,7 +25,7 @@ const SingleMusic = () => {
   const [displayDownloadButton, setDisplayDownloadButton] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
 
-  const [data, setData] = useState(null)
+  const [data, setData] = useState<AudioState>()
   const [isLoad, setIsLoad] = useState(false)
   const [filteredData, setFilteredData] = useState<Array<AudioState>>([])
   const [forkData, setForkData] = useState<Array<SelectedAudio>>([])
@@ -49,7 +49,7 @@ const SingleMusic = () => {
         if (key.toLowerCase().startsWith('0x')) {
           filtered.push({
             key,
-            data: data[key],
+            data: data[key as keyof AudioState],
             isMuted: false,
             playerState: PlayerState.STOP,
           } as AudioState)
@@ -84,17 +84,21 @@ const SingleMusic = () => {
 
   useEffect(() => {
     const checkBookmarked = async (tokenId: string) => {
-      const isMinted = await check_if_bookmarked(address, tokenId)
+      const isMinted = await check_if_bookmarked(address ?? '0x', tokenId)
       setDisplayDownloadButton(isMinted)
     }
 
     if (!dataKey && !tokenId) {
       let regex = new RegExp('.{1,' + 64 + '}', 'g')
+
+      if(!router.query.key) return
       let result = router.query.key.toString().match(regex)
 
-      checkBookmarked(result[1])
-      setDataKey(result[0])
-      setTokenId(result[1])
+      if(result && result [0] && result[1]){
+        checkBookmarked(result[1])
+        setDataKey(result[0])
+        setTokenId(result[1])
+      }
     }
   }, [router, dataKey, tokenId])
 
@@ -144,7 +148,7 @@ const SingleMusic = () => {
     updatedData[index] = {
       ...updatedData[index],
       selected: !state.selected,
-      isMuted: state.selected,
+      isMuted: state.selected as boolean,
     }
 
     setFilteredData(updatedData)
@@ -155,7 +159,7 @@ const SingleMusic = () => {
   }
   const onHandleDialogClosed = () => {
     setTimeout(() => {
-      setData(null)
+      setData(undefined)
       setFilteredData([])
       setIsLoad(false)
       setIsDialogRecordingOpened(!isDialogRecordingOpened)
@@ -178,7 +182,7 @@ const SingleMusic = () => {
   }
 
   const fork = () => {
-    const selections = []
+    const selections: SelectedAudio[] = []
 
     filteredData.forEach(audio => {
       if (audio.selected) {

@@ -5,7 +5,7 @@ interface RecordingProp {
   state: RecordingDialogState
   onHandleStopRecordingClicked: () => any
   setAudioData: (obj: any) => void
-  mediaStream: MediaStream
+  mediaStream: MediaStream | undefined
 }
 
 const Recording = (prop: RecordingProp) => {
@@ -14,7 +14,7 @@ const Recording = (prop: RecordingProp) => {
   const [timer, setTimer] = useState(0)
 
   useEffect(() => {
-    let intervalIdTime
+    let intervalIdTime: NodeJS.Timer
 
     if (prop.state == RecordingDialogState.RECORD) {
       intervalIdTime = setInterval(() => {

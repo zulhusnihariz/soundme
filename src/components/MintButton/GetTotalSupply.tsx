@@ -1,8 +1,8 @@
+// @ts-nocheck
 import { useEffect, useState } from 'react'
 import { useContractRead } from 'wagmi'
 import { BigNumber } from 'ethers'
-
-const GetTotalSupply = ({ tokenId }) => {
+const GetTotalSupply = ({ tokenId  }: { tokenId :String }) => {
   const [supplyLeft, setSupplyLeft] = useState(0)
 
   const maxSupply = useContractRead({

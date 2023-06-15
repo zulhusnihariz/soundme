@@ -19,7 +19,7 @@ interface UploadProp {
 }
 
 const Upload = (prop: UploadProp) => {
-  const [audioUrl, setAudioUrl] = useState('')
+  const [audioUrl, setAudioUrl] = useState<string>('')
 
   const { ipfs } = useIpfs()
   const { address } = useAccount()
@@ -57,26 +57,28 @@ const Upload = (prop: UploadProp) => {
   useEffect(() => {
     const signMessage = async () => {
       try {
+
+
         await signMessageAsync({ message: audioUrl })
       } catch (e: unknown) {
         const error = e as Error
         showError(`${error.message}`)
         setIsLoading(false)
-        setAudioUrl(null)
+        setAudioUrl('')
       }
     }
 
     if (audioUrl) signMessage()
   }, [audioUrl, signMessageAsync])
 
-  const add_new_beat = async signature => {
+  const add_new_beat = async (signature: string) => {
     try {
       await add_beat(
         prop.dataKey.toString(),
-        process.env.NEXT_PUBLIC_TOKEN_KEY,
+        process.env.NEXT_PUBLIC_TOKEN_KEY ?? '',
         prop.tokenId.toString(),
         '',
-        address,
+        address as `0x${string}`,
         signature,
         audioUrl
       )

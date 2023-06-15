@@ -30,6 +30,7 @@ const ConfirmButton = ({ tokenId, onBookmarkSuccess }: ConfirmButton) => {
       },
     ],
     functionName: 'mint',
+    //@ts-ignore
     args: [BigNumber.from(tokenId)._hex, 1],
     value: parseEther('0.015'),
     onError(error) {

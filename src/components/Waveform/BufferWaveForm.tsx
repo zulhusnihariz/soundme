@@ -94,7 +94,7 @@ const BufferWaveform: React.FC<BufferWaveformProps> = ({
     <div className="flex items-center justify-between">
       <div ref={waveformRef} />
       {!isSelecting && isSelecting !== undefined && (
-        <button className="rounded-full" onClick={() => onToggleSound(!isMuted)}>
+        <button className="rounded-full" onClick={() => onToggleSound?.(!isMuted)}>
           {isMuted && <MutedSpeakerIcon />}
           {!isMuted && <UnmutedSpeakerIcon />}
         </button>
@@ -107,7 +107,7 @@ const BufferWaveform: React.FC<BufferWaveformProps> = ({
           })}
           onClick={() => {
             if (onSelectButtonClicked) {
-              onToggleSound(true)
+              onToggleSound?.(true)
               onSelectButtonClicked()
             }
           }}

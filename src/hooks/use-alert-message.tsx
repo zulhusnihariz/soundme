@@ -42,7 +42,7 @@ export const AlertMessageProvider = ({ children }: AlertMessageProviderProps) =>
   }
 
   useEffect(() => {
-    let timeout = null
+    let timeout: NodeJS.Timeout
 
     if (errorMessage) {
       timeout = setTimeout(() => {

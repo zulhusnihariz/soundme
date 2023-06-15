@@ -30,12 +30,14 @@ const MintButton = (prop: MintProp) => {
       },
     ],
     functionName: 'mint',
+    //@ts-ignore
     args: [BigNumber.from(prop.tokenId)._hex, 1],
     value: parseEther('0.015'),
     onError(error) {
       console.log('Error', error)
     },
   })
+
 
   const { data, writeAsync } = useContractWrite(config)
 
