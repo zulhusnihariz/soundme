@@ -5,8 +5,8 @@ export const app: { [key: string]: string } = {
   keywords: 'web3, dapp, ethereum, nft, music', // keywords for SEO
   url: 'collabeat.io', // website url
   image: '/icon-512x512.png', // image url for SEO
-  favicon: '/collabeat-favicon.ico', // favicon url
-  twitter: '@collabeat', // twitter account
+  favicon: '/favicon.ico', // favicon url
+  twitter: '@TheCollaBeat', // twitter account
   themeColor: '#FFFFFF', // theme color
   themeColorDark: '#000000', // theme color dark
-}
+};
