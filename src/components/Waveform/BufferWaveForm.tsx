@@ -1,18 +1,19 @@
-import { PlayerState } from 'lib'
-import { useEffect, useRef } from 'react'
-import classNames from 'classnames'
-import { MutedSpeakerIcon, UnmutedSpeakerIcon } from 'components/Icons/icons'
-import { isMobile } from 'react-device-detect'
+import { PlayerState } from 'lib';
+import { useEffect, useRef } from 'react';
+import classNames from 'classnames';
+import { MutedSpeakerIcon, UnmutedSpeakerIcon } from 'components/Icons/icons';
+import { isMobile } from 'react-device-detect';
 
 interface BufferWaveformProps {
-  buffer: AudioBuffer
-  playerState: PlayerState
-  isMuted?: Boolean
-  isSelecting?: Boolean
-  isSelected?: Boolean
-  onToggleSound?: (muted: boolean) => void
-  onFinish?: () => void
-  onSelectButtonClicked?: () => void
+  buffer: AudioBuffer;
+  playerState: PlayerState;
+  isMuted?: Boolean;
+  isSelecting?: Boolean;
+  isSelected?: Boolean;
+  onToggleSound?: (muted: boolean) => void;
+  onFinish?: () => void;
+  onSelectButtonClicked?: () => void;
+  isHidden?: Boolean;
 }
 
 const BufferWaveform: React.FC<BufferWaveformProps> = ({
@@ -24,19 +25,20 @@ const BufferWaveform: React.FC<BufferWaveformProps> = ({
   isSelecting,
   isSelected,
   onSelectButtonClicked,
+  isHidden,
 }) => {
-  const waveformRef = useRef<HTMLDivElement>(null)
-  const wavesurferRef = useRef<WaveSurfer | null>(null)
+  const waveformRef = useRef<HTMLDivElement>(null);
+  const wavesurferRef = useRef<WaveSurfer | null>(null);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const loadWaveSurfer = async () => {
       if (typeof window === 'undefined') {
-        return
+        return;
       }
 
-      const { default: WaveSurfer } = await import('wavesurfer.js')
+      const { default: WaveSurfer } = await import('wavesurfer.js');
 
       if (isMounted && waveformRef.current) {
         wavesurferRef.current = WaveSurfer.create({
@@ -52,46 +54,50 @@ const BufferWaveform: React.FC<BufferWaveformProps> = ({
           minPxPerSec: 8,
           fillParent: false,
           scrollParent: false,
-        })
-        wavesurferRef.current.loadDecodedBuffer(buffer)
+        });
+        wavesurferRef.current.loadDecodedBuffer(buffer);
 
         wavesurferRef.current.on('ready', () => {
           switch (playerState) {
             case PlayerState.PLAY:
-              wavesurferRef.current?.play()
-              break
+              wavesurferRef.current?.play();
+              break;
             case PlayerState.PAUSED:
               if (wavesurferRef.current?.isPlaying) {
-                wavesurferRef.current?.pause()
+                wavesurferRef.current?.pause();
               }
-              break
+              break;
             case PlayerState.STOP:
             default:
-              wavesurferRef.current?.stop()
-              break
+              wavesurferRef.current?.stop();
+              break;
           }
-        })
+        });
 
         wavesurferRef.current.on('finish', () => {
           if (onFinish) {
-            onFinish()
+            onFinish();
           }
-        })
+        });
 
-        wavesurferRef.current.fireEvent('ready')
+        wavesurferRef.current.fireEvent('ready');
       }
-    }
+    };
 
-    loadWaveSurfer()
+    loadWaveSurfer();
 
     return () => {
-      isMounted = false
-      wavesurferRef.current?.destroy()
-    }
-  }, [playerState])
+      isMounted = false;
+      wavesurferRef.current?.destroy();
+    };
+  }, [playerState]);
 
   return (
-    <div className="flex items-center justify-between">
+    <div
+      className={classNames('flex items-center justify-between', {
+        hidden: isHidden,
+      })}
+    >
       <div ref={waveformRef} />
       {!isSelecting && isSelecting !== undefined && (
         <button className="rounded-full" onClick={() => onToggleSound?.(!isMuted)}>
@@ -107,8 +113,8 @@ const BufferWaveform: React.FC<BufferWaveformProps> = ({
           })}
           onClick={() => {
             if (onSelectButtonClicked) {
-              onToggleSound?.(true)
-              onSelectButtonClicked()
+              onToggleSound?.(true);
+              onSelectButtonClicked();
             }
           }}
         >
@@ -116,7 +122,7 @@ const BufferWaveform: React.FC<BufferWaveformProps> = ({
         </button>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default BufferWaveform
+export default BufferWaveform;
