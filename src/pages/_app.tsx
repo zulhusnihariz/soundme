@@ -9,7 +9,7 @@ import HeadGlobal from 'components/HeadGlobal';
 // Web3Wrapper deps:
 import { metaMaskWallet, walletConnectWallet } from '@rainbow-me/rainbowkit/wallets';
 import { connectorsForWallets, RainbowKitProvider, lightTheme, darkTheme } from '@rainbow-me/rainbowkit';
-import { goerli, polygonMumbai } from 'wagmi/chains';
+import { mainnet, bsc, bscTestnet, polygon, polygonMumbai } from 'wagmi/chains';
 import { createConfig, configureChains, WagmiConfig } from 'wagmi';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { publicProvider } from 'wagmi/providers/public';
@@ -35,14 +35,14 @@ function App({ Component, pageProps }: AppProps) {
 }
 export default App;
 
-const currentChain = [];
+const currentChain = [mainnet, bsc, polygon, bscTestnet, polygonMumbai];
 switch (process.env.NEXT_PUBLIC_CHAIN_ID) {
   case '80001':
     currentChain.push(polygonMumbai);
     break;
   case 'goerli':
   default:
-    currentChain.push(goerli);
+    currentChain.push(mainnet);
 }
 
 // Web3 Configs
@@ -67,7 +67,6 @@ const connectors = connectorsForWallets([
         chains,
         projectId: 'some_string',
       }),
-      walletConnectWallet({ chains, projectId: 'some_string', version: '1' }),
     ],
   },
 ]);
@@ -90,7 +89,7 @@ export function Web3Wrapper({ children }: { children: React.ReactNode }) {
           learnMoreUrl: app.url,
         }}
         chains={chains}
-        initialChain={polygonMumbai} // Optional, initialChain={1}, initialChain={chain.mainnet}, initialChain={gnosisChain}
+        initialChain={mainnet} // Optional, initialChain={1}, initialChain={chain.mainnet}, initialChain={gnosisChain}
         showRecentTransactions={true}
         theme={resolvedTheme === 'dark' ? darkTheme() : lightTheme()}
       >
