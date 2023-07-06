@@ -1,13 +1,13 @@
-import React from 'react'
-import { Disclosure } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { ThemeToggleButton, ThemeToggleList } from 'components/Theme'
-import ConnectWallet from 'components/Connect/ConnectWallet'
-import styles from '../../styles/Home.module.scss'
+import React from 'react';
+import { Disclosure } from '@headlessui/react';
 
-import logo from '../../assets/img/logo.png'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
+import ConnectWallet from 'components/Connect/ConnectWallet';
+import styles from '../../styles/Home.module.scss';
+
+import logo from '../../assets/img/logo.png';
+import Link from 'next/link';
+import ConnectSolana from 'components/Connect/ConnectSolana';
+import ConnectNear from 'components/Connect/ConnectNear';
 
 export default function Header() {
   return (
@@ -23,10 +23,12 @@ export default function Header() {
             </div>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center gap-4 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <ConnectNear />
+            <ConnectSolana />
             <ConnectWallet />
           </div>
         </div>
       </div>
     </Disclosure>
-  )
+  );
 }
