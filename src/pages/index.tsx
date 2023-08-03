@@ -10,6 +10,8 @@ import { useAccount } from 'wagmi';
 import { createMixedAudio } from 'utils/';
 import MintDialog from 'components/MintDialog';
 import { AlertMessageContext } from 'hooks/use-alert-message';
+import Moralis from 'moralis';
+import { EvmChain } from '@moralisweb3/common-evm-utils';
 
 enum CURRENT_SECTION {
   ALL,
@@ -124,6 +126,34 @@ export default function MusicCollection() {
     );
   }
 
+  const getNftsMoralis = async () => {
+    await Moralis.start({
+      apiKey: process.env.NEXT_PUBLIC_MORALIS_API_KEY,
+      // ...and any other configuration
+    });
+
+    const allNFTs = [];
+
+    const address = '0xba21Df4cF0e779F46CAdd58CCf5a24Ce2512d09e';
+
+    const chains = [EvmChain.ETHEREUM, EvmChain.BSC, EvmChain.POLYGON, EvmChain.MUMBAI];
+
+    for (const chain of chains) {
+      const evmResponse = await Moralis.EvmApi.nft.getWalletNFTs({
+        address,
+        chain,
+      });
+
+      const solResponse = await Moralis.SolApi.nft.getNFTMetadata({
+        address,
+      });
+
+      allNFTs.push(evmResponse);
+    }
+
+    console.log(allNFTs);
+  };
+
   useEffect(() => {
     const getSheets = async () => {
       setSkip(prev => prev + page_size);
@@ -163,6 +193,7 @@ export default function MusicCollection() {
     };
 
     getSheets();
+    // getNftsMoralis();
   }, [currentPage]);
 
   return (

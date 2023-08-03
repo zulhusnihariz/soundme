@@ -6,10 +6,14 @@ import styles from '../../styles/Home.module.scss';
 
 import logo from '../../assets/img/logo.png';
 import Link from 'next/link';
-import ConnectSolana from 'components/Connect/ConnectSolana';
-import ConnectNear from 'components/Connect/ConnectNear';
+import { useBoundStore } from 'store';
+import { ConnectedWalletInfo } from './ConnectedWalletInfo';
+import { CURRENT_CHAIN } from 'store/slices/wallet.slice';
+import { useConnectedWallet } from 'hooks/use-connected-wallet';
 
 export default function Header() {
+  const { setModalState, current } = useBoundStore();
+  useConnectedWallet();
   return (
     <Disclosure as="nav" className="bg-transparent">
       <div className="mx-auto mt-6 max-w-[3840px] px-2 sm:px-6 lg:px-8">
@@ -23,9 +27,16 @@ export default function Header() {
             </div>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center gap-4 pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <ConnectNear />
-            <ConnectSolana />
-            <ConnectWallet />
+            {current.chain ? (
+              <ConnectedWalletInfo />
+            ) : (
+              <button
+                onClick={() => setModalState({ signUpMain: { isOpen: true } })}
+                className="rounded-sm bg-gradient-to-t from-[#7224A7] to-[#FF3065] px-4 py-2"
+              >
+                Connect Wallet
+              </button>
+            )}
           </div>
         </div>
       </div>

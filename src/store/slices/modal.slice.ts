@@ -19,8 +19,8 @@ export interface ModalSlice {
 
 const initialModal = {
   modal: {
-    signUpMain: { isOpen: true },
-    signUpRainbow: { isOpen: true },
+    signUpMain: { isOpen: false },
+    signUpRainbow: { isOpen: false },
   },
 };
 

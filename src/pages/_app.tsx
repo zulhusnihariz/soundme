@@ -19,6 +19,7 @@ import { IpfsProvider } from 'hooks/use-ipfs';
 import MainLayout from 'layout/MainLayout';
 import { AlertMessageProvider } from 'hooks/use-alert-message';
 import { rainbowWeb3AuthConnector } from 'hooks/rainbow-web3auth-connector';
+import SignInModal from 'components/Modal/SignInModal';
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -92,12 +93,14 @@ export function Web3Wrapper({ children }: { children: React.ReactNode }) {
         initialChain={mainnet} // Optional, initialChain={1}, initialChain={chain.mainnet}, initialChain={gnosisChain}
         showRecentTransactions={true}
         theme={resolvedTheme === 'dark' ? darkTheme() : lightTheme()}
+        modalSize="compact"
       >
         <IpfsProvider>
           <FluenceProvider>
             <AlertMessageProvider>{children}</AlertMessageProvider>
           </FluenceProvider>
         </IpfsProvider>
+        <SignInModal />
       </RainbowKitProvider>
     </WagmiConfig>
   );
