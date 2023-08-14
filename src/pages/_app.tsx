@@ -20,6 +20,7 @@ import MainLayout from 'layout/MainLayout';
 import { AlertMessageProvider } from 'hooks/use-alert-message';
 import { rainbowWeb3AuthConnector } from 'hooks/rainbow-web3auth-connector';
 import SignInModal from 'components/Modal/SignInModal';
+import { TezosProvider } from 'hooks/useTezos';
 
 function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -83,6 +84,7 @@ export function Web3Wrapper({ children }: { children: React.ReactNode }) {
   if (!mounted) return null;
 
   return (
+    <TezosProvider>
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider
         appInfo={{
@@ -103,5 +105,6 @@ export function Web3Wrapper({ children }: { children: React.ReactNode }) {
         <SignInModal />
       </RainbowKitProvider>
     </WagmiConfig>
+    </TezosProvider>
   );
 }

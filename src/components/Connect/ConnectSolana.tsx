@@ -4,7 +4,7 @@ import { PhantomProvider } from 'lib/Phantom';
 import { CURRENT_CHAIN } from 'store/slices/wallet.slice';
 
 export default function ConnectSolana() {
-  const { current, setCurrentState, setWalletState, setModalState } = useBoundStore();
+  const { current, setCurrentWalletState, setWalletState, setModalState } = useBoundStore();
 
   useEffect(() => {
     const getProvider = (): PhantomProvider | undefined => {
@@ -31,7 +31,7 @@ export default function ConnectSolana() {
         setWalletState({
           phantom: { address: response.publicKey.toString(), publicKey: response.publicKey.toString() },
         });
-        setCurrentState({ chain: CURRENT_CHAIN.SOLANA });
+        setCurrentWalletState({ chain: CURRENT_CHAIN.SOLANA });
         setModalState({ signUpMain: { isOpen: false } });
       } catch (err) {
         // { code: 4001, message: 'User rejected the request.' }
@@ -41,7 +41,7 @@ export default function ConnectSolana() {
 
   return (
     <>
-      {current.chain === null && (
+      {current.chain === undefined && (
         <button onClick={() => connectWallet()} className="rounded-xl bg-[#3898FF] px-[14px] py-2 font-bold">
           Connect Phantom
         </button>

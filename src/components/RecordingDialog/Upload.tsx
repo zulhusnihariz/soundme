@@ -4,9 +4,7 @@ import { useAccount, useMutation, useSignMessage } from 'wagmi';
 import { LoadingSpinner, PlayIcon, StopIcon } from 'components/Icons/icons';
 import { AlertMessageContext } from 'hooks/use-alert-message';
 import { useBoundStore } from 'store';
-import { CURRENT_CHAIN } from 'store/slices/wallet.slice';
-import { encode } from 'bs58';
-import { useConnectedWallet } from 'hooks/use-connected-wallet';
+import { useConnectedWallet } from 'hooks/useConnectedWallet';
 
 interface UploadProp {
   audioData: any;
@@ -76,7 +74,7 @@ const Upload = (prop: UploadProp) => {
   const add_to_nft = async () => {
     if (!prop.audioData.blob) return;
 
-    if (!address && !wallet.phantom.address && !wallet.near.address) {
+    if (!address && !wallet.phantom.address && !wallet.near.address && !wallet.tezos.address) {
       showError('Connect your wallet to add beat to NFT');
       return;
     }

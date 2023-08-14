@@ -5,16 +5,16 @@ import { CURRENT_CHAIN } from 'store/slices/wallet.slice';
 import { useEffect } from 'react';
 
 export default function ConnectWallet() {
-  const { setCurrentState, setWalletState, setModalState } = useBoundStore();
+  const { setCurrentWalletState, setWalletState, setModalState } = useBoundStore();
   const { isConnected, isDisconnected, address } = useAccount();
 
   useEffect(() => {
     if (isConnected) {
       setModalState({ signUpMain: { isOpen: false } });
-      setCurrentState({ chain: CURRENT_CHAIN.EVM });
+      setCurrentWalletState({ chain: CURRENT_CHAIN.EVM });
       setWalletState({ evm: { address, publicKey: address } });
     }
-    if (isDisconnected) setCurrentState({ chain: null });
+    if (isDisconnected) setCurrentWalletState({ chain: undefined });
   }, [isConnected]);
 
   return (

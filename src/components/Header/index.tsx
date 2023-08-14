@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useBoundStore } from 'store';
 import { ConnectedWalletInfo } from './ConnectedWalletInfo';
 import { CURRENT_CHAIN } from 'store/slices/wallet.slice';
-import { useConnectedWallet } from 'hooks/use-connected-wallet';
+import { useConnectedWallet } from 'hooks/useConnectedWallet';
 
 export default function Header() {
   const { setModalState, current } = useBoundStore();

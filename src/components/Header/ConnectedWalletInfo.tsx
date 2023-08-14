@@ -1,5 +1,5 @@
 import ConnectWallet from 'components/Connect/ConnectWallet';
-import { useConnectedWallet } from 'hooks/use-connected-wallet';
+import { useConnectedWallet } from 'hooks/useConnectedWallet';
 import { useBoundStore } from 'store';
 import { CURRENT_CHAIN } from 'store/slices/wallet.slice';
 

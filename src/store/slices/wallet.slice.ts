@@ -1,50 +1,39 @@
 import { StateCreator } from 'zustand';
 import { resetters } from '..';
-import { PhantomProvider } from 'lib/Phantom';
-import { NearProvider } from 'lib/Near';
 
 export enum CURRENT_CHAIN {
   SOLANA = 'solana',
   EVM = 'evm',
   NEAR = 'near',
+  TEZOS = 'tezos',
 }
 
-type WalletBalance = {
-  decimals?: number;
-  formatted: string;
-  symbol?: string;
-};
-
-export type Wallet<P> = {
+export type Wallet = {
   address: string;
   publicKey: string;
-  balance: WalletBalance;
-  provider: P | undefined;
+  balance: {
+    decimals?: number;
+    formatted: string;
+    symbol?: string;
+  };
+  provider?: any;
 };
 
-type CurrentWallet = Omit<Wallet<undefined>, 'provider'> & {
-  chain: CURRENT_CHAIN | null;
-};
+type CurrentWallet = Omit<Wallet, 'provider'> & { chain?: CURRENT_CHAIN };
 
-type PartialWallet = Partial<{
-  evm: Partial<Wallet<undefined>>;
-  phantom: Partial<Wallet<PhantomProvider>>;
-  near: Partial<Wallet<NearProvider>>;
-}>;
-
-type PartialCurrentWallet = Partial<CurrentWallet>;
+type WalletType = 'evm' | 'phantom' | 'near' | 'tezos';
 
 export interface WalletSlice {
   current: CurrentWallet;
-  wallet: { evm: Wallet<undefined>; phantom: Wallet<PhantomProvider>; near: Wallet<NearProvider> };
-  setCurrentState: (chain: PartialCurrentWallet) => void;
-  setWalletState: (wallet: PartialWallet) => void;
+  wallet: { [key: string]: Partial<Wallet> };
+  setCurrentWalletState: (currentWallet: Partial<CurrentWallet>) => void;
+  setWalletState: (wallet: { [key in Partial<WalletType>]?: Partial<Wallet> }) => void;
   resetWallet: () => void;
 }
 
 const initialWallet = {
   current: {
-    chain: null,
+    chain: undefined,
     address: '',
     publicKey: '',
     balance: {
@@ -83,6 +72,16 @@ const initialWallet = {
         symbol: 'NEAR',
       },
     },
+    tezos: {
+      address: '',
+      publicKey: '',
+      provider: undefined,
+      balance: {
+        decimals: 0,
+        formatted: '',
+        symbol: 'XTZ',
+      },
+    },
   },
 };
 
@@ -91,11 +90,11 @@ export const createWalletSlice: StateCreator<WalletSlice, [], [], WalletSlice> =
 
   return {
     ...initialWallet,
-    setCurrentState: current => {
+    setCurrentWalletState: current => {
       set(state => ({ current: Object.assign(state.current, current) }));
     },
     setWalletState: wallet => {
-      let key = Object.keys(wallet)[0] as 'phantom' | 'near';
+      let key = Object.keys(wallet)[0] as WalletType;
 
       set(state => ({
         wallet: { ...state.wallet, [key]: Object.assign(state.wallet[key], wallet[key]) },

@@ -29,11 +29,11 @@ export default function ConnectNear() {
 
   return (
     <>
-      {current.chain === null && (
+      {
         <button onClick={() => onClickConnect()} className="rounded-xl bg-[#3898FF] px-[14px] py-2 font-bold">
           NEAR
         </button>
-      )}
+      }
     </>
   );
 }

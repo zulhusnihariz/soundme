@@ -11,13 +11,18 @@ import MyNearIconUrl from '@near-wallet-selector/my-near-wallet/assets/my-near-w
 import { useChainId, useBalance, useAccount, useSignMessage, useDisconnect } from 'wagmi';
 import { abbreviateETHBalance, shortenAddress } from 'utils';
 import { encode } from 'bs58';
+import { useTezosToolkit } from './useTezos';
+import { SigningType } from '@airgap/beacon-dapp';
+import { char2Bytes } from '@taquito/utils';
 
 export function useConnectedWallet() {
-  const { current, wallet, setCurrentState, setWalletState } = useBoundStore();
-  const { near, phantom } = wallet;
+  const { current, wallet, setCurrentWalletState, setWalletState } = useBoundStore();
+  const { near, phantom, tezos } = wallet;
 
   const [address, setAddress] = useState({ display: '', full: '' });
   const [balance, setBalance] = useState({ formatted: '', symbol: '' });
+
+  const { tezos: tezosProvider, beaconWallet } = useTezosToolkit();
 
   // Wagmi hooks
   const { address: evmAddress } = useAccount();
@@ -38,6 +43,9 @@ export function useConnectedWallet() {
       case CURRENT_CHAIN.NEAR:
         setAddress({ display: shortenAddress(`${near.address}`), full: `${near.publicKey}` });
         return;
+      case CURRENT_CHAIN.TEZOS:
+        setAddress({ display: shortenAddress(`${tezos?.address}`), full: `${tezos?.address}` });
+        return;
     }
   }
 
@@ -48,8 +56,6 @@ export function useConnectedWallet() {
       case CURRENT_CHAIN.EVM:
         const ethBalance = evmBalance == null ? void 0 : evmBalance.formatted;
         const displayBalance = ethBalance ? abbreviateETHBalance(parseFloat(ethBalance)) : void 0;
-
-        console.log(evmChainId, evmBalance);
 
         setBalance({ formatted: displayBalance ?? '0', symbol: evmBalance?.symbol ?? '' });
         break;
@@ -72,6 +78,15 @@ export function useConnectedWallet() {
 
         setBalance({ formatted: `${0}`, symbol: 'NEAR' });
         break;
+      case CURRENT_CHAIN.TEZOS:
+        if (tezosProvider && beaconWallet) {
+          const active = await beaconWallet.client.getActiveAccount();
+          if (active) {
+            const balance = await tezosProvider.tz.getBalance(active.address as string);
+            setBalance({ formatted: `${Number(balance)}`, symbol: 'XTZ' });
+            return;
+          }
+        }
     }
   }
 
@@ -106,6 +121,38 @@ export function useConnectedWallet() {
             return e;
           }
         }
+      case CURRENT_CHAIN.TEZOS:
+        let formattedInput = ['Tezos Signed Message:', 'http://localhost:3000', new Date().toISOString(), message].join(
+          ' '
+        );
+
+        const bytes = char2Bytes(formattedInput);
+        const bytesLength = (bytes.length / 2).toString(16);
+        const addPadding = `00000000${bytesLength}`;
+        const paddedBytesLength = addPadding.slice(addPadding.length - 8);
+        const payloadBytes = '05' + '01' + paddedBytesLength + bytes;
+
+        try {
+          let test = await beaconWallet?.client.requestSignPayload({
+            signingType: SigningType.MICHELINE,
+            payload: `${payloadBytes}`,
+          });
+
+          // let test = await beaconWallet?.client.requestSignPayload({
+          //   signingType: SigningType.RAW,
+          //   payload: message,
+          // });
+
+          // let decoded = b58cdecode(test?.signature as string, prefix.edsig);
+          // console.log(test?.signature, buf2hex(decoded));
+
+          // return buf2hex(decoded);
+
+          return test?.signature;
+        } catch (e) {
+          console.log(e);
+          return e;
+        }
     }
   }
 
@@ -134,15 +181,21 @@ export function useConnectedWallet() {
           setWalletState({ near: { address: '' } });
         }
         break;
+      case CURRENT_CHAIN.TEZOS:
+        if (beaconWallet) {
+          beaconWallet.client.clearActiveAccount();
+          setWalletState({ tezos: { address: '' } });
+        }
+        break;
     }
 
-    setCurrentState({ chain: null, address: '', publicKey: '', balance: { formatted: '', symbol: '' } });
+    setCurrentWalletState({ chain: undefined, address: '', publicKey: '', balance: { formatted: '', symbol: '' } });
     setAddress({ display: '', full: '' });
     setBalance({ formatted: '', symbol: '' });
   }
 
   useEffect(() => {
-    console.log('inside init near wallet');
+    console.log('inside useConnectedWallet hooks');
     async function setConnectedBalance() {
       await getBalance();
     }
@@ -173,7 +226,7 @@ export function useConnectedWallet() {
       const isSignedIn = selector.isSignedIn();
 
       if (isSignedIn) {
-        setCurrentState({ chain: CURRENT_CHAIN.NEAR });
+        setCurrentWalletState({ chain: CURRENT_CHAIN.NEAR });
 
         const nearConnection = await connect(connectionConfig);
         let accounts = selector.store.getState().accounts[0];
